@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "selinay",
+  title: "Elacetin",
   description: "Modern işletme web sitesi",
 };
 
