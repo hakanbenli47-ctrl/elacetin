@@ -14,6 +14,7 @@ export type ThemeType = "luxury" | "dark" | "soft"
 /* -------------------------------------------------- */
 type ThemeSchema = {
   bg: string
+  heroCard: string
   card: string
   input: string
   button: string
@@ -49,7 +50,7 @@ const themes: Record<ThemeType, ThemeSchema> = {
   /* ---------------- LUXURY ---------------- */
   luxury: {
     bg: "min-h-screen bg-gradient-to-br from-[#f3e8ec] via-[#f8f3f5] to-[#f1e4ea] text-gray-900",
-
+heroCard: "bg-white/40 backdrop-blur-xl border border-white/30 shadow-[0_20px_60px_rgba(0,0,0,0.15)]",
     card: "bg-white/40 backdrop-blur-xl border border-white/30 shadow-[0_20px_80px_rgba(0,0,0,0.12)] rounded-2xl",
 
     input: "bg-white border border-gray-200 focus:border-pink-500 outline-none",
@@ -87,7 +88,7 @@ const themes: Record<ThemeType, ThemeSchema> = {
   /* ---------------- DARK ---------------- */
   dark: {
     bg: "min-h-screen bg-gradient-to-br from-black via-[#0f0f0f] to-[#1a0f14] text-white",
-
+heroCard: "bg-white/5 backdrop-blur-xl border border-white/10",
     card: "bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl",
 
     input: "bg-zinc-900 border border-zinc-700 text-white",
@@ -133,7 +134,7 @@ const themes: Record<ThemeType, ThemeSchema> = {
     button: "bg-gradient-to-r from-pink-400 to-pink-600 text-white px-6 py-3 rounded-xl hover:scale-[1.05] transition",
 
     softButton: "bg-pink-100 hover:bg-pink-200 text-pink-600",
-
+heroCard: "bg-white/70 backdrop-blur-md border border-pink-100",
     danger: "bg-gray-300",
 
     title: "bg-gradient-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent font-semibold",
