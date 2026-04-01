@@ -73,53 +73,95 @@ export default function Home() {
       <Header />
 
       {/* --- HERO SECTION (Ferah ve Şık) --- */}
-      <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 pt-20">
-       <motion.div 
-  variants={staggerContainer} 
-  initial="hidden" 
-  animate="show" 
-  className="max-w-4xl mx-auto z-10"
->
+     <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 pt-20 overflow-hidden">
 
-  <h1 className="hidden">
-    Antalya kadın kuaförü, saç kesimi, boya, ombre, gelin başı ve makyaj hizmetleri
-  </h1>
+  {/* 🖼️ ARKA PLAN GÖRSEL */}
+  <div className="absolute inset-0">
+    <img
+      src="/images/gorsel1.jpg"
+      alt="Nail Art"
+      className="w-full h-full object-cover scale-110"
+    />
+  </div>
 
-  <motion.p variants={fadeInUp} className={`${theme.subtitle} text-xs md:text-sm uppercase tracking-[0.4em] mb-6 font-medium`}>
-    {content.salon.location}
-  </motion.p>
-          
-          <motion.h1 variants={fadeInUp} className={`${theme.title} text-5xl md:text-7xl lg:text-8xl font-light mb-6 tracking-tight leading-tight`}>
-            Güzelliğinize <br />
-            <span className="font-serif italic text-4xl md:text-6xl lg:text-7xl">Değer Katıyoruz</span>
-          </motion.h1>
+  {/* 🔥 KARARTMA + GRADIENT */}
+  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80"></div>
 
-          <motion.p className={`${theme.subtitle} max-w-2xl mx-auto text-base md:text-lg font-light leading-relaxed mb-10`}>
-  Antalya’da profesyonel saç kesimi, boya, ombre, gelin başı ve makyaj hizmetleri sunuyoruz. En iyi kuaför deneyimi için hemen randevu alın.
-</motion.p>
+  {/* ✨ IŞIK EFEKTİ */}
+  <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-pink-500/20 blur-[120px] rounded-full"></div>
 
-          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href={`tel:${content.salon.phone}`} className={`${theme.button} px-10 py-4 text-xs font-bold uppercase tracking-widest transition-transform hover:-translate-y-1`}>
-              Hemen Ara
-            </a>
-            <a href={`https://wa.me/${content.salon.whatsapp}`} target="_blank" rel="noreferrer" className={`${theme.soft} px-10 py-4 text-xs font-bold uppercase tracking-widest transition-transform hover:-translate-y-1 border border-black/5`}>
-              WhatsApp
-            </a>
-          </motion.div>
-        </motion.div>
+  {/* İÇERİK */}
+  <motion.div 
+    variants={staggerContainer} 
+    initial="hidden" 
+    animate="show" 
+    className="max-w-4xl mx-auto z-10"
+  >
 
-        {/* Zarif aşağı kaydırma oku */}
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce"
-        >
-          <svg className={`w-6 h-6 ${theme.subtitle}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </motion.div>
-      </section>
+    <h1 className="hidden">
+    Antalya’da profesyonel nail artist hizmetleri: kalıcı oje, protez tırnak, nail art ve el bakımı
+    </h1>
+
+    <motion.p 
+      variants={fadeInUp} 
+      className={`${theme.subtitle} text-white/70 text-xs md:text-sm uppercase tracking-[0.4em] mb-6 font-medium`}
+    >
+      {content.salon.location}
+    </motion.p>
+            
+    <motion.h1 
+      variants={fadeInUp} 
+      className="text-5xl md:text-7xl lg:text-8xl font-light mb-6 tracking-tight leading-tight"
+    >
+      <span className="bg-gradient-to-r from-pink-400 to-rose-300 bg-clip-text text-transparent">
+        Şıklık
+      </span>
+      <br />
+      <span className="font-serif italic text-4xl md:text-6xl lg:text-7xl bg-gradient-to-r from-pink-300 to-rose-200 bg-clip-text text-transparent">
+        Burada Başlar.
+      </span>
+    </motion.h1>
+
+    <motion.p className="text-white/80 max-w-2xl mx-auto text-base md:text-lg font-light leading-relaxed mb-10">
+     Antalya’da profesyonel nail artist hizmetleri: kalıcı oje, protez tırnak, nail art ve el bakımı
+    </motion.p>
+
+    <motion.div 
+      variants={fadeInUp} 
+      className="flex flex-col sm:flex-row items-center justify-center gap-4"
+    >
+      <a 
+        href={`tel:${content.salon.phone}`} 
+        className="bg-gradient-to-r from-pink-500 to-rose-400 px-10 py-4 text-xs font-bold uppercase tracking-widest text-white rounded-full shadow-lg hover:scale-105 transition"
+      >
+        Hemen Ara
+      </a>
+
+      <a 
+        href={`https://wa.me/${content.salon.whatsapp}`} 
+        target="_blank" 
+        rel="noreferrer" 
+        className="px-10 py-4 text-xs font-bold uppercase tracking-widest text-white border border-white/30 rounded-full hover:bg-white/10 transition"
+      >
+        WhatsApp
+      </a>
+    </motion.div>
+
+  </motion.div>
+
+  {/* ⬇️ AŞAĞI OK */}
+  <motion.div 
+    initial={{ opacity: 0 }} 
+    animate={{ opacity: 1 }} 
+    transition={{ delay: 1, duration: 1 }}
+    className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce z-10"
+  >
+    <svg className="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
+  </motion.div>
+
+</section>
 
       {/* --- HAKKIMIZDA / İSTATİSTİKLER --- */}
       <section id="hakkimizda" className={`py-24 px-6 ${theme.sectionSoft}`}>
@@ -189,31 +231,41 @@ export default function Home() {
       </section>
 
       {/* --- EKİBİMİZ (ZARİF PROFİLLER) --- */}
-      <section id="ekip" className={`py-32 px-6 ${theme.bg}`}>
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
-            <span className={`${theme.subtitle} text-xs uppercase tracking-[0.4em] font-semibold block mb-4`}>
-              Yetenekli Eller
-            </span>
-            <h2 className={`${theme.title} text-4xl md:text-5xl font-light tracking-tight mb-20`}>
-              Ekibimizle <span className="font-serif italic text-5xl md:text-6xl">Tanışın</span>
-            </h2>
-            
-            <div className="flex flex-wrap justify-center gap-16">
-              {content.ekip.map((member, i) => (
-                <div key={i} className="flex flex-col items-center max-w-sm">
-                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-8 border border-black/5 p-2 bg-white/5">
-                    <img src={member.img} alt={member.name} className="w-full h-full object-cover rounded-full filter grayscale hover:grayscale-0 transition-all duration-700" />
-                  </div>
-                  <h3 className={`${theme.title} text-2xl font-light uppercase tracking-wider mb-2`}>{member.name}</h3>
-                  <p className={`${theme.subtitle} text-xs font-bold uppercase tracking-widest mb-6`}>{member.role}</p>
-                  <p className={`${theme.subtitle} text-sm font-light leading-relaxed italic px-4`}>"{member.bio}"</p>
-                </div>
-              ))}
+     <section id="ekip" className={`py-32 px-6 ${theme.bg}`}>
+  <div className="max-w-7xl mx-auto text-center">
+    <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
+      <span className={`${theme.subtitle} text-xs uppercase tracking-[0.4em] font-semibold block mb-4`}>
+        Yetenekli Eller
+      </span>
+      <h2 className={`${theme.title} text-4xl md:text-5xl font-light tracking-tight mb-20`}>
+        Ekibimizle <span className="font-serif italic text-5xl md:text-6xl">Tanışın</span>
+      </h2>
+      
+      <div className="flex flex-wrap justify-center gap-16">
+        {content.ekip.map((member, i) => (
+          <div key={i} className="flex flex-col items-center max-w-sm">
+            <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-8 border border-black/5 p-2 bg-white/5">
+              <img
+                src={member.img}
+                alt={member.name}
+                className="w-full h-full object-cover rounded-full transition-all duration-700"
+              />
             </div>
-          </motion.div>
-        </div>
-      </section>
+            <h3 className={`${theme.title} text-2xl font-light uppercase tracking-wider mb-2`}>
+              {member.name}
+            </h3>
+            <p className={`${theme.subtitle} text-xs font-bold uppercase tracking-widest mb-6`}>
+              {member.role}
+            </p>
+            <p className={`${theme.subtitle} text-sm font-light leading-relaxed italic px-4`}>
+              "{member.bio}"
+            </p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  </div>
+</section>
 
       {/* --- YORUMLAR (GÜVEN VEREN TASARIM) --- */}
       <section id="yorumlar" className={`py-32 px-6 ${theme.sectionSoft}`}>
@@ -226,9 +278,9 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-             { name: "Zeynep T.", comment: "İlk kez geldim ama sanki yıllardır buradaymışım gibi hissettim. Saçım tam istediğim gibi oldu, gerçekten işlerini çok iyi biliyorlar." },
-{ name: "Merve Y.", comment: "Saç rengimi değiştirdim ve sonuç beklediğimin bile üstündeydi. Hem ilgileri hem ortam çok profesyoneldi." },
-{ name: "Ayşegül D.", comment: "Kesim ve bakım yaptırdım, saçım resmen kendine geldi. Bu kadar fark beklemiyordum açıkçası." }
+            { name: "Zeynep T.", comment: "İlk kez geldim ama sanki yıllardır geliyormuşum gibi hissettim. Tırnak tasarımım tam istediğim gibi oldu, gerçekten işlerini çok iyi biliyorlar." },
+{ name: "Merve Y.", comment: "Jel tırnak yaptırdım ve sonuç beklediğimin bile üstündeydi. Hem ilgileri hem hijyenleri çok profesyoneldi." },
+{ name: "Ayşegül D.", comment: "Nail art yaptırdım, tırnaklarım resmen bambaşka oldu. Bu kadar güzel ve kalıcı olacağını beklemiyordum açıkçası." }
             ].map((item, i) => (
               <motion.div key={i} whileHover={{ y: -5 }} className={`${theme.card} p-10 flex flex-col justify-between border-none shadow-sm`}>
                 <div className="flex text-yellow-500 mb-6">
@@ -253,42 +305,85 @@ export default function Home() {
       </section>
 
       {/* --- FOOTER (NET VE TEMİZ İLETİŞİM) --- */}
-      <footer className={`${theme.footerBg} ${theme.footerText} py-20 px-6 border-t border-black/10`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 border-b border-black/10 pb-16">
-            <div className="md:col-span-2">
-              <span className="text-3xl font-light tracking-widest uppercase block mb-6">{content.salon.shortName}</span>
-              <span className="text-3xl font-light tracking-widest uppercase block mb-6">{content.salon.name}</span>
-              <p className="opacity-70 text-sm leading-relaxed max-w-sm font-light">
-                {content.salon.slogan} <br /> {content.salon.location}
-              </p>
-            </div>
-            
-            <div className="flex flex-col space-y-4 text-xs font-bold uppercase tracking-widest">
-              <h4 className="opacity-40 mb-2">Sayfalar</h4>
-              <a href="#hizmetler" className="hover:opacity-60 transition">Menü / Hizmetler</a>
-              <a href="#hakkimizda" className="hover:opacity-60 transition">Hakkımızda</a>
-              <a href="#ekip" className="hover:opacity-60 transition">Ekip</a>
-            </div>
-            
-            <div className="flex flex-col space-y-4">
-              <h4 className="text-xs uppercase tracking-widest font-bold opacity-40 mb-2">İletişim</h4>
-              <a href={`tel:${content.salon.phone}`} className="text-xl md:text-2xl font-light hover:opacity-60 transition">{content.salon.phone}</a>
-              <a href={`https://wa.me/${content.salon.whatsapp}`} target="_blank" rel="noreferrer" className="text-xs uppercase font-bold tracking-widest hover:opacity-60 transition flex items-center">
-                WhatsApp İle Ulaşın <span className="ml-2">↗</span>
-              </a>
-              <a href="https://www.instagram.com/elactn.hairstudio" target="_blank" rel="noreferrer" className="text-xs uppercase font-bold tracking-widest hover:opacity-60 transition flex items-center mt-2">
-                Instagram <span className="ml-2">↗</span>
-              </a>
-            </div>
-          </div>
-          
-          <div className="flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs uppercase tracking-widest opacity-50 font-semibold">
-            <p>{content.salon.copyright}</p>
-            <p className="mt-4 md:mt-0">Premium Beauty Studio</p>
-          </div>
-        </div>
-      </footer>
+ <footer className="bg-[#0a0a0a] text-white py-20 px-6 border-t border-white/10">
+  <div className="max-w-7xl mx-auto">
+    
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 border-b border-white/10 pb-16">
+      
+      {/* SOL ALAN */}
+      <div className="md:col-span-2">
+        <span className="text-3xl font-light tracking-widest uppercase block mb-4">
+          {content.salon.shortName}
+        </span>
+
+        <span className="text-xl opacity-70 block mb-6">
+          {content.salon.name}
+        </span>
+
+        <p className="opacity-60 text-sm leading-relaxed max-w-sm font-light">
+          {content.salon.slogan} <br />
+          {content.salon.location}
+        </p>
+      </div>
+
+      {/* SAYFALAR */}
+      <div className="flex flex-col space-y-4 text-xs font-bold uppercase tracking-widest">
+        <h4 className="opacity-40 mb-2">Sayfalar</h4>
+
+        <a href="#hizmetler" className="hover:opacity-70 transition">
+          Menü / Hizmetler
+        </a>
+
+        <a href="#hakkimizda" className="hover:opacity-70 transition">
+          Hakkımızda
+        </a>
+
+        <a href="#ekip" className="hover:opacity-70 transition">
+          Ekip
+        </a>
+      </div>
+
+      {/* İLETİŞİM */}
+      <div className="flex flex-col space-y-4">
+        <h4 className="text-xs uppercase tracking-widest font-bold opacity-40 mb-2">
+          İletişim
+        </h4>
+
+        <a
+          href={`tel:${content.salon.phone}`}
+          className="text-xl md:text-2xl font-light hover:opacity-70 transition"
+        >
+          {content.salon.phone}
+        </a>
+
+        <a
+          href={`https://wa.me/${content.salon.whatsapp}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs uppercase font-bold tracking-widest hover:opacity-70 transition flex items-center"
+        >
+          WhatsApp İle Ulaşın <span className="ml-2">↗</span>
+        </a>
+
+        <a
+          href="https://www.instagram.com/selinay.nailarts?igsh=MTUxMWVpOXpuNmF5Nw%3D%3D"
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs uppercase font-bold tracking-widest hover:opacity-70 transition flex items-center mt-2"
+        >
+          Instagram <span className="ml-2">↗</span>
+        </a>
+      </div>
+    </div>
+
+    {/* ALT BAR */}
+    <div className="flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs uppercase tracking-widest opacity-40 font-semibold">
+      <p>{content.salon.copyright}</p>
+      <p className="mt-4 md:mt-0">Premium Beauty Studio</p>
+    </div>
+
+  </div>
+</footer>
     </main>
   )
 }

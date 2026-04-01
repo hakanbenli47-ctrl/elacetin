@@ -1,12 +1,12 @@
 export const content = {
   salon: {
-  shortName: "ELa Çetin ",
-   name: "Hair Studio",
+  shortName: "Selin Ay ",
+   name: "Nail Artist",
   slogan: "Antalya'nın en güvenilir ve modern güzellik deneyimi.",
-  phone: "905520793312",       // sadece arama için
-  whatsapp: "905520793312",   // WhatsApp için
-  location: "Antalya Kepez – Türkiye",
-  copyright: "© 2026 Ela Çetin Hair Stüdio",
+  phone: "905533919827",       // sadece arama için
+  whatsapp: "905533919827",   // WhatsApp için
+  location: "Antalya  – Türkiye",
+  copyright: "© 2026 Selin Ay Nail Artist",
 },
 
   links: {
@@ -89,10 +89,10 @@ export const content = {
   /* 3 ÇALIŞAN */
  ekip: [
   {
-    name: "Ela Çetin ",
-    role: "İşletme Sahibi & Saç Tasarım Uzmanı",
+    name: "Selin Ay ",
+    role: "İşletme Sahibi & Nail Artist",
     img: "/person1.jpg",  // public klasörüne ekle
-    bio: "Ela Çetin, 10 yıldır saç tasarımı ve güzellik sektöründe uzmanlaşmış bir profesyoneldir. Modern teknikler ve kişiye özel çözümlerle müşterilerine eşsiz deneyimler sunar. Antalya’da birçok başarılı projeye imza atmış ve sektörde kendini kanıtlamış bir isimdir."
+    bio: "Selin Ay, nail art ve güzellik sektöründe 10 yılı aşkın deneyime sahip, alanında uzman bir nail artisttir. Modern teknikler, trend tasarımlar ve kişiye özel uygulamalarla her müşterisine özgün ve estetik tırnak tasarımları sunar. Antalya’da gerçekleştirdiği başarılı çalışmalarla sektörde kendini kanıtlamış, kaliteli ve detay odaklı hizmet anlayışıyla öne çıkan bir isimdir."
   }
 ],
 

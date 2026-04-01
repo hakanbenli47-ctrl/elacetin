@@ -9,174 +9,171 @@ import {
 } from "react"
 
 /* -------------------------------------------------- */
-/* 1️⃣ Tema isimleri (buraya yeni tema eklenebilir)  */
-/* -------------------------------------------------- */
-export type ThemeType = "pink" | "dark" | "gold"
+export type ThemeType = "luxury" | "dark" | "soft"
 
 /* -------------------------------------------------- */
-/* 2️⃣ Her temada bulunması gereken alan şeması      */
-/*    (TypeScript güvenliği için zorunlu alanlar)    */
-/* -------------------------------------------------- */
 type ThemeSchema = {
-  bg: string              // Ana sayfa arka planı
-  card: string            // Kart tasarımları
-  input: string           // Input alanları
-  soft: string            // Yumuşak buton / arka plan tonu
-  button: string          // Ana buton rengi
-  danger: string          // Pasif / dolu / hata butonu
-  heroText: string        // Hero yazı rengi
-  heroCard: string        // Hero içindeki kart tasarımı
-  title: string           // Başlık stili
-  subtitle: string        // Alt başlık stili
-  headerBg: string        // Scroll sonrası header arka plan
-  headerText: string      // Scroll sonrası header yazı rengi
-  heroOverlay: string     // Hero görselinin üzerindeki koyuluk
-  sectionAlt: string      // Alternatif section arka plan
-  sectionSoft: string     // Daha yumuşak arka plan
-  ctaBg: string           // Call-to-action arka plan
-  ctaText: string         // CTA yazı rengi
-  footerBg: string        // Footer arka plan
-  footerText: string      // Footer yazı rengi
-  link: string            // Link rengi
-  accentLine: string      // Başlık altı çizgi rengi
+  bg: string
+  card: string
+  input: string
+  button: string
+  softButton: string
+  danger: string
+
+  title: string
+  subtitle: string
+
+  header: string
+  headerBg: string          // ✅ EKLENDİ
+  headerText: string        // ✅ EKLENDİ
+
+  heroOverlay: string
+  heroText: string
+
+  section: string
+  sectionAlt: string
+  sectionSoft: string       // ✅ EKLENDİ
+
+  cta: string
+  footer: string
+
+  link: string
+
+  soft: string              // ✅ EKLENDİ
+  accentLine: string        // ✅ EKLENDİ
 }
 
 /* -------------------------------------------------- */
-/* 3️⃣ Tema renkleri                                  */
-/* -------------------------------------------------- */
 const themes: Record<ThemeType, ThemeSchema> = {
 
-  /* ---------------- PINK THEME ---------------- */
-  pink: {
-    bg: "min-h-screen bg-[#f7edf2] text-gray-900", // Açık pembe zemin
+  /* ---------------- LUXURY ---------------- */
+  luxury: {
+    bg: "min-h-screen bg-gradient-to-br from-[#f3e8ec] via-[#f8f3f5] to-[#f1e4ea] text-gray-900",
 
-    card: "bg-white border border-[#ead6dd] shadow-2xl", // Kart stili
-    input: "bg-white border border-[#e8cfd8] text-gray-900 placeholder-gray-400 focus:border-[#c2185b]",
-    soft: "bg-[#f2dfe7] hover:bg-[#e9cdd9] text-gray-800",
-    button: "bg-[#c2185b] hover:bg-[#a3154c] text-white", // Ana buton
-    danger: "bg-red-500/70 text-white cursor-not-allowed", // Pasif buton
+    card: "bg-white/40 backdrop-blur-xl border border-white/30 shadow-[0_20px_80px_rgba(0,0,0,0.12)] rounded-2xl",
 
-    heroText: "text-white",
-    heroCard: "bg-white border border-[#ead6dd] shadow-xl",
+    input: "bg-white border border-gray-200 focus:border-pink-500 outline-none",
 
-    title: "text-gray-900",
+    button: "bg-gradient-to-r from-pink-500 to-rose-400 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-[1.05] transition",
+
+    softButton: "bg-pink-50 hover:bg-pink-100 text-pink-600",
+
+    danger: "bg-gray-300 text-white cursor-not-allowed",
+
+    title: "bg-gradient-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent font-bold",
     subtitle: "text-gray-500",
 
-    headerBg: "bg-white",
-    headerText: "text-black",
+    header: "bg-white/60 backdrop-blur-xl border-b border-white/40",
+    headerBg: "bg-white/60 backdrop-blur-xl",
+    headerText: "text-gray-900",
 
-    heroOverlay: "bg-black/60", // Hero görsel koyuluğu
+    heroOverlay: "bg-gradient-to-b from-black/60 via-black/30 to-transparent",
+    heroText: "text-white",
 
-    sectionAlt: "bg-gray-50",
-    sectionSoft: "bg-gray-100",
+    section: "py-20 px-6",
+    sectionAlt: "py-20 px-6 bg-gradient-to-b from-[#f3e8ec] to-[#f8f3f5]",
+    sectionSoft: "py-20 px-6 bg-pink-50",
 
-    ctaBg: "bg-[#c2185b]",
-    ctaText: "text-white",
+    cta: "bg-gradient-to-r from-pink-500 to-rose-400 text-white py-16 px-6 text-center rounded-2xl shadow-xl",
 
-    footerBg: "bg-black",
-    footerText: "text-white",
+    footer: "bg-gradient-to-br from-[#0a0a0a] via-[#1a0f14] to-black text-white py-20 px-6",
 
-    link: "text-[#c2185b] hover:text-[#a3154c]",
+    link: "bg-gradient-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent hover:opacity-70",
 
-    accentLine: "bg-[#c2185b]" // Başlık alt çizgi
+    soft: "bg-pink-50",
+    accentLine: "h-[2px] bg-gradient-to-r from-pink-500 to-rose-400"
   },
 
-  /* ---------------- DARK THEME ---------------- */
+  /* ---------------- DARK ---------------- */
   dark: {
-    bg: "min-h-screen bg-black text-white", // Siyah zemin
+    bg: "min-h-screen bg-gradient-to-br from-black via-[#0f0f0f] to-[#1a0f14] text-white",
 
-    card: "bg-zinc-900 border border-zinc-800 shadow-2xl",
-    input: "bg-zinc-800 border border-zinc-700 text-white placeholder-white/40 focus:border-yellow-500",
-    soft: "bg-zinc-800 hover:bg-zinc-700 text-white",
-    button: "bg-yellow-500 hover:bg-yellow-600 text-black",
-    danger: "bg-red-600/60 text-white cursor-not-allowed",
+    card: "bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl",
 
-    heroText: "text-white",
-    heroCard: "bg-zinc-900 border border-zinc-800 shadow-xl",
+    input: "bg-zinc-900 border border-zinc-700 text-white",
 
-    title: "text-white",
-    subtitle: "text-white/50",
+    button: "bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-xl shadow-lg hover:scale-[1.05] transition",
 
-    headerBg: "bg-black",
+    softButton: "bg-zinc-800 hover:bg-zinc-700",
+
+    danger: "bg-red-600/60",
+
+    title: "bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent font-bold",
+    subtitle: "text-white/60",
+
+    header: "bg-black/60 backdrop-blur-xl border-b border-white/10",
+    headerBg: "bg-black/60",
     headerText: "text-white",
 
     heroOverlay: "bg-black/70",
+    heroText: "text-white",
 
-    sectionAlt: "bg-zinc-900",
-    sectionSoft: "bg-zinc-800",
+    section: "py-20 px-6",
+    sectionAlt: "py-20 px-6 bg-gradient-to-b from-black to-[#0f0f0f]",
+    sectionSoft: "py-20 px-6 bg-zinc-900",
 
-    ctaBg: "bg-yellow-500",
-    ctaText: "text-black",
+    cta: "bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-16 px-6 text-center rounded-2xl",
 
-    footerBg: "bg-black",
-    footerText: "text-white",
+    footer: "bg-gradient-to-br from-black via-[#1a0f14] to-black text-white py-20 px-6",
 
-    link: "text-yellow-400 hover:text-yellow-300",
+    link: "bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent hover:opacity-80",
 
-    accentLine: "bg-yellow-500"
+    soft: "bg-zinc-800",
+    accentLine: "h-[2px] bg-gradient-to-r from-yellow-400 to-yellow-600"
   },
 
-  /* ---------------- GOLD THEME ---------------- */
-  gold: {
-    bg: "min-h-screen bg-[#f6f1e7] text-gray-900", // Altın ton zemin
+  /* ---------------- SOFT ---------------- */
+  soft: {
+    bg: "min-h-screen bg-gradient-to-br from-[#fff5f7] via-white to-[#ffe4ec] text-gray-900",
 
-    card: "bg-white border border-yellow-200 shadow-2xl",
-    input: "bg-white border border-yellow-300 text-gray-900 placeholder-gray-400 focus:border-[#b78b2e]",
-    soft: "bg-yellow-100 hover:bg-yellow-200 text-gray-800",
-    button: "bg-[#b78b2e] hover:bg-[#9c7425] text-white",
-    danger: "bg-red-500/70 text-white cursor-not-allowed",
+    card: "bg-white border border-pink-100 shadow-xl rounded-2xl",
 
-    heroText: "text-white",
-    heroCard: "bg-white border border-yellow-200 shadow-xl",
+    input: "bg-white border border-pink-200",
 
-    title: "bg-gradient-to-r from-[#b78b2e] via-[#e5c76b] to-[#a67c1b] bg-clip-text text-transparent",
-    subtitle: "text-[#8c6b1f]",
+    button: "bg-gradient-to-r from-pink-400 to-pink-600 text-white px-6 py-3 rounded-xl hover:scale-[1.05] transition",
 
+    softButton: "bg-pink-100 hover:bg-pink-200 text-pink-600",
+
+    danger: "bg-gray-300",
+
+    title: "bg-gradient-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent font-semibold",
+    subtitle: "text-gray-500",
+
+    header: "bg-white border-b",
     headerBg: "bg-white",
     headerText: "text-gray-900",
 
-    heroOverlay: "bg-black/50",
+    heroOverlay: "bg-pink-900/30",
+    heroText: "text-white",
 
-    sectionAlt: "bg-[#f6f1e7]",
-    sectionSoft: "bg-[#efe6d3]",
+    section: "py-20 px-6",
+    sectionAlt: "py-20 px-6 bg-gradient-to-b from-[#fff5f7] to-white",
+    sectionSoft: "py-20 px-6 bg-pink-50",
 
-    ctaBg: "bg-[#b78b2e]",
-    ctaText: "text-white",
+    cta: "bg-gradient-to-r from-pink-400 to-pink-600 text-white py-16 px-6 text-center",
 
-    footerBg: "bg-[#1a1a1a]",
-    footerText: "text-white",
+    footer: "bg-gradient-to-br from-pink-600 via-pink-500 to-rose-500 text-white py-20 px-6",
 
-    link: "text-[#b78b2e] hover:text-[#9c7425]",
+    link: "bg-gradient-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent hover:opacity-80",
 
-    accentLine: "bg-[#b78b2e]"
+    soft: "bg-pink-50",
+    accentLine: "h-[2px] bg-gradient-to-r from-pink-500 to-rose-400"
   }
 }
 
 /* -------------------------------------------------- */
-/* 4️⃣ Context tipi                                   */
-/* -------------------------------------------------- */
 type ThemeContextType = {
-  theme: ThemeSchema          // Aktif temanın class'ları
-  activeTheme: ThemeType      // Aktif tema adı
-  setTheme: (theme: ThemeType) => void // Tema değiştirme fonksiyonu
+  theme: ThemeSchema
+  activeTheme: ThemeType
+  setTheme: (theme: ThemeType) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null)
 
 /* -------------------------------------------------- */
-/* 5️⃣ Provider                                       */
-/* -------------------------------------------------- */
-export function ThemeProvider({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [activeTheme, setActiveTheme] = useState<ThemeType>("soft")
 
-  // Varsayılan tema
-  const [activeTheme, setActiveTheme] =
-    useState<ThemeType>("pink")
-
-  // Sayfa açıldığında localStorage'dan temayı yükler
   useEffect(() => {
     const stored = localStorage.getItem("theme") as ThemeType | null
     if (stored && themes[stored]) {
@@ -184,13 +181,11 @@ export function ThemeProvider({
     }
   }, [])
 
-  // Tema değiştir ve localStorage'a kaydet
   const setTheme = (theme: ThemeType) => {
     localStorage.setItem("theme", theme)
     setActiveTheme(theme)
   }
 
-  // Performans için memo
   const value = useMemo(
     () => ({
       theme: themes[activeTheme],
@@ -200,21 +195,15 @@ export function ThemeProvider({
     [activeTheme]
   )
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
-/* -------------------------------------------------- */
-/* 6️⃣ Hook                                           */
 /* -------------------------------------------------- */
 export function useTheme() {
   const context = useContext(ThemeContext)
 
   if (!context) {
-    throw new Error("useTheme, ThemeProvider içinde kullanılmalı")
+    throw new Error("useTheme ThemeProvider içinde kullanılmalı")
   }
 
   return context
