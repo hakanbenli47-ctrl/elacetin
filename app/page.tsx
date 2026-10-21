@@ -1,246 +1,127 @@
 "use client";
-
 import { useEffect, useMemo, useState } from "react";
-
-type Category = "Tümü" | "Kuruyemiş" | "Leblebi" | "Çekirdek" | "Karışık";
-type CartLine = { key: string; productId: string; gramaj: string; adet: number };
-type Product = { id: string; name: string; category: Exclude<Category, "Tümü">; tagline: string; image: string; position?: string; label?: string };
-
-const store = {
-  name: "Benli Kuruyemiş",
-  // WhatsApp numarasını Vercel'de NEXT_PUBLIC_WHATSAPP_NUMBER olarak tanımlayın.
-  // Örnek: 905XXXXXXXXX. Numara girilene kadar gerçek siparişe yönlendirme yapılmaz.
-  whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, ""),
-};
-
-const photos = {
-  mix: "https://images.unsplash.com/photo-1600189020840-e9918c25269d?auto=format&fit=crop&w=1600&q=85",
-  almond: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=950&q=85",
-  pistachio: "https://images.unsplash.com/photo-1645291787539-ac637edb7fa5?auto=format&fit=crop&w=950&q=85",
-  cashew: "https://images.unsplash.com/photo-1769255484443-50e4e3e2bbdb?auto=format&fit=crop&w=950&q=85",
-  grain: "https://images.unsplash.com/photo-1573936001854-de71ea654bf3?auto=format&fit=crop&w=1100&q=85",
-};
-
-const products: Product[] = [
-  { id: "antep-fistigi", name: "Antep Fıstığı", category: "Kuruyemiş", tagline: "Her tanesinde tanıdık bir lezzet.", image: photos.pistachio, label: "Çok sevilen" },
-  { id: "kaju", name: "Kaju", category: "Kuruyemiş", tagline: "Yumuşak dokulu, doyumsuz lezzet.", image: photos.cashew },
-  { id: "cig-badem", name: "Çiğ Badem", category: "Kuruyemiş", tagline: "Sade ve lezzetli bir tercih.", image: photos.almond },
-  { id: "karisik-kuruyemis", name: "Karışık Kuruyemiş", category: "Karışık", tagline: "Sevilen lezzetler bir arada.", image: photos.mix, label: "Koleksiyon" },
-  { id: "findik", name: "Fındık", category: "Kuruyemiş", tagline: "Geleneksel sofraların vazgeçilmezi.", image: photos.grain },
-  { id: "tuzlu-fistik", name: "Tuzlu Fıstık", category: "Kuruyemiş", tagline: "Keyifli molalara eşlik eder.", image: photos.mix },
-  { id: "citir-leblebi", name: "Çıtır Leblebi", category: "Leblebi", tagline: "Çıtır dokusu ile ayrı bir keyif.", image: photos.grain },
-  { id: "ay-cekirdegi", name: "Ay Çekirdeği", category: "Çekirdek", tagline: "Sohbetlerin klasik eşlikçisi.", image: photos.almond },
-];
-
-const weights = ["250 g", "500 g", "1 kg"];
-const tabs: Category[] = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Karışık"];
-const formatter = new Intl.NumberFormat("tr-TR");
-
-function Icon({ name, size = 21 }: { name: "bag" | "arrow" | "up" | "menu" | "close" | "plus" | "minus" | "search" | "leaf" | "check" | "trash"; size?: number }) {
-  const shared = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.65, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
-  const paths: Record<typeof name, React.ReactNode> = {
-    bag: <><path d="M4 8h16l-1 12H5L4 8Z" /><path d="M9 9V6a3 3 0 0 1 6 0v3" /></>,
-    arrow: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
-    up: <><path d="M5 19 19 5" /><path d="M9 5h10v10" /></>,
-    menu: <><path d="M4 7h16M4 12h16M4 17h16" /></>,
-    close: <><path d="M5 5 19 19M19 5 5 19" /></>,
-    plus: <><path d="M12 5v14M5 12h14" /></>,
-    minus: <path d="M5 12h14" />,
-    search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></>,
-    leaf: <><path d="M21 3C9 3 4 8 4 15a6 6 0 0 0 6 6c7 0 11-6 11-18Z" /><path d="M4 21c4-7 7-10 13-14" /></>,
-    check: <path d="m5 12 4 4L19 6" />,
-    trash: <><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v6m4-6v6" /></>,
-  };
-  return <svg {...shared}>{paths[name]}</svg>;
+import type { Product, Category } from "@/lib/types";
+import { defaultProducts } from "@/lib/seed";
+import "./store.css";
+const PHONE="905515550302";
+const categories = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Kuru Meyve", "Karışık"] as const;
+type CartLine = {productId:string;weight:string;qty:number};
+const amounts=["250","500","1000"] as const;
+const img="https://images.unsplash.com/photo-1600189020840-e9918c25269d?auto=format&fit=crop&w=1750&q=88";
+const format=(value:number)=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(value);
+function Icon({type,size=21}:{type:string;size?:number}){
+ const p:Record<string,React.ReactNode>={
+  bag:<><path d="M4 8h16l-1.5 12H5.5L4 8Z"/><path d="M9 9V6a3 3 0 016 0v3"/></>,
+  arrow:<><path d="M4 12h16m-7-6 6 6-6 6"/></>,up:<><path d="M5 19 19 5M9 5h10v10"/></>,
+  search:<><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5.5 5.5"/></>,
+  menu:<path d="M4 7h16M4 12h16M4 17h16"/>,x:<path d="M5 5 19 19M19 5 5 19"/>,
+  plus:<path d="M5 12h14M12 5v14"/>,minus:<path d="M5 12h14"/>,user:<><circle cx="12" cy="8" r="4"/><path d="M4 21c1-8 15-8 16 0"/></>,
+  leaf:<><path d="M21 3C9 3 4 8 4 15a6 6 0 006 6c7 0 11-6 11-18Z"/><path d="M4 21c4-7 7-10 13-14"/></>,
+  truck:<><path d="M2 7h12v11H2zM14 11h4l4 4v3h-8"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></>,
+  check:<path d="m4 12 5 5L20 6"/>,chat:<path d="M20 11.5a8.5 8.5 0 01-8.5 8.5c-1.5 0-2.5-.3-3.7-.9L3 21l1.7-4.7a8.5 8.5 0 1115.3-4.8Z"/>,
+  package:<><rect x="3" y="6" width="18" height="15" rx="2"/><path d="m3 9 9 5 9-5M12 14v7"/></>,
+  shield:<><path d="m12 2 8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m8 12 3 3 5-6"/></>,
+ };
+ return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{p[type]}</svg>;
 }
+function Logo(){return <a href="/" className="bm-logo"><span className="bm-symbol">B<em>✦</em></span><span className="bm-logotext"><strong>BENLİ</strong><small>KURUYEMİŞ</small></span></a>}
+function SafeImage({src,alt,className=""}:{src:string;alt:string;className?:string}){return <img src={src||img} alt={alt} className={className} loading="lazy" onError={e=>{e.currentTarget.src=img;}}/>}
+function Money({price}:{price:number|null}){return <>{price===null?"Fiyat sorunuz":format(price)}</>}
+function InfoTitle({eyebrow,title,sub}:{eyebrow:string;title:React.ReactNode;sub?:string}){return <div className="bm-heading"><span>{eyebrow}</span><h2>{title}</h2>{sub&&<p>{sub}</p>}</div>}
 
-function Brand({ inverse = false }: { inverse?: boolean }) {
-  return (
-    <a className={`brand ${inverse ? "brand-inverse" : ""}`} href="#ust" aria-label="Benli Kuruyemiş ana sayfa">
-      <span className="brand-mark"><span>B</span><i><Icon name="leaf" size={14}/></i></span>
-      <span className="brand-copy"><strong>benli</strong><small>KURUYEMİŞ</small></span>
-    </a>
-  );
-}
+export default function Home(){
+ const [products,setProducts]=useState<Product[]>(defaultProducts);
+ const [category,setCategory]=useState<string>("Tümü");
+ const [search,setSearch]=useState("");
+ const [cart,setCart]=useState<CartLine[]>([]);
+ const [loaded,setLoaded]=useState(false);
+ const [drawer,setDrawer]=useState(false);
+ const [menu,setMenu]=useState(false);
+ const [detail,setDetail]=useState<Product|null>(null);
+ const [selectedWeight,setSelectedWeight]=useState("500");
+ const [checkout,setCheckout]=useState(false);
+ const [customer,setCustomer]=useState({name:"",phone:"",email:"",address:"",note:""});
+ const [google,setGoogle]=useState<{name:string;email:string}|null>(null);
+ const [sending,setSending]=useState(false);
+ const [error,setError]=useState("");
+ const [notice,setNotice]=useState("");
 
-function SectionTitle({ eyebrow, title, accent, desc }: { eyebrow: string; title: string; accent?: string; desc?: string }) {
-  return (
-    <div className="section-title">
-      <div className="eyebrow"><span className="eyebrow-line" />{eyebrow}</div>
-      <h2>{title} {accent && <em>{accent}</em>}</h2>
-      {desc && <p>{desc}</p>}
+ useEffect(()=>{
+  fetch("/api/products",{cache:"no-store"}).then(r=>r.json()).then(d=>{if(Array.isArray(d.products))setProducts(d.products);}).catch(()=>{});
+  fetch("/api/google/session",{cache:"no-store"}).then(r=>r.json()).then(d=>{if(d.user){setGoogle(d.user);setCustomer(s=>({...s,email:d.user.email,name:d.user.name}));}}).catch(()=>{});
+  try{const saved=JSON.parse(localStorage.getItem("benli-cart")||"[]");if(Array.isArray(saved))setCart(saved.filter((x:any)=>x&&typeof x.productId==="string"&&amounts.includes(String(x.weight) as typeof amounts[number])&&Number.isInteger(x.qty)&&x.qty>0&&x.qty<100));}catch{}
+  setLoaded(true);
+ },[]);
+ useEffect(()=>{if(loaded)localStorage.setItem("benli-cart",JSON.stringify(cart))},[cart,loaded]);
+ useEffect(()=>{document.body.style.overflow=(drawer||detail||checkout)?"hidden":"";return()=>{document.body.style.overflow=""}},[drawer,detail,checkout]);
+ useEffect(()=>{if(!notice)return;const t=setTimeout(()=>setNotice(""),3000);return()=>clearTimeout(t)},[notice]);
+ const show=useMemo(()=>products.filter(p=>p.active&&(category==="Tümü"||p.category===category)&&`${p.name} ${p.category} ${p.description}`.toLocaleLowerCase("tr-TR").includes(search.toLocaleLowerCase("tr-TR").trim())),[products,category,search]);
+ const featured=products.filter(p=>p.active&&p.featured).slice(0,4);
+ const count=cart.reduce((s,x)=>s+x.qty,0);
+ const expanded=cart.map(l=>{const p=products.find(x=>x.id===l.productId);return p?{...l,p,unit:p.prices[l.weight]??null}:null}).filter((x):x is NonNullable<typeof x>=>x!==null);
+ const total=expanded.length>0&&expanded.every(x=>x.unit!==null)?expanded.reduce((s,x)=>s+Number(x.unit)*x.qty,0):null;
+ function add(id:string,weight:string){
+  const p=products.find(x=>x.id===id);if(!p||!p.active||p.stock<1){setNotice("Bu ürün stokta bulunmuyor.");return}
+  setCart(a=>{const exists=a.find(x=>x.productId===id&&x.weight===weight);return exists?a.map(x=>x===exists?{...x,qty:Math.min(x.qty+1,Math.min(99,p.stock))}:x):[...a,{productId:id,weight,qty:1}]});
+  setNotice("Ürün sepete eklendi");
+ }
+ function changeQty(id:string,weight:string,by:number){setCart(a=>a.map(l=>{const p=products.find(x=>x.id===id);return l.productId===id&&l.weight===weight?{...l,qty:Math.min(l.qty+by,p?.stock||99)}:l}).filter(l=>l.qty>0));}
+ function chooseCategory(cat:string){setCategory(cat);document.getElementById("urunler")?.scrollIntoView({behavior:"smooth"})}
+ function openDetail(p:Product){setDetail(p);setSelectedWeight("500")}
+ async function sendOrder(){
+  if(sending)return;
+  if(!customer.name.trim()||customer.phone.replace(/\D/g,"").length<10){setError("Ad soyad ve geçerli telefon numaranızı girin.");return}
+  if(expanded.length===0){setError("Sepetiniz boş.");return}
+  setSending(true);setError("");
+  try{
+   const resp=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...customer,items:cart,payment:"WhatsApp görüşmesi"})});
+   const result=await resp.json();
+   if(!resp.ok)throw Error(result.error||"Sipariş talebi oluşturulamadı.");
+   const lineText=expanded.map((line,i)=>`${i+1}) ${line.p.name} — ${line.weight==="1000"?"1 kg":line.weight+" g"} x ${line.qty} — ${line.unit===null?"Fiyat sorulacak":format(line.unit*line.qty)}`).join("\n");
+   const message=`Merhaba Benli Kuruyemiş, ürünler için sipariş talebi göndermek istiyorum.\n\nTalep No: ${result.orderId}\n${lineText}\n\nÜrün toplamı: ${total===null?"Fiyat teyidi gerekli":format(total)}\nKargo: Satıcı tarafından teyit edilecek\n\nAd Soyad: ${customer.name}\nTelefon: ${customer.phone}\n${customer.address?"Adres: "+customer.address+"\n":""}${customer.note?"Not: "+customer.note+"\n":""}Lütfen siparişimi ve ödeme koşullarını teyit edin.`;
+   const url="https://wa.me/"+PHONE+"?text="+encodeURIComponent(message);
+   window.location.href=url;
+  }catch(e){setError(e instanceof Error?e.message:"Talep oluşturulamadı");setSending(false)}
+ }
+ return <div className="bm">
+  <div className="bm-topline"><span><Icon type="leaf" size={14}/> BENLİ KURUYEMİŞ • DOĞRU LEZZETİN ADRESİ</span><a href="https://wa.me/905515550302" target="_blank" rel="noreferrer"><Icon type="chat" size={15}/> 0551 555 03 02 • WhatsApp</a></div>
+  <header className="bm-header">
+   <div className="bm-mainnav"><Logo/>
+    <div className="bm-search"><Icon type="search" size={21}/><input value={search} onChange={e=>setSearch(e.target.value)} onFocus={()=>{}} placeholder="Hangi kuruyemişi arıyorsunuz?" aria-label="Ürün ara"/>{search&&<button type="button" aria-label="Aramayı sil" onClick={()=>setSearch("")}>×</button>}<button onClick={()=>document.getElementById("urunler")?.scrollIntoView({behavior:"smooth"})} type="button">ARA</button></div>
+    <div className="bm-main-actions">
+     <a href="/giris" className="bm-account"><Icon type="user"/><span>{google?google.name.split(" ")[0]:"Google ile"}<strong>{google?"Hesabım":"Giriş Yap"}</strong></span></a>
+     <button className="bm-cartbtn" onClick={()=>setDrawer(true)} type="button"><Icon type="bag" size={25}/><span>Sepetim<strong>{count} ürün</strong></span>{count>0&&<b>{count}</b>}</button>
+     <button className="bm-mobmenu" aria-label="Menüyü aç" onClick={()=>setMenu(!menu)} type="button"><Icon type={menu?"x":"menu"} size={25}/></button>
     </div>
-  );
+   </div>
+   <nav className={`bm-categories ${menu?"open":""}`}>
+    <button type="button" className="bm-catall" onClick={()=>chooseCategory("Tümü")}><Icon type="menu" size={18}/> TÜM ÜRÜNLER</button>
+    {categories.slice(1).map(c=><button key={c} type="button" onClick={()=>{chooseCategory(c);setMenu(false)}}>{c}</button>)}
+    <a href="#hikayemiz">Hakkımızda</a><a className="bm-bulk" href="https://wa.me/905515550302?text=Toptan%20kuruyemi%C5%9F%20teklifi%20almak%20istiyorum." target="_blank" rel="noreferrer">TOPTAN SİPARİŞ ↗</a>
+   </nav>
+  </header>
+  <main>
+   <section className="bm-hero"><div className="bm-hero-copy"><p className="bm-overline">✦ BENLİ KURUYEMİŞ</p><h1>Lezzetin<br/><em>en güzel</em><br/>hâli.</h1><p className="bm-hero-desc">Toptan ticaretin deneyiminden, evinizin en keyifli anlarına. Her avuçta özen, her lokmada lezzet.</p><div className="bm-hero-buttons"><a href="#urunler" className="bm-btn primary">ÜRÜNLERİ KEŞFET <Icon type="arrow"/></a><a href="#hikayemiz" className="bm-btn outline">BİZİ TANIYIN <Icon type="up"/></a></div><div className="bm-hero-hint"><span>01 / 03</span><div><span/></div><small>Benli&apos;nin lezzet dünyasına hoş geldiniz.</small></div></div><div className="bm-hero-image"><SafeImage src={img} alt="Benli Kuruyemiş kuruyemiş koleksiyonu"/><div className="bm-hero-photo-overlay"/></div><div className="bm-seal"><span>BENLİ</span><strong>✦</strong><span>KURUYEMİŞ</span></div></section>
+   <div className="bm-features"><div><Icon type="package" size={26}/><p><strong>Özenli ürün seçimi</strong><span>Kuruyemişte deneyim</span></p></div><div><Icon type="truck" size={28}/><p><strong>Türkiye geneli gönderim</strong><span>Kargo koşulları siparişte teyit edilir</span></p></div><div><Icon type="chat" size={26}/><p><strong>Doğrudan iletişim</strong><span>WhatsApp üzerinden görüşme</span></p></div><div><Icon type="shield" size={27}/><p><strong>Şeffaf alışveriş</strong><span>Fiyat ve sipariş için onay</span></p></div></div>
+   <section className="bm-section bm-category-wrap" id="kategoriler"><div className="bm-titlebar"><InfoTitle eyebrow="BİRBİRİNDEN LEZZETLİ" title={<>Lezzeti <em>kategorilere ayırdık.</em></>} sub="Aradığınız bütün kuruyemiş çeşitleri bir arada."/><a href="#urunler">TÜM ÜRÜNLER <Icon type="arrow" size={18}/></a></div><div className="bm-category-grid">
+    {[{name:"Kuruyemiş",pic:defaultProducts[0].image,note:"KLASİKLER"},{name:"Leblebi",pic:defaultProducts[6].image,note:"ÇITIR ATIŞTIRMALIKLAR"},{name:"Çekirdek",pic:defaultProducts[7].image,note:"SOHBETLERİN VAZGEÇİLMEZİ"},{name:"Karışık",pic:defaultProducts[3].image,note:"SEVİLEN KARIŞIMLAR"},{name:"Kuru Meyve",pic:"https://images.unsplash.com/photo-1598371629575-9dbfc81d5c8e?auto=format&fit=crop&w=900&q=85",note:"ÖZEL SEÇKİ"}].map((c,i)=><button type="button" key={c.name} className="bm-category" onClick={()=>chooseCategory(c.name)}><SafeImage src={c.pic} alt={c.name}/><span className="bm-category-text"><small>{c.note}</small><strong>{c.name}</strong></span><span className="bm-category-icon"><Icon type="up" size={18}/></span></button>)}
+   </div></section>
+   <section className="bm-promo-row"><div className="bm-promo-light"><span>KEYİFLİ ANLARIN TADI</span><h3>Bir avuç <em>mutluluk.</em></h3><p>Sevdiğiniz lezzetleri keşfetmeye başlayın.</p><a href="#urunler">ÜRÜNLERE BAKIN <Icon type="arrow" size={17}/></a></div><div className="bm-promo-dark"><span>İŞLETMELERE ÖZEL</span><h3>Toptan kuruyemişte<br/><em>yanınızdayız.</em></h3><p>Toplu alımlar için doğrudan görüşelim.</p><a href="https://wa.me/905515550302?text=Merhaba%2C%20toptan%20kuruyemi%C5%9F%20i%C3%A7in%20fiyat%20teklifi%20almak%20istiyorum." target="_blank" rel="noreferrer">TEKLİF ALIN <Icon type="up" size={17}/></a></div></section>
+   <section className="bm-section bm-products-wrap" id="urunler"><div className="bm-titlebar"><InfoTitle eyebrow="SİZİN İÇİN SEÇTİK" title={<>Kuruyemişin <em>en sevilenleri.</em></>} sub="Gramajınızı seçin, sepetinize ekleyin. Fiyatlar ürün yönetiminden girilebilir."/><span className="bm-display-count">{show.length} ürün</span></div><div className="bm-filterrow">{categories.map(c=><button type="button" key={c} onClick={()=>setCategory(c)} className={category===c?"active":""}>{c}</button>)}</div>
+    {show.length===0?<div className="bm-noresults">Bu kategoride henüz ürün bulunmuyor. <button onClick={()=>{setCategory("Tümü");setSearch("")}} type="button">Tüm ürünleri göster</button></div>:<div className="bm-products-grid">{show.map(p=><ProductCard key={p.id} p={p} add={add} showDetails={openDetail}/>)}</div>}
+   </section>
+   <section className="bm-story" id="hikayemiz"><div className="bm-story-photo"><SafeImage src={defaultProducts[2].image} alt="Benli Kuruyemiş ürünlerinden bir görünüm"/></div><div className="bm-story-copy"><InfoTitle eyebrow="BENLİ HİKÂYESİ" title={<>Kuruyemişi <em>iyi tanıyoruz.</em></>} /><p>Benli Kuruyemiş&apos;te toptan ticaretin getirdiği deneyimimizi şimdi online satışa taşıyoruz. Ürünlerimizi yakından inceleyebileceğiniz, fiyatı açıkça görebileceğiniz ve sorularınızı doğrudan sorabileceğiniz bir alışveriş deneyimi tasarladık.</p><div className="bm-story-badges"><span><Icon type="check" size={18}/> Doğrudan tedarik tecrübesi</span><span><Icon type="check" size={18}/> WhatsApp üzerinden iletişim</span><span><Icon type="check" size={18}/> Gramaj seçimi</span></div><a href="https://wa.me/905515550302" target="_blank" rel="noreferrer" className="bm-btn dark">BİZE ULAŞIN <Icon type="up"/></a></div></section>
+   <section className="bm-newsletter"><span>GÜZEL BİR MOLA VERİN</span><h2>Keyfiniz <em>yerinde olsun.</em></h2><p>Beğendiğiniz ürünleri sepetinize ekleyin, WhatsApp üzerinden bizimle iletişime geçin.</p><a href="#urunler" className="bm-btn primary">ÜRÜNLERİ İNCELEYİN <Icon type="arrow"/></a></section>
+  </main>
+  <footer className="bm-footer"><div className="bm-footer-cols"><div><Logo/><p>Toptan kuruyemişin deneyimi, Benli&apos;nin lezzet dünyasıyla buluşuyor.</p></div><div><h4>HIZLI ERİŞİM</h4><a href="#urunler">Ürünlerimiz</a><a href="#kategoriler">Kategoriler</a><a href="#hikayemiz">Hakkımızda</a><a href="/giris">Google ile giriş</a></div><div><h4>KATEGORİLER</h4>{categories.slice(1,5).map(c=><a href="#urunler" key={c} onClick={()=>setCategory(c)}>{c}</a>)}</div><div><h4>İLETİŞİM</h4><a href="tel:+905515550302">0551 555 03 02</a><a href="https://wa.me/905515550302" target="_blank" rel="noreferrer">WhatsApp ile yazın ↗</a><p>İşletme adresi ve yasal satış bilgileri yayına alınmadan önce tamamlanmalıdır.</p></div></div><div className="bm-footer-bottom"><span>© {new Date().getFullYear()} BENLİ KURUYEMİŞ</span><span>Site önizlemesi • Siparişler WhatsApp ile teyit edilir.</span><a href="/admin">Yönetim</a></div></footer>
+  {notice&&<div className="bm-toast" role="status"><Icon type="check" size={17}/>{notice}</div>}
+  {detail&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setDetail(null)}/><section className="bm-detail bm-modal" role="dialog" aria-modal="true" aria-label={detail.name}><button type="button" className="bm-close" onClick={()=>setDetail(null)} aria-label="Kapat"><Icon type="x"/></button><div className="bm-detail-image"><SafeImage src={detail.image} alt={detail.name}/></div><div className="bm-detail-copy"><span className="bm-overline">{detail.category}</span><h2>{detail.name}</h2><p>{detail.description}</p><h4>GRAMaj SEÇİN</h4><div className="bm-weight-options">{amounts.map(w=><button type="button" className={selectedWeight===w?"active":""} key={w} onClick={()=>setSelectedWeight(w)}>{w==="1000"?"1 kg":w+" g"}</button>)}</div><div className="bm-pricebig"><Money price={detail.prices[selectedWeight]??null}/></div><button type="button" disabled={detail.stock<1} className="bm-btn dark" onClick={()=>{add(detail.id,selectedWeight);setDetail(null);setDrawer(true)}}>{detail.stock<1?"STOKTA YOK":"SEPETE EKLE"} <Icon type="bag"/></button><div className="bm-detail-extra"><h4>Ürün açıklaması</h4><p>{detail.description||"Ürün bilgileri hazırlanıyor."}</p><h4>İçindekiler</h4><p>{detail.ingredients||"Ürün içerik bilgisi eklenecek."}</p><h4>Alerjen bilgisi</h4><p>{detail.allergens||"Alerjen bilgisi doğrulanacak."}</p></div></div></section></div>}
+  {drawer&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setDrawer(false)}/><aside role="dialog" aria-modal="true" aria-labelledby="bm-cart-title" className="bm-drawer"><div className="bm-drawer-header"><div><span>BENLİ KURUYEMİŞ</span><h2 id="bm-cart-title">Sepetim ({count})</h2></div><button type="button" className="bm-close" onClick={()=>setDrawer(false)} aria-label="Kapat"><Icon type="x"/></button></div><div className="bm-cart-lines">{!expanded.length?<div className="bm-emptycart"><Icon type="bag" size={49}/><h3>Sepetiniz henüz boş.</h3><p>Sevdiğiniz lezzetleri eklemek için ürünlere göz atın.</p><button type="button" className="bm-btn dark" onClick={()=>setDrawer(false)}>ALIŞVERİŞE DEVAM</button></div>:expanded.map(l=><div className="bm-cart-line" key={l.productId+":"+l.weight}><div className="bm-cart-thumb"><SafeImage src={l.p.image} alt={l.p.name}/></div><div><strong>{l.p.name}</strong><small>{l.weight==="1000"?"1 kg":l.weight+" g"}</small><span><Money price={l.unit}/></span><div className="bm-qty"><button type="button" onClick={()=>changeQty(l.productId,l.weight,-1)}><Icon type="minus" size={16}/></button>{l.qty}<button type="button" onClick={()=>changeQty(l.productId,l.weight,1)}><Icon type="plus" size={16}/></button></div></div><button type="button" className="bm-remove" onClick={()=>setCart(a=>a.filter(x=>x.productId!==l.productId||x.weight!==l.weight))}>Sil</button></div>)}</div>{expanded.length>0&&<div className="bm-cart-summary"><div><span>Ürün toplamı</span><strong>{total===null?"Fiyat teyidi gerekli":format(total)}</strong></div><p>Kargo bedeli ve ödeme koşulları WhatsApp üzerinden teyit edilir.</p><button className="bm-btn dark" type="button" onClick={()=>{setDrawer(false);setCheckout(true)}}>SİPARİŞ TALEBİ OLUŞTUR <Icon type="arrow"/></button></div>}</aside></div>}
+  {checkout&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setCheckout(false)}/><section className="bm-checkout bm-modal" role="dialog" aria-modal="true" aria-label="Sipariş talebi"><button className="bm-close" onClick={()=>setCheckout(false)} type="button" aria-label="Kapat"><Icon type="x"/></button><span className="bm-overline">WHATSAPP İLE SİPARİŞ</span><h2>Sipariş talebiniz</h2><p>Bilgilerinizi girin. Talebiniz oluşturulduktan sonra WhatsApp&apos;a yönlendirileceksiniz. <strong>WhatsApp mesajını göndermeden sipariş kesinleşmez.</strong></p>{google&&<div className="bm-user-chip"><Icon type="check" size={17}/> Google ile giriş yapıldı: {google.email}</div>}<div className="bm-formgrid"><label>Ad Soyad *<input value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})} placeholder="Adınız soyadınız"/></label><label>Telefon *<input value={customer.phone} onChange={e=>setCustomer({...customer,phone:e.target.value})} placeholder="05xx xxx xx xx"/></label><label>E-posta<input type="email" value={customer.email} onChange={e=>setCustomer({...customer,email:e.target.value})} placeholder="ornek@gmail.com"/></label><label>Teslimat adresi (opsiyonel)<input value={customer.address} onChange={e=>setCustomer({...customer,address:e.target.value})} placeholder="İl / ilçe / adres"/></label><label className="wide">Sipariş notu<textarea rows={3} value={customer.note} onChange={e=>setCustomer({...customer,note:e.target.value})} placeholder="Varsa özel talebiniz..."/></label></div><p className="bm-checkout-summary">Ürün toplamı: <strong>{total===null?"Fiyat teyidi gerekli":format(total)}</strong> • Kargo henüz eklenmedi.</p><p className="bm-privacy-note">Bilgileriniz sipariş görüşmesi için kullanılacaktır. Bu aşamada online ödeme alınmaz.</p>{error&&<div className="bm-form-error" role="alert">{error}</div>}<button className="bm-btn dark" type="button" disabled={sending} onClick={sendOrder}>{sending?"HAZIRLANIYOR...":"WHATSAPP'A DEVAM ET"} <Icon type="arrow"/></button></section></div>}
+ </div>
 }
-
-function ProductImage({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
-  return <img src={src} alt={alt} className={className} loading="lazy" onError={(event) => { const target = event.currentTarget; target.style.opacity = "0"; target.parentElement?.classList.add("image-unavailable"); }} />;
-}
-
-function ProductCard({ product, add }: { product: Product; add: (productId: string, gramaj: string) => void }) {
-  const [weight, setWeight] = useState("500 g");
-  return (
-    <article className="product-card">
-      <div className="product-image">
-        <ProductImage src={product.image} alt={product.name} />
-        {product.label && <span className="product-label">{product.label}</span>}
-        <div className="image-fallback" aria-hidden="true"><Icon name="leaf" size={50} /></div>
-      </div>
-      <div className="product-info">
-        <span className="product-category">{product.category}</span>
-        <h3>{product.name}</h3>
-        <p>{product.tagline}</p>
-        <div className="weight-row" role="group" aria-label={`${product.name} gramaj seçimi`}>
-          {weights.map((gramaj) => <button key={gramaj} className={`weight ${weight === gramaj ? "selected" : ""}`} type="button" onClick={() => setWeight(gramaj)} aria-pressed={weight === gramaj}>{gramaj}</button>)}
-        </div>
-        <div className="product-bottom">
-          <span>Fiyat için bilgi alın</span>
-          <button className="add-button" type="button" aria-label={`${product.name} ${weight} talep sepetine ekle`} title="Talep sepetine ekle" onClick={() => add(product.id, weight)}><Icon name="plus" size={19}/></button>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-export default function Home() {
-  const [filter, setFilter] = useState<Category>("Tümü");
-  const [search, setSearch] = useState("");
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [cart, setCart] = useState<CartLine[]>([]);
-  const [ready, setReady] = useState(false);
-  const [toast, setToast] = useState("");
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("benli-talep-sepeti") || "[]");
-      if (Array.isArray(saved)) {
-        setCart(saved.filter((line) => line && typeof line.productId === "string" && typeof line.gramaj === "string" && Number.isInteger(line.adet) && line.adet > 0 && line.adet < 1000 && products.some((p) => p.id === line.productId)).map((line) => ({ key: `${line.productId}:${line.gramaj}`, productId: line.productId, gramaj: line.gramaj, adet: line.adet })));
-      }
-    } catch { /* Bozuk kayıt durumunda boş sepetle başla. */ }
-    setReady(true);
-  }, []);
-  useEffect(() => {
-    if (ready) localStorage.setItem("benli-talep-sepeti", JSON.stringify(cart));
-  }, [cart, ready]);
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(""), 3200);
-    return () => clearTimeout(timer);
-  }, [toast]);
-  useEffect(() => {
-    document.body.style.overflow = cartOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [cartOpen]);
-
-  const count = cart.reduce((sum, line) => sum + line.adet, 0);
-  const visibleProducts = useMemo(() => products.filter((p) => (filter === "Tümü" || p.category === filter) && `${p.name} ${p.category}`.toLocaleLowerCase("tr-TR").includes(search.toLocaleLowerCase("tr-TR").trim())), [filter, search]);
-
-  function add(productId: string, gramaj: string) {
-    const key = `${productId}:${gramaj}`;
-    setCart((prev) => {
-      const exists = prev.find((line) => line.key === key);
-      return exists ? prev.map((line) => line.key === key ? { ...line, adet: Math.min(line.adet + 1, 999) } : line) : [...prev, { key, productId, gramaj, adet: 1 }];
-    });
-    setToast("Ürün talep sepetine eklendi.");
-  }
-
-  function changeAmount(key: string, delta: number) {
-    setCart((prev) => prev.map((line) => line.key === key ? { ...line, adet: line.adet + delta } : line).filter((line) => line.adet > 0));
-  }
-
-  function requestOffer() {
-    if (!store.whatsapp) {
-      setToast("WhatsApp sipariş numarası henüz tanımlanmadı.");
-      return;
-    }
-    if (cart.length === 0) return;
-    const lines = cart.map((line, index) => {
-      const product = products.find((p) => p.id === line.productId);
-      return `${index + 1}. ${product?.name ?? "Ürün"} — ${line.gramaj} × ${line.adet}`;
-    });
-    const message = ["Merhaba Benli Kuruyemiş, aşağıdaki ürünler için fiyat ve sipariş bilgisi almak istiyorum:", "", ...lines, "", "Ürünlerin güncel fiyatını ve kargo koşullarını paylaşabilir misiniz?"].join("\n");
-    window.open(`https://wa.me/${store.whatsapp}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
-  }
-
-  function chooseCategory(category: Category) {
-    setFilter(category);
-    document.getElementById("urunler")?.scrollIntoView({ behavior: "smooth" });
-  }
-
-  return (
-    <div id="ust" className="site">
-      <div className="announcement">TOPTAN TİCARETİN TECRÜBESİ · LEZZETİN YENİ ADRESİ <span>✦</span> BENLİ KURUYEMİŞ</div>
-
-      <header className="header">
-        <div className="header-inner container">
-          <Brand />
-          <nav className="desktop-nav" aria-label="Ana menü">
-            <a href="#ust">Ana Sayfa</a><a href="#kategoriler">Kategoriler</a><a href="#urunler">Ürünlerimiz</a><a href="#hikayemiz">Hikâyemiz</a>
-          </nav>
-          <div className="header-actions">
-            <button className="cart-trigger" type="button" onClick={() => setCartOpen(true)} aria-label={`Talep sepetini aç, ${count} ürün`}>
-              <Icon name="bag" size={21}/><span className="cart-text">Talep Sepeti</span>{count > 0 && <b>{formatter.format(count)}</b>}
-            </button>
-            <button className="mobile-toggle" type="button" aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"} aria-expanded={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)}><Icon name={mobileOpen ? "close" : "menu"} size={25}/></button>
-          </div>
-        </div>
-        {mobileOpen && <nav className="mobile-nav" aria-label="Mobil menü">
-          {[["Ana Sayfa","#ust"],["Kategoriler","#kategoriler"],["Ürünlerimiz","#urunler"],["Hikâyemiz","#hikayemiz"]].map(([label,href]) => <a key={href} href={href} onClick={() => setMobileOpen(false)}>{label}<Icon name="up" size={17}/></a>)}
-        </nav>}
-      </header>
-
-      <main>
-        <section className="hero">
-          <div className="hero-orbit orbit-one"/><div className="hero-orbit orbit-two"/>
-          <div className="hero-content container">
-            <div className="hero-copy">
-              <p className="hero-overline"><span />KURUYEMİŞİN BENLİ HÂLİ</p>
-              <h1>Lezzetin<br/><em>en doğal</em><br/>hâli.</h1>
-              <p className="hero-description">Toptan kuruyemiş ticaretindeki birikimimiz, şimdi sizin için hazırladığımız yepyeni bir vitrinde. Her avuçta iyi bir mola.</p>
-              <div className="hero-buttons"><a className="button button-gold" href="#urunler">Lezzetleri keşfet <Icon name="arrow"/></a><a className="hero-link" href="#hikayemiz">Hikâyemizi oku <Icon name="up" size={18}/></a></div>
-              <div className="hero-foot"><span className="hero-foot-icon"><Icon name="leaf" size={23}/></span><span>Tanıdık lezzetler.<br/>Yeni bir alışveriş deneyimi.</span></div>
-            </div>
-          </div>
-          <div className="hero-photo"><ProductImage src={photos.mix} alt="Kâsede sunulan çeşitli kuruyemişler" className="hero-photo-img"/><div className="hero-photo-cover"/><span className="hero-stamp">BENLİ <i>✦</i><br/>KURUYEMİŞ</span><div className="hero-photo-caption"><em>Bir avuç mutluluk.</em><span>01 / 03 — LEZZET KOLEKSİYONU</span></div></div>
-        </section>
-
-        <section className="values"><div className="container values-inner">
-          {[["01","Toptan ticaret tecrübesi"],["02","Özenle seçilmiş lezzetler"],["03","Tanıdık kuruyemiş çeşitleri"],["04","Benli Kuruyemiş vitrini"]].map(([num,text]) => <div className="value" key={num}><span>{num}</span><p>{text}</p></div>)}
-        </div></section>
-
-        <section className="section categories-section" id="kategoriler"><div className="container">
-          <div className="section-top"><SectionTitle eyebrow="KOLEKSİYONUMUZ" title="Her damak tadına" accent="bir lezzet." desc="Paylaştıkça çoğalan keyifli anlar için sevilen kuruyemiş çeşitlerini bir araya getiriyoruz."/><a href="#urunler" className="text-link">Bütün ürünleri gör <Icon name="up" size={18}/></a></div>
-          <div className="category-grid">
-            {[{title:"Kuruyemiş",tag:"KLASİK LEZZETLER",image:photos.pistachio,type:"Kuruyemiş" as Category,cls:"category-wide"},
-            {title:"Leblebi",tag:"HER MOLAYA EŞLİK",image:photos.grain,type:"Leblebi" as Category,cls:""},
-            {title:"Karışık",tag:"BİR ARADA DAHA GÜZEL",image:photos.mix,type:"Karışık" as Category,cls:""}].map((cat) => (
-              <button key={cat.title} className={`category-tile ${cat.cls}`} type="button" onClick={() => chooseCategory(cat.type)}>
-                <ProductImage src={cat.image} alt={cat.title} /><span className="category-shade"/><span className="category-content"><small>{cat.tag}</small><strong>{cat.title}</strong></span><span className="category-arrow"><Icon name="up" size={21}/></span>
-              </button>
-            ))}
-          </div>
-        </div></section>
-
-        <section className="section products-section" id="urunler"><div className="container">
-          <div className="section-top"><SectionTitle eyebrow="ÜRÜNLERİMİZ" title="Sevilen tatlar," accent="tek çatı altında." desc="Aşağıdaki katalog önizlemedir. Ürün, fiyat ve stok bilgileri yayına alınmadan önce kesinleştirilecektir."/></div>
-          <div className="products-toolbar"><div className="tabs" role="group" aria-label="Ürün kategorileri">{tabs.map((category) => <button key={category} type="button" className={filter === category ? "active" : ""} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category}</button>)}</div><label className="search"><Icon name="search" size={19}/><input aria-label="Ürün ara" type="search" value={search} placeholder="Ürün ara..." onChange={(e) => setSearch(e.target.value)}/></label></div>
-          {visibleProducts.length === 0 ? <div className="empty-products"><p>Aradığınız ürün bu listede bulunamadı.</p><button type="button" onClick={() => {setFilter("Tümü");setSearch("");}}>Filtreyi temizle</button></div> : <div className="products-grid">{visibleProducts.map((product) => <ProductCard key={product.id} product={product} add={add}/>)}</div>}
-          <div className="products-note"><Icon name="leaf" size={22}/><p><strong>Henüz sipariş almıyoruz.</strong> Bu sürüm, Benli Kuruyemiş&apos;in yeni mağaza tasarımıdır. Sepete ürün ekleyebilirsiniz; sipariş hattı ve fiyatlar tanımlanınca WhatsApp talep sistemi kullanılabilecektir.</p></div>
-        </div></section>
-
-        <section className="story-section" id="hikayemiz"><div className="container story-grid">
-          <div className="story-art"><ProductImage src={photos.almond} alt="Doğal kuruyemişlerden bir detay" /><div className="story-badge"><Icon name="leaf" size={26}/><span>Benli&apos;nin<br/>lezzet dünyası</span></div></div>
-          <div className="story-copy"><SectionTitle eyebrow="BİZİ TANIYIN" title="Bu işin" accent="özünde lezzet var."/><p>Benli Kuruyemiş olarak kuruyemişin toptan ticaretindeki birikimimizi, şimdi kendi dijital vitrinimize taşıyoruz. Ürünlerimizi tanıtabileceğimiz, sade ve güven veren bir alışveriş deneyimi oluşturuyoruz.</p><div className="story-points"><div><span><Icon name="leaf" size={21}/></span><strong>Ticaretin içinden</strong><p>Sektördeki deneyimimizi dijital dünyaya taşıyoruz.</p></div><div><span><Icon name="check" size={21}/></span><strong>Açık ve anlaşılır</strong><p>Ürün bilgilerini kolayca inceleyebileceğiniz bir mağaza.</p></div></div><a href="#urunler" className="text-link">Koleksiyona göz atın <Icon name="arrow" size={19}/></a></div>
-        </div></section>
-
-        <section className="cta-section"><div className="container cta-content"><p>BENLİ KURUYEMİŞ</p><h2>Lezzetli molaların<br/><em>yeni adresi.</em></h2><span>Ürünlerimizi keşfedin, talep sepetinizi oluşturun.</span><a className="button button-green" href="#urunler">Ürünlerimize göz at <Icon name="arrow"/></a></div></section>
-      </main>
-
-      <footer className="footer"><div className="container"><div className="footer-grid"><div><Brand inverse/><p>Toptan kuruyemiş ticaretindeki deneyimimizle, tanıdık lezzetleri dijital dünyaya taşıyoruz.</p></div><div><h3>Keşfet</h3><a href="#ust">Ana Sayfa</a><a href="#kategoriler">Kategoriler</a><a href="#urunler">Ürünlerimiz</a><a href="#hikayemiz">Hikâyemiz</a></div><div><h3>İletişim</h3><p>İşletme adresi, telefon ve sipariş hattı yayına geçiş öncesinde eklenecektir.</p><p className="footer-small">Ürün fotoğrafları temsilidir; fiyat ve stok bilgisi sunulmamaktadır.</p></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Benli Kuruyemiş. Tüm hakları saklıdır.</span><a href="#ust">Yukarı dön ↑</a></div></div></footer>
-
-      {toast && <div className="toast" role="status"><Icon name="check" size={18}/>{toast}</div>}
-      {cartOpen && <div className="cart-modal" role="presentation"><button className="cart-backdrop" type="button" aria-label="Sepeti kapat" onClick={() => setCartOpen(false)}/><aside className="cart-panel" role="dialog" aria-modal="true" aria-labelledby="cart-title"><div className="cart-header"><div><span className="eyebrow">BENLİ KURUYEMİŞ</span><h2 id="cart-title">Talep Sepetim <small>({count})</small></h2></div><button type="button" className="round-button" aria-label="Sepeti kapat" onClick={() => setCartOpen(false)}><Icon name="close"/></button></div><div className="cart-list">{cart.length === 0 ? <div className="empty-cart"><Icon name="bag" size={48}/><h3>Sepetiniz boş</h3><p>Beğendiğiniz ürünleri sepete ekleyerek başlayın.</p><button className="button button-green" type="button" onClick={() => setCartOpen(false)}>Ürünlere dön <Icon name="arrow"/></button></div> : cart.map((line) => {const product = products.find((p) => p.id === line.productId);if (!product) return null;return <div className="cart-line" key={line.key}><div className="cart-line-image"><ProductImage src={product.image} alt={product.name}/></div><div className="cart-line-info"><strong>{product.name}</strong><small>{line.gramaj} · Fiyat sorunuz</small><div className="quantity"><button type="button" aria-label={`${product.name} adedini azalt`} onClick={() => changeAmount(line.key, -1)}><Icon name="minus" size={15}/></button><b>{line.adet}</b><button type="button" aria-label={`${product.name} adedini artır`} onClick={() => changeAmount(line.key, 1)}><Icon name="plus" size={15}/></button></div></div><button className="remove" type="button" title="Ürünü kaldır" aria-label={`${product.name} ürünü kaldır`} onClick={() => setCart((prev) => prev.filter((item) => item.key !== line.key))}><Icon name="trash" size={19}/></button></div>})}</div>{cart.length > 0 && <div className="cart-bottom"><p><strong>Fiyat ve kargo bilgisi</strong><br/>Bu aşamada görüntülenmiyor; satıcı tarafından teyit edilecek.</p><button className="button button-green checkout" type="button" onClick={requestOffer}>WhatsApp ile fiyat sor <Icon name="arrow"/></button>{!store.whatsapp && <small>WhatsApp hattı henüz bağlanmadı. Sipariş alınmıyor.</small>}</div>}</aside></div>}
-    </div>
-  );
+function ProductCard({p,add,showDetails}:{p:Product;add:(id:string,weight:string)=>void;showDetails:(p:Product)=>void}){
+ const [weight,setWeight]=useState("500");
+ const price=p.prices[weight]??null;
+ return <article className="bm-product"><div className="bm-product-image"><button type="button" onClick={()=>showDetails(p)} aria-label={p.name+" detaylarını görüntüle"}><SafeImage src={p.image} alt={p.name}/></button>{p.featured&&<span className="bm-product-badge">ÖNE ÇIKAN</span>}{p.stock<1&&<span className="bm-outofstock">STOKTA YOK</span>}</div><div className="bm-product-body"><small>{p.category}</small><button className="bm-product-title" onClick={()=>showDetails(p)} type="button">{p.name}</button><p>{p.description}</p><div className="bm-packs">{amounts.map(w=><button type="button" aria-pressed={weight===w} className={weight===w?"active":""} key={w} onClick={()=>setWeight(w)}>{w==="1000"?"1 kg":w+" g"}</button>)}</div><div className="bm-product-footer"><div><span>{weight==="1000"?"1 kg":weight+" g"}</span><strong><Money price={price}/></strong></div><button type="button" disabled={p.stock<1} onClick={()=>add(p.id,weight)} aria-label={p.name+" sepete ekle"}><Icon type="plus" size={22}/></button></div></div></article>
 }
