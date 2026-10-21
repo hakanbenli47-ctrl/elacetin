@@ -1,5 +1,6 @@
 import "server-only";
 import { createHmac, createHash, createPublicKey, randomBytes, verify, timingSafeEqual } from "node:crypto";
+import type { JsonWebKey } from "node:crypto";
 import type { NextRequest } from "next/server";
 export const googleConfigured=Boolean(process.env.GOOGLE_CLIENT_ID&&process.env.GOOGLE_CLIENT_SECRET&&process.env.AUTH_SECRET);
 export const sessionCookie="benli_google";
@@ -25,7 +26,7 @@ export async function verifyGoogleIdToken(jwt:string,nonce:string):Promise<Googl
  if(!result.ok)throw new Error("Google anahtarları alınamadı");
  const keys=await result.json() as {keys:Array<{kid:string;kty:string;[key:string]:unknown}>};
  const jwk=keys.keys.find(k=>k.kid===header.kid&&k.kty==="RSA");if(!jwk)throw new Error("Google imza anahtarı bulunamadı");
- const key=createPublicKey({key:jwk as Parameters<typeof createPublicKey>[0] & object,format:"jwk"});
+ const key=createPublicKey({key:jwk as unknown as JsonWebKey,format:"jwk"});
  if(!verify("RSA-SHA256",Buffer.from(parts[0]+"."+parts[1]),key,Buffer.from(parts[2],"base64url")))throw new Error("Google imzası geçersiz");
  const p=JSON.parse(Buffer.from(parts[1],"base64url").toString()) as GoogleJWT;
  if(!["https://accounts.google.com","accounts.google.com"].includes(p.iss)||p.aud!==process.env.GOOGLE_CLIENT_ID||p.exp*1000<Date.now()||p.iat*1000>Date.now()+60000||p.nonce!==nonce||!p.email_verified||!p.sub||!p.email)throw new Error("Google oturum bilgileri geçersiz");
