@@ -1,37 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Benli Kuruyemiş
 
-## Getting Started
+Benli Kuruyemiş için sıfırdan tasarlanmış, mobil uyumlu Next.js 16 mağaza ön yüzü.
 
-First, run the development server:
+## Çalıştırma
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## WhatsApp teklifi
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Gerçek işletme numarası belli olduğunda Vercel projesine aşağıdaki ortam değişkenini ekleyin:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+NEXT_PUBLIC_WHATSAPP_NUMBER=905XXXXXXXXX
+```
 
-## Learn More
+Değişkeni ekledikten sonra **yeniden dağıtım** yapın. Talep sepeti gramaj ve adetlerle WhatsApp mesajını oluşturur.
 
-To learn more about Next.js, take a look at the following resources:
+## Yayına geçmeden önce
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Demo ürün isimlerini, ürün görsellerini, stok ve gramajlarını doğrulayın.
+- Gerçek fiyatları ve kargo ücretlerini işletme verilerine göre ekleyin.
+- İşletmenin doğrulanmış telefon ve adres bilgilerini, yasal bilgilendirmelerini ekleyin.
+- Ödeme ve sipariş onayı sistemi henüz yoktur; bu yalnızca vitrin / teklif sepeti tasarımıdır.
+- Ürün fotoğrafları temsilidir, kendi çektiğiniz fotoğraflarla değiştirin.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# elacetin" 
+Önceki salon/randevu paneli ve Supabase dosyaları bu proje sürümünden çıkarılmıştır.

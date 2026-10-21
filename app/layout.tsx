@@ -1,45 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/app/theme/theme";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
-  title: "Benli Kuruyemiş | Lezzetin Doğal Hâli",
-  description:
-    "Benli Kuruyemiş'in kuruyemiş çeşitlerini keşfedin. Toptan kuruyemiş ticaretindeki birikimimizi dijital vitrinimize taşıyoruz.",
+  title: "Benli Kuruyemiş | Lezzetin En Doğal Hâli",
+  description: "Benli Kuruyemiş'in yeni dijital vitrini. Kuruyemiş, leblebi, çekirdek ve karışık kuruyemiş çeşitlerini keşfedin.",
   applicationName: "Benli Kuruyemiş",
   robots: { index: true, follow: true },
   openGraph: {
-    title: "Benli Kuruyemiş | Lezzetin Doğal Hâli",
-    description: "Benli Kuruyemiş'in ürünlerini ve lezzet dünyasını keşfedin.",
-    locale: "tr_TR",
     type: "website",
+    locale: "tr_TR",
+    title: "Benli Kuruyemiş",
+    description: "Toptan kuruyemiş ticaretindeki tecrübemiz şimdi yeni dijital vitrinimizde.",
   },
+  icons: { icon: "/favicon.svg" },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html
-      lang="tr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
-    </html>
-  );
+export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) {
+  return <html lang="tr"><body>{children}</body></html>;
 }
