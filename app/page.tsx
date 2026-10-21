@@ -1,389 +1,348 @@
-"use client"
-import { motion, Variants } from "framer-motion"
-import { useState, useEffect } from "react"
-import { useTheme } from "@/app/theme/theme"
-import { content } from "@/data/content"
+"use client";
 
-/* --- ZARİF ANİMASYONLAR --- */
-const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  show: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.8, ease: "easeOut" } 
-  }
+import { useState } from "react";
+
+const images = {
+  hero: "https://images.unsplash.com/photo-1600189020840-e9918c25269d?auto=format&fit=crop&w=1500&q=85",
+  pistachio: "https://images.unsplash.com/photo-1645291787539-ac637edb7fa5?auto=format&fit=crop&w=900&q=85",
+  almond: "https://images.unsplash.com/photo-1642337841034-249c5a21623c?auto=format&fit=crop&w=900&q=85",
+  cashew: "https://images.unsplash.com/photo-1769255484443-50e4e3e2bbdb?auto=format&fit=crop&w=900&q=85",
+  mixed: "https://images.unsplash.com/photo-1600189020840-e9918c25269d?auto=format&fit=crop&w=900&q=85",
+  detail: "https://images.unsplash.com/photo-1573936001854-de71ea654bf3?auto=format&fit=crop&w=1200&q=85",
+};
+
+const categories = [
+  {
+    number: "01",
+    name: "Kabuklu lezzetler",
+    subtitle: "Her çıtırtıda ayrı keyif",
+    image: images.pistachio,
+    className: "md:col-span-2",
+  },
+  {
+    number: "02",
+    name: "Seçkin kuruyemişler",
+    subtitle: "Günlük keyfin vazgeçilmezi",
+    image: images.almond,
+    className: "md:col-span-1",
+  },
+  {
+    number: "03",
+    name: "Karışık lezzetler",
+    subtitle: "Bir arada daha güzel",
+    image: images.mixed,
+    className: "md:col-span-1",
+  },
+];
+
+const products = [
+  { name: "Antep Fıstığı", category: "Kuruyemiş", image: images.pistachio, description: "Çıtır çıtır, vazgeçilmez bir klasik." },
+  { name: "Badem", category: "Kuruyemiş", image: images.almond, description: "Her avuçta sade bir lezzet." },
+  { name: "Kaju", category: "Kuruyemiş", image: images.cashew, description: "Yumuşak dokusu, kendine özgü tadı." },
+  { name: "Karışık Kuruyemiş", category: "Karışımlar", image: images.mixed, description: "Sevilen çeşitler bir arada." },
+];
+
+function ArrowIcon({ diagonal = false, className = "" }: { diagonal?: boolean; className?: string }) {
+  return diagonal ? (
+    <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 19 19 5M7 5h12v12" /></svg>
+  ) : (
+    <svg className={className} width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-7-7 7 7-7 7" /></svg>
+  );
 }
 
-const staggerContainer: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.2 }
-  }
+function LeafIcon({ className = "" }: { className?: string }) {
+  return <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 4C11 4 5 7 4 14c-.5 3 1.7 6 5 6 8 0 11-8 11-16Z"/><path d="M4 20c3-5 7-8 12-11"/></svg>;
 }
 
-/* --- HEADER --- */
-function Header() {
-  const [scrolled, setScrolled] = useState(false)
-  const { theme } = useTheme()
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
+function Logo({ light = false }: { light?: boolean }) {
   return (
-    <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? `${theme.headerBg} shadow-sm py-4` : "bg-transparent py-6"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 md:px-12">
-        <div className="flex flex-col">
-          <span className={`text-xl font-bold tracking-widest uppercase ${scrolled ? theme.headerText : theme.title}`}>
-            {content.salon.shortName}
-          </span>
-          <span className={`text-[10px] uppercase tracking-[0.2em] ${scrolled ? theme.headerText : theme.subtitle}`}>
-            {content.salon.name}
-          </span>
-        </div>
+    <a href="#anasayfa" className="inline-flex items-center gap-3 group" aria-label="Benli Kuruyemiş ana sayfa">
+      <span className={"relative grid size-11 shrink-0 place-items-center rounded-full border transition-transform duration-300 group-hover:rotate-[-8deg] " + (light ? "border-[#b6a16c] text-[#ead8aa]" : "border-[#34553d] text-[#34553d]")}>
+        <span className="font-serif text-3xl italic leading-none -translate-y-px">B</span>
+        <span className={"absolute -bottom-1 -right-1 rounded-full p-0.5 " + (light ? "bg-[#203d2d]" : "bg-[#f7f4ec]")}><LeafIcon className="size-3.5" /></span>
+      </span>
+      <span className="flex flex-col leading-none">
+        <strong className={"font-serif text-[25px] font-semibold tracking-[-0.05em] " + (light ? "text-[#f8f5e9]" : "text-[#23402e]")}>benli</strong>
+        <span className={"mt-1 text-[8px] font-bold uppercase tracking-[0.31em] " + (light ? "text-[#d1c3a4]" : "text-[#66806a]")}>kuruyemiş</span>
+      </span>
+    </a>
+  );
+}
 
-        <nav className={`hidden lg:flex space-x-8 text-xs font-medium uppercase tracking-widest ${scrolled ? theme.headerText : theme.title}`}>
-          {["hizmetler", "hakkimizda", "ekip", "yorumlar"].map((item) => (
-            <a key={item} href={`#${item}`} className="hover:opacity-60 transition-opacity">
-              {item === "hakkimizda" ? "Hakkımızda" : item}
-            </a>
-          ))}
-        </nav>
-
-        <a href={`tel:${content.salon.phone}`} className={`${theme.button} px-6 py-2 rounded-none text-xs font-semibold uppercase tracking-wider transition-all hover:shadow-lg`}>
-          Randevu Al
-        </a>
-      </div>
-    </header>
-  )
+function SectionHeading({ eyebrow, title, italic, description }: { eyebrow: string; title: string; italic?: string; description?: string }) {
+  return (
+    <div className="max-w-[630px]">
+      <p className="mb-4 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#99804e]">
+        <span className="h-px w-7 bg-[#ae9157]" />{eyebrow}
+      </p>
+      <h2 className="font-serif text-[clamp(2.7rem,5vw,4.7rem)] leading-[1.05] tracking-[-0.055em] text-[#213c2a]">
+        {title} {italic && <em className="font-normal text-[#a5834c]">{italic}</em>}
+      </h2>
+      {description && <p className="mt-5 max-w-lg text-[15px] leading-8 text-[#6d746b]">{description}</p>}
+    </div>
+  );
 }
 
 export default function Home() {
-  const { theme } = useTheme()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navigation = [
+    { label: "Ana Sayfa", href: "#anasayfa" },
+    { label: "Kategoriler", href: "#kategoriler" },
+    { label: "Ürünler", href: "#urunler" },
+    { label: "Hikâyemiz", href: "#hikayemiz" },
+  ];
 
   return (
-    <main className={`${theme.bg} overflow-x-hidden font-sans`}>
-      <Header />
+    <main id="anasayfa" className="min-h-screen overflow-x-hidden bg-[#f8f6ef] text-[#23402e]">
+      {/* Üst bilgi şeridi */}
+      <div className="bg-[#1c3828] px-4 py-2.5 text-center text-[10px] font-medium tracking-[0.16em] text-[#e9dcc3] sm:text-[11px]">
+        TOPTAN TİCARETİN TECRÜBESİ, BENLİ KURUYEMİŞ&apos;İN LEZZETİ
+      </div>
 
-      {/* --- HERO SECTION (Ferah ve Şık) --- */}
-     <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 pt-20 overflow-hidden">
-
-  {/* 🖼️ ARKA PLAN GÖRSEL */}
-  <div className="absolute inset-0">
-    <img
-      src="/images/gorsel1.jpg"
-      alt="Nail Art"
-      className="w-full h-full object-cover scale-110"
-    />
-  </div>
-
-  {/* 🔥 KARARTMA + GRADIENT */}
-  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80"></div>
-
-  {/* ✨ IŞIK EFEKTİ */}
-  <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-pink-500/20 blur-[120px] rounded-full"></div>
-
-  {/* İÇERİK */}
-  <motion.div 
-    variants={staggerContainer} 
-    initial="hidden" 
-    animate="show" 
-    className="max-w-4xl mx-auto z-10"
-  >
-
-    <h1 className="hidden">
-    Antalya’da profesyonel nail artist hizmetleri: kalıcı oje, protez tırnak, nail art ve el bakımı
-    </h1>
-
-    <motion.p 
-      variants={fadeInUp} 
-      className={`${theme.subtitle} text-white/70 text-xs md:text-sm uppercase tracking-[0.4em] mb-6 font-medium`}
-    >
-      {content.salon.location}
-    </motion.p>
-            
-    <motion.h1 
-      variants={fadeInUp} 
-      className="text-5xl md:text-7xl lg:text-8xl font-light mb-6 tracking-tight leading-tight"
-    >
-      <span className="bg-gradient-to-r from-pink-400 to-rose-300 bg-clip-text text-transparent">
-        Şıklık
-      </span>
-      <br />
-      <span className="font-serif italic text-4xl md:text-6xl lg:text-7xl bg-gradient-to-r from-pink-300 to-rose-200 bg-clip-text text-transparent">
-        Burada Başlar.
-      </span>
-    </motion.h1>
-
-    <motion.p className="text-white/80 max-w-2xl mx-auto text-base md:text-lg font-light leading-relaxed mb-10">
-     Antalya’da profesyonel nail artist hizmetleri: kalıcı oje, protez tırnak, nail art ve el bakımı
-    </motion.p>
-
-    <motion.div 
-      variants={fadeInUp} 
-      className="flex flex-col sm:flex-row items-center justify-center gap-4"
-    >
-      <a 
-        href={`tel:${content.salon.phone}`} 
-        className="bg-gradient-to-r from-pink-500 to-rose-400 px-10 py-4 text-xs font-bold uppercase tracking-widest text-white rounded-full shadow-lg hover:scale-105 transition"
-      >
-        Hemen Ara
-      </a>
-
-      <a 
-        href={`https://wa.me/${content.salon.whatsapp}`} 
-        target="_blank" 
-        rel="noreferrer" 
-        className="px-10 py-4 text-xs font-bold uppercase tracking-widest text-white border border-white/30 rounded-full hover:bg-white/10 transition"
-      >
-        WhatsApp
-      </a>
-    </motion.div>
-
-  </motion.div>
-
-  {/* ⬇️ AŞAĞI OK */}
-  <motion.div 
-    initial={{ opacity: 0 }} 
-    animate={{ opacity: 1 }} 
-    transition={{ delay: 1, duration: 1 }}
-    className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce z-10"
-  >
-    <svg className="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-    </svg>
-  </motion.div>
-
-</section>
-
-      {/* --- HAKKIMIZDA / İSTATİSTİKLER --- */}
-      <section id="hakkimizda" className={`py-24 px-6 ${theme.sectionSoft}`}>
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp} className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className={`${theme.title} text-3xl md:text-4xl font-serif italic mb-6`}>Kendinize Vakit Ayırın</h2>
-            <p className={`${theme.subtitle} text-lg leading-relaxed font-light`}>
-              Modern dokunuşlar, profesyonel ekipmanlar ve alanında uzman kadromuzla saçınıza ve cildinize en uygun bakımı sunuyoruz. Kaliteden ödün vermeden, size özel bir deneyim tasarlıyoruz.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center border-t border-black/5 pt-16">
-            {[
-              { count: "10+", label: "Yıllık Tecrübe" },
-              { count: "4000+", label: "Mutlu Müşteri" },
-              { count: "20+", label: "Özel Hizmet" },
-              { count: "100%", label: "Memnuniyet" }
-            ].map((stat, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }}>
-                <span className={`${theme.title} block text-4xl md:text-5xl font-light mb-2`}>{stat.count}</span>
-                <span className={`${theme.subtitle} text-[10px] md:text-xs uppercase tracking-widest font-semibold`}>{stat.label}</span>
-              </motion.div>
+      {/* Navigasyon */}
+      <header className="relative z-40 border-b border-[#d9dfd3] bg-[#f8f6ef]/95">
+        <div className="mx-auto flex h-[86px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-16">
+          <Logo />
+          <nav className="hidden items-center gap-9 lg:flex" aria-label="Ana menü">
+            {navigation.map((item) => (
+              <a key={item.href} href={item.href} className="group relative py-2 text-[12px] font-semibold text-[#314936] transition-colors hover:text-[#b38b51]">
+                {item.label}
+                <span className="absolute bottom-0 left-0 h-px w-0 bg-[#a68651] transition-all group-hover:w-full" />
+              </a>
             ))}
+          </nav>
+          <div className="hidden items-center gap-4 lg:flex">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8e978b]">Yeni dijital vitrinimiz</span>
+            <a href="#urunler" className="inline-flex items-center gap-3 rounded-full bg-[#254831] px-6 py-3.5 text-xs font-semibold text-[#fffaf0] transition hover:bg-[#173321]">
+              Koleksiyonu keşfet <ArrowIcon diagonal className="size-4" />
+            </a>
           </div>
+          <button
+            type="button"
+            className="grid size-11 place-items-center rounded-full border border-[#d1dacd] text-[#24452e] lg:hidden"
+            aria-label={mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19" /></svg>
+            ) : (
+              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+            )}
+          </button>
         </div>
-      </section>
-
-      {/* --- HİZMETLERİMİZ (SPA / MENÜ STİLİ) --- */}
-      <section id="hizmetler" className={`py-32 px-6 ${theme.sectionAlt}`}>
-        <div className="max-w-7xl mx-auto">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp} className="text-center mb-24">
-            <span className={`${theme.subtitle} text-xs uppercase tracking-[0.4em] font-semibold block mb-4`}>
-              Uzmanlık Alanlarımız
-            </span>
-            <h2 className={`${theme.title} text-4xl md:text-5xl font-light tracking-tight`}>
-              Güzellik <span className="font-serif italic text-5xl md:text-6xl">Menüsü</span>
-            </h2>
-            <div className={`w-16 h-px ${theme.accentLine} mx-auto mt-8`} />
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {content.hizmetler.map((item, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className={`${theme.card} rounded-none border-b-2 border-transparent hover:border-black/10 transition-all p-8 md:p-12 flex flex-col group`}
-              >
-                <div className="mb-8">
-                  <span className={`${theme.subtitle} text-[10px] uppercase tracking-widest font-bold block mb-4`}>0{i + 1}</span>
-                  <h3 className={`${theme.title} text-2xl font-light uppercase tracking-wide mb-4`}>{item.title}</h3>
-                  <p className={`${theme.subtitle} text-sm leading-relaxed font-light`}>
-                    {item.desc}
-                  </p>
-                </div>
-                <div className="mt-auto pt-6 border-t border-black/5">
-                  <a href={`https://wa.me/${content.salon.whatsapp}?text=Merhaba, ${item.title} hizmeti hakkında bilgi almak istiyorum.`} target="_blank" rel="noreferrer" className={`${theme.link} text-xs uppercase font-bold tracking-widest inline-flex items-center group-hover:translate-x-2 transition-transform`}>
-                    Bilgi Al <span className="ml-2">→</span>
-                  </a>
-                </div>
-              </motion.div>
+        {mobileMenuOpen && (
+          <nav id="mobile-navigation" aria-label="Mobil menü" className="border-t border-[#e0e4d9] bg-[#f8f6ef] px-7 py-5 lg:hidden">
+            {navigation.map((item) => (
+              <a key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between border-b border-[#e4e6dd] py-4 text-sm font-semibold">
+                {item.label}<ArrowIcon diagonal className="size-4 text-[#b48a51]" />
+              </a>
             ))}
-          </div>
-        </div>
-      </section>
+          </nav>
+        )}
+      </header>
 
-      {/* --- EKİBİMİZ (ZARİF PROFİLLER) --- */}
-     <section id="ekip" className={`py-32 px-6 ${theme.bg}`}>
-  <div className="max-w-7xl mx-auto text-center">
-    <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp}>
-      <span className={`${theme.subtitle} text-xs uppercase tracking-[0.4em] font-semibold block mb-4`}>
-        Yetenekli Eller
-      </span>
-      <h2 className={`${theme.title} text-4xl md:text-5xl font-light tracking-tight mb-20`}>
-        Ekibimizle <span className="font-serif italic text-5xl md:text-6xl">Tanışın</span>
-      </h2>
-      
-      <div className="flex flex-wrap justify-center gap-16">
-        {content.ekip.map((member, i) => (
-          <div key={i} className="flex flex-col items-center max-w-sm">
-            <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-8 border border-black/5 p-2 bg-white/5">
-              <img
-                src={member.img}
-                alt={member.name}
-                className="w-full h-full object-cover rounded-full transition-all duration-700"
-              />
+      {/* Hero */}
+      <section className="relative isolate overflow-hidden bg-[#203d2b]">
+        <div className="pointer-events-none absolute -left-40 bottom-[-24rem] size-[37rem] rounded-full border border-white/10" />
+        <div className="pointer-events-none absolute -left-28 bottom-[-21rem] size-[30rem] rounded-full border border-white/10" />
+        <div className="pointer-events-none absolute right-[-12rem] top-[-18rem] size-[36rem] rounded-full bg-[#446348]/25 blur-[100px]" />
+        <div className="mx-auto grid min-h-[640px] max-w-[1440px] items-stretch lg:min-h-[690px] lg:grid-cols-[52%_48%]">
+          <div className="relative z-10 flex flex-col justify-center px-6 py-20 sm:px-12 lg:px-16 lg:py-28">
+            <div className="mb-8 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#d7c398]">
+              <span className="h-px w-9 bg-[#d1b27c]" /> Benli Kuruyemiş&apos;e hoş geldiniz
             </div>
-            <h3 className={`${theme.title} text-2xl font-light uppercase tracking-wider mb-2`}>
-              {member.name}
-            </h3>
-            <p className={`${theme.subtitle} text-xs font-bold uppercase tracking-widest mb-6`}>
-              {member.role}
+            <h1 className="max-w-[740px] font-serif text-[clamp(4rem,7.2vw,8rem)] leading-[0.97] tracking-[-0.068em] text-[#fffaf0]">
+              Lezzetin<br />
+              <em className="font-normal text-[#d4b580]">doğal</em><br />
+              hâli.
+            </h1>
+            <p className="mt-8 max-w-[460px] text-sm leading-8 text-[#d4dfd2] sm:text-[16px]">
+              Kuruyemiş ticaretindeki birikimimizi şimdi dijital dünyaya taşıyoruz. Her sofraya yakışan lezzetler, Benli dokunuşuyla.
             </p>
-            <p className={`${theme.subtitle} text-sm font-light leading-relaxed italic px-4`}>
-              "{member.bio}"
-            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <a href="#urunler" className="inline-flex min-h-14 items-center justify-center gap-5 rounded-full bg-[#e4c994] px-8 text-xs font-bold tracking-wide text-[#223a29] transition hover:-translate-y-0.5 hover:bg-[#f1d9ab]">
+                Ürünleri keşfet <ArrowIcon />
+              </a>
+              <a href="#hikayemiz" className="inline-flex min-h-14 items-center gap-3 border-b border-[#a3b09f] text-xs font-semibold text-[#f4f2e7] transition hover:border-[#e4c994] hover:text-[#e4c994]">
+                Bizi tanıyın <ArrowIcon diagonal className="size-4" />
+              </a>
+            </div>
+            <div className="mt-16 flex items-center gap-4 border-t border-white/15 pt-7 text-xs text-[#d4dfd2] sm:mt-20">
+              <span className="grid size-11 shrink-0 place-items-center rounded-full border border-[#88a48b]/50 text-[#dec394]"><LeafIcon className="size-5" /></span>
+              <span className="max-w-xs leading-6">Geleneksel kuruyemiş ticaretinden ilham alan yeni alışveriş deneyimi.</span>
+            </div>
           </div>
-        ))}
-      </div>
-    </motion.div>
-  </div>
-</section>
 
-      {/* --- YORUMLAR (GÜVEN VEREN TASARIM) --- */}
-      <section id="yorumlar" className={`py-32 px-6 ${theme.sectionSoft}`}>
-        <div className="max-w-7xl mx-auto">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-20">
-            <h2 className={`${theme.title} text-4xl md:text-5xl font-light tracking-tight`}>
-              Sizden <span className="font-serif italic text-5xl md:text-6xl">Gelenler</span>
-            </h2>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-            { name: "Zeynep T.", comment: "İlk kez geldim ama sanki yıllardır geliyormuşum gibi hissettim. Tırnak tasarımım tam istediğim gibi oldu, gerçekten işlerini çok iyi biliyorlar." },
-{ name: "Merve Y.", comment: "Jel tırnak yaptırdım ve sonuç beklediğimin bile üstündeydi. Hem ilgileri hem hijyenleri çok profesyoneldi." },
-{ name: "Ayşegül D.", comment: "Nail art yaptırdım, tırnaklarım resmen bambaşka oldu. Bu kadar güzel ve kalıcı olacağını beklemiyordum açıkçası." }
-            ].map((item, i) => (
-              <motion.div key={i} whileHover={{ y: -5 }} className={`${theme.card} p-10 flex flex-col justify-between border-none shadow-sm`}>
-                <div className="flex text-yellow-500 mb-6">
-                  {[...Array(5)].map((_, idx) => (
-                    <svg key={idx} className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  ))}
-                </div>
-                <p className={`${theme.subtitle} text-base md:text-lg font-light italic leading-relaxed mb-8 flex-grow`}>"{item.comment}"</p>
-                <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-full ${theme.soft} flex items-center justify-center font-bold text-sm uppercase`}>
-                    {item.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h4 className={`${theme.title} text-xs font-bold uppercase tracking-widest`}>{item.name}</h4>
-                    <span className={`${theme.subtitle} text-[10px] uppercase tracking-widest font-semibold`}>Google Yorumu</span>
-                  </div>
-                </div>
-              </motion.div>
+          <div className="relative min-h-[410px] overflow-hidden lg:min-h-full">
+            <img
+              src={images.hero}
+              alt="Farklı kuruyemişlerden yakın plan bir görünüm"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#14271b]/50 via-transparent to-[#12281b]/10 lg:bg-gradient-to-r lg:from-[#203d2b]/30 lg:to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between text-white sm:bottom-9 sm:left-9">
+              <p className="max-w-[245px] font-serif text-[27px] italic leading-tight drop-shadow-lg sm:text-[34px]">Bir avuç mutluluk.</p>
+              <div className="grid size-[94px] rotate-12 place-items-center rounded-full border border-[#fff7e4]/60 bg-[#fff7e4]/95 p-3 text-center text-[9px] font-bold uppercase leading-4 tracking-widest text-[#23432c] shadow-xl sm:size-[115px]">
+                <span>Doğanın<br /><span className="font-serif text-2xl italic normal-case tracking-normal">lezzeti</span><br />sizinle</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Kısa vurgu bandı */}
+      <div className="border-b border-[#deded2] bg-[#eee9dd]">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-[#d9d8cc] px-4 py-6 sm:px-10 lg:grid-cols-4 lg:px-16">
+          {["Toptan ticaret tecrübesi", "Sevilen kuruyemiş çeşitleri", "Benli Kuruyemiş güvencesi", "Yeni dijital alışveriş deneyimi"].map((feature, index) => (
+            <div key={feature} className="flex items-center gap-3 px-3 py-2 sm:px-6">
+              <span className="font-serif text-2xl italic text-[#b39a6b]">{String(index + 1).padStart(2, "0")}</span>
+              <span className="max-w-[160px] text-[11px] font-semibold leading-5 text-[#3f5644] sm:text-xs">{feature}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Kategoriler */}
+      <section id="kategoriler" className="scroll-mt-20 px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
+        <div className="mx-auto max-w-[1312px]">
+          <div className="mb-11 flex flex-col items-start justify-between gap-6 lg:mb-14 lg:flex-row lg:items-end">
+            <SectionHeading eyebrow="Koleksiyonumuz" title="Her damak tadına" italic="bir lezzet." description="Atıştırmalık molalarından kalabalık sofralara, kuruyemişin sevilen çeşitleri bir arada." />
+            <a href="#urunler" className="inline-flex items-center gap-3 border-b border-[#ac925f] pb-2 text-xs font-bold text-[#31503a] transition hover:text-[#b18c55]">
+              Tüm ürünleri gör <ArrowIcon diagonal className="size-4" />
+            </a>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-4">
+            {categories.map((category) => (
+              <a href="#urunler" key={category.number} className={"group relative isolate min-h-[355px] overflow-hidden rounded-[6px] sm:min-h-[425px] " + category.className}>
+                <img src={category.image} alt={category.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <span className="absolute inset-0 bg-gradient-to-t from-[#142318]/90 via-[#172b1a]/25 to-[#142318]/5" />
+                <span className="relative z-10 flex h-full min-h-[355px] flex-col justify-between p-7 text-white sm:min-h-[425px] sm:p-9">
+                  <span className="font-serif text-lg italic text-[#e1cfac]">{category.number} / Koleksiyon</span>
+                  <span>
+                    <span className="mb-2 block text-xs text-[#dcded4]">{category.subtitle}</span>
+                    <span className="flex items-end justify-between gap-4">
+                      <span className="max-w-[320px] font-serif text-3xl leading-tight tracking-[-0.04em] sm:text-4xl">{category.name}</span>
+                      <span className="grid size-11 shrink-0 place-items-center rounded-full border border-white/70 transition group-hover:bg-white group-hover:text-[#233b29]"><ArrowIcon diagonal /></span>
+                    </span>
+                  </span>
+                </span>
+              </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* --- FOOTER (NET VE TEMİZ İLETİŞİM) --- */}
- <footer className="bg-[#0a0a0a] text-white py-20 px-6 border-t border-white/10">
-  <div className="max-w-7xl mx-auto">
-    
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 border-b border-white/10 pb-16">
-      
-      {/* SOL ALAN */}
-      <div className="md:col-span-2">
-        <span className="text-3xl font-light tracking-widest uppercase block mb-4">
-          {content.salon.shortName}
-        </span>
+      {/* Ürün kartları: henüz yalnızca vitrin tasarımı */}
+      <section id="urunler" className="scroll-mt-20 bg-[#eeefe6] px-5 py-24 sm:px-8 lg:px-16 lg:py-28">
+        <div className="mx-auto max-w-[1312px]">
+          <div className="mb-12 flex flex-col justify-between gap-7 md:flex-row md:items-end">
+            <SectionHeading eyebrow="Ürün vitrini" title="Göz atmaya" italic="değer." description="Kuruyemiş severlerin yakından tanıdığı tatlardan bir seçki. Buradaki ürünler tasarım önizlemesi içindir." />
+            <span className="w-fit rounded-full border border-[#b9c6b6] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#506d54]">Fiyatlar yakında eklenecek</span>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product, index) => (
+              <article key={product.name} className="group overflow-hidden rounded-[5px] border border-[#dce1d5] bg-[#fbfaf4] shadow-[0_12px_35px_rgba(32,61,43,0.035)]">
+                <div className="relative aspect-[1/1.02] overflow-hidden bg-[#e4e4da]">
+                  <img src={product.image} alt={product.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <span className="absolute left-4 top-4 rounded-full bg-[#fffaf1]/95 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.13em] text-[#37543c]">{index === 3 ? "Karışım" : "Kuruyemiş"}</span>
+                </div>
+                <div className="px-5 pb-6 pt-6">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.19em] text-[#9d845c]">{product.category}</span>
+                  <h3 className="mt-2 font-serif text-[26px] leading-tight tracking-[-0.04em] text-[#25422e]">{product.name}</h3>
+                  <p className="mt-2 min-h-[42px] text-[12px] leading-5 text-[#768076]">{product.description}</p>
+                  <div className="mt-6 flex items-center justify-between border-t border-[#e2e5dc] pt-4">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[#819081]">Ürün tanıtımı</span>
+                    <span aria-label="Detaylar hazırlanıyor" className="grid size-9 place-items-center rounded-full border border-[#c8d3c4] text-[#56735a]"><ArrowIcon diagonal className="size-4" /></span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-col justify-between gap-4 rounded-[5px] border border-[#d4ddce] bg-[#f7f7ee] px-6 py-5 text-sm text-[#436049] sm:flex-row sm:items-center">
+            <p className="font-medium">Online sipariş ve WhatsApp sepet deneyimi sonraki aşamada eklenecek.</p>
+            <span className="w-fit rounded-full bg-[#e5ebdd] px-4 py-2 text-[10px] font-bold uppercase tracking-wider">Tasarım önizlemesi</span>
+          </div>
+        </div>
+      </section>
 
-        <span className="text-xl opacity-70 block mb-6">
-          {content.salon.name}
-        </span>
+      {/* Marka hikayesi */}
+      <section id="hikayemiz" className="scroll-mt-20 bg-[#f8f6ef] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
+        <div className="mx-auto grid max-w-[1312px] items-center gap-12 lg:grid-cols-2 lg:gap-24">
+          <div className="relative min-h-[450px] lg:min-h-[630px]">
+            <div className="absolute inset-0 rounded-t-[45%] bg-[#e4e0d2]" />
+            <img src={images.detail} alt="Doğal yeşil tonlarıyla Antep fıstığı içleri" loading="lazy" className="absolute inset-4 h-[calc(100%-16px)] w-[calc(100%-32px)] rounded-t-[45%] object-cover" />
+            <div className="absolute bottom-[-22px] right-[-5px] flex size-[140px] -rotate-12 flex-col items-center justify-center rounded-full border-[7px] border-[#f8f6ef] bg-[#bba073] text-center text-[#1b3b2a] shadow-lg sm:right-[-25px] sm:size-[164px]">
+              <LeafIcon className="mb-1 size-6" />
+              <span className="text-[9px] font-bold uppercase leading-4 tracking-[0.12em]">Benli&apos;nin<br />lezzet dünyası</span>
+            </div>
+          </div>
+          <div className="pt-8 lg:pl-5">
+            <p className="mb-6 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#a58551]"><span className="h-px w-8 bg-[#bda170]" /> Bizi tanıyın</p>
+            <h2 className="font-serif text-[clamp(3rem,5.2vw,5.6rem)] leading-[1.02] tracking-[-0.065em] text-[#203d2b]">
+              İşin <em className="font-normal text-[#a58655]">özünde</em><br />lezzet var.
+            </h2>
+            <p className="mt-7 text-[15px] leading-8 text-[#697569]">
+              Benli Kuruyemiş olarak kuruyemişin toptan ticaretindeki birikimimizi, şimdi kendimize ait bir dijital vitrinle buluşturuyoruz. Amacımız, ürünlerimizi daha yakından tanıtabildiğimiz, sade ve güven veren bir alışveriş deneyimi sunmak.
+            </p>
+            <div className="mt-9 grid gap-5 border-t border-[#d6ddcf] pt-8 sm:grid-cols-2">
+              <div>
+                <span className="mb-3 grid size-10 place-items-center rounded-full bg-[#e4e9dc] text-[#33573b]"><LeafIcon className="size-5" /></span>
+                <h3 className="text-sm font-bold text-[#29482f]">Ticaretin içinden</h3>
+                <p className="mt-2 text-xs leading-6 text-[#728072]">Sektördeki deneyimimiz, markamızın temelinde.</p>
+              </div>
+              <div>
+                <span className="mb-3 grid size-10 place-items-center rounded-full bg-[#e4e9dc] font-serif text-xl italic text-[#33573b]">B</span>
+                <h3 className="text-sm font-bold text-[#29482f]">Şimdi dijitalde</h3>
+                <p className="mt-2 text-xs leading-6 text-[#728072]">Benli Kuruyemiş&apos;in yeni adresini birlikte keşfedin.</p>
+              </div>
+            </div>
+            <a href="#kategoriler" className="mt-9 inline-flex items-center gap-3 border-b border-[#8b9b85] pb-3 text-xs font-bold text-[#294a33] transition hover:text-[#a1814b]">Koleksiyona göz atın <ArrowIcon /></a>
+          </div>
+        </div>
+      </section>
 
-        <p className="opacity-60 text-sm leading-relaxed max-w-sm font-light">
-          {content.salon.slogan} <br />
-          {content.salon.location}
-        </p>
-      </div>
+      {/* Alt çağrı */}
+      <section className="relative overflow-hidden bg-[#d7c096] px-6 py-20 text-center sm:px-8 lg:py-28">
+        <div className="pointer-events-none absolute -left-36 -top-32 size-96 rounded-full border border-[#25462f]/15" />
+        <div className="pointer-events-none absolute -right-28 -bottom-44 size-[30rem] rounded-full border border-[#25462f]/15" />
+        <div className="relative mx-auto max-w-[770px]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.29em] text-[#5f6949]">Benli Kuruyemiş</p>
+          <h2 className="mt-5 font-serif text-[clamp(3.1rem,6vw,6.3rem)] leading-[1.06] tracking-[-0.07em] text-[#203b2a]">
+            Güzel bir mola, <em className="font-normal">güzel bir lezzet.</em>
+          </h2>
+          <p className="mx-auto mt-5 max-w-[450px] text-sm leading-7 text-[#52604b]">Yeni ürün vitrinimizi keşfedin. Fiyatlar, sipariş ve iletişim bilgileri yakında eklenecek.</p>
+          <a href="#urunler" className="mt-8 inline-flex min-h-14 items-center justify-center gap-4 rounded-full bg-[#23422e] px-9 text-xs font-bold text-[#fffaf0] transition hover:bg-[#112d1c]">Ürünlere göz at <ArrowIcon /></a>
+        </div>
+      </section>
 
-      {/* SAYFALAR */}
-      <div className="flex flex-col space-y-4 text-xs font-bold uppercase tracking-widest">
-        <h4 className="opacity-40 mb-2">Sayfalar</h4>
-
-        <a href="#hizmetler" className="hover:opacity-70 transition">
-          Menü / Hizmetler
-        </a>
-
-        <a href="#hakkimizda" className="hover:opacity-70 transition">
-          Hakkımızda
-        </a>
-
-        <a href="#ekip" className="hover:opacity-70 transition">
-          Ekip
-        </a>
-      </div>
-
-      {/* İLETİŞİM */}
-      <div className="flex flex-col space-y-4">
-        <h4 className="text-xs uppercase tracking-widest font-bold opacity-40 mb-2">
-          İletişim
-        </h4>
-
-        <a
-          href={`tel:${content.salon.phone}`}
-          className="text-xl md:text-2xl font-light hover:opacity-70 transition"
-        >
-          {content.salon.phone}
-        </a>
-
-        <a
-          href={`https://wa.me/${content.salon.whatsapp}`}
-          target="_blank"
-          rel="noreferrer"
-          className="text-xs uppercase font-bold tracking-widest hover:opacity-70 transition flex items-center"
-        >
-          WhatsApp İle Ulaşın <span className="ml-2">↗</span>
-        </a>
-
-        <a
-          href="https://www.instagram.com/selinay.nailarts?igsh=MTUxMWVpOXpuNmF5Nw%3D%3D"
-          target="_blank"
-          rel="noreferrer"
-          className="text-xs uppercase font-bold tracking-widest hover:opacity-70 transition flex items-center mt-2"
-        >
-          Instagram <span className="ml-2">↗</span>
-        </a>
-      </div>
-    </div>
-
-    {/* ALT BAR */}
-    <div className="flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs uppercase tracking-widest opacity-40 font-semibold">
-      <p>{content.salon.copyright}</p>
-      <p className="mt-4 md:mt-0">Premium Beauty Studio</p>
-    </div>
-
-  </div>
-</footer>
+      {/* Footer */}
+      <footer className="bg-[#193323] px-6 pb-9 pt-16 text-[#eaf0e4] sm:px-8 lg:px-16 lg:pt-20">
+        <div className="mx-auto grid max-w-[1312px] gap-12 border-b border-white/15 pb-14 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div>
+            <Logo light />
+            <p className="mt-7 max-w-[340px] text-sm leading-7 text-[#b7c7b8]">Toptan kuruyemiş tecrübemizle şekillenen yeni dijital dünyamız. Lezzeti birlikte keşfedelim.</p>
+          </div>
+          <div>
+            <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.23em] text-[#d4bf91]">Hızlı bağlantılar</h3>
+            <div className="flex flex-col items-start gap-3 text-sm text-[#d3ddd1]">
+              {navigation.map((item) => <a key={item.href} href={item.href} className="hover:text-[#efd8a7]">{item.label}</a>)}
+            </div>
+          </div>
+          <div>
+            <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.23em] text-[#d4bf91]">İletişim</h3>
+            <p className="max-w-xs text-sm leading-7 text-[#c1d1c1]">Sipariş hattı, işletme adresi ve diğer iletişim bilgileri hazırlık tamamlandığında burada yer alacak.</p>
+            <a href="#anasayfa" className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-[#e7d2a2]">Başa dön ↑</a>
+          </div>
+        </div>
+        <div className="mx-auto flex max-w-[1312px] flex-col justify-between gap-4 pt-7 text-[11px] text-[#acbfae] sm:flex-row">
+          <span>© {new Date().getFullYear()} Benli Kuruyemiş. Tüm hakları saklıdır.</span>
+          <span>Bu sayfa ana sayfa tasarım önizlemesidir.</span>
+        </div>
+      </footer>
     </main>
-  )
+  );
 }
