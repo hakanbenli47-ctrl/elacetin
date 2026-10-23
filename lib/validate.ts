@@ -20,5 +20,5 @@ export function parseProduct(raw:unknown):Product|null{
  }
  const stock=Number(d.stock);
  if(!Number.isSafeInteger(stock)||stock<0||stock>1000000000)return null;
- return {id:id||randomUUID(),name,slug,category:d.category as Category,description:str(d.description,6000),image,images:[],unit:"g",prices,stock,active:Boolean(d.active),featured:Boolean(d.featured),ingredients:str(d.ingredients,5000),allergens:str(d.allergens,5000)};
+ return {id:id||randomUUID(),name,slug,category:d.category as Category,description:str(d.description,6000),image,images:[],unit:"g",prices,stock,active:Boolean(d.active),featured:Boolean(d.featured),badge:str(d.badge,26),ingredients:str(d.ingredients,5000),allergens:str(d.allergens,5000)};
 }
