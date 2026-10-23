@@ -5,13 +5,13 @@ import type {OrderStatus} from "@/lib/types";
 export const runtime="nodejs";
 export async function PATCH(request:NextRequest,ctx:{params:Promise<{id:string}>}){
  if(!isAdmin(request))return NextResponse.json({error:"Yetkisiz."},{status:401});
- const {id}=await ctx.params;const existing=findOrder(id);if(!existing)return NextResponse.json({error:"Talep bulunamadı."},{status:404});
+ const {id}=await ctx.params;const existing=await findOrder(id);if(!existing)return NextResponse.json({error:"Talep bulunamadı."},{status:404});
  try{
  const data=await request.json() as {status?:unknown;carrier?:unknown;trackingNo?:unknown;payment?:unknown};
  if(data.status!==undefined){if(!orderStatuses.includes(data.status as OrderStatus))return NextResponse.json({error:"Geçersiz durum."},{status:400});existing.status=data.status as OrderStatus;}
  if(typeof data.carrier==="string")existing.carrier=data.carrier.slice(0,100);
  if(typeof data.trackingNo==="string")existing.trackingNo=data.trackingNo.slice(0,120);
  if(typeof data.payment==="string")existing.payment=data.payment.slice(0,100);
- saveOrder(existing);return NextResponse.json({order:existing});
+ await saveOrder(existing);return NextResponse.json({order:existing});
  }catch{return NextResponse.json({error:"Talep güncellenemedi."},{status:500});}
 }

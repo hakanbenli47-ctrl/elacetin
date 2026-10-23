@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminConfigured, cookieName, cookieOptions, isAdmin, signAdminSession, verifyCredentials } from "@/lib/auth";
+import { ephemeral } from "@/lib/db";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const failed = new Map<string,{count:number;start:number}>();
-export async function GET(request:NextRequest){return NextResponse.json({authenticated:isAdmin(request),configured:adminConfigured,ephemeral:!!process.env.VERCEL});}
+export async function GET(request:NextRequest){return NextResponse.json({authenticated:isAdmin(request),configured:adminConfigured,ephemeral});}
 export async function POST(request:NextRequest){
  const ip=request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()||"unknown";
  const recent=failed.get(ip);if(recent&&Date.now()-recent.start<15*60*1000&&recent.count>=6)return NextResponse.json({error:"Çok fazla başarısız deneme. 15 dakika sonra tekrar deneyin."},{status:429});
