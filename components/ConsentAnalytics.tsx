@@ -142,6 +142,6 @@ export default function ConsentAnalytics(){
   </div>
   <div className="bn-consent-links"><Link href="/cerez-politikasi">Çerez ve gizlilik politikası</Link><span>• İzninizi istediğiniz an değiştirebilirsiniz.</span></div>
  </div>}
- {!open&&<button type="button" className="bn-consent-tab" onClick={()=>{setOpen(true);setCustomize(true);setCustomAnalytics(Boolean(selected?.analytics))}}>Çerez ayarları</button>}
+ 
  </>;
 }
