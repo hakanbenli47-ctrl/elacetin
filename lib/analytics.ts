@@ -38,7 +38,6 @@ export function sameOrigin(request:NextRequest):boolean{
  const origin=request.headers.get("origin");
  return !!origin&&origin===new URL(request.url).origin;
 }
-let lastCleanup=0;
 
 type DbAnalyticsRow = {
  visitor_id:string;session_id:string;event:string;page:string;target:string;
