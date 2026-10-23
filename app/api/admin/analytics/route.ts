@@ -6,6 +6,6 @@ export async function GET(request:NextRequest){
  if(!isAdmin(request))return NextResponse.json({error:"Yetkisiz."},{status:401});
  const days=Number(request.nextUrl.searchParams.get("days")||7);
  if(![7,30,90].includes(days))return NextResponse.json({error:"Geçersiz tarih aralığı."},{status:400});
- try{return NextResponse.json({report:analyticsReport(days),ephemeral:!!process.env.VERCEL},{headers:{"Cache-Control":"no-store"}})}
+ try{return NextResponse.json({report:await analyticsReport(days),ephemeral:!process.env.SUPABASE_SECRET_KEY},{headers:{"Cache-Control":"no-store"}})}
  catch{return NextResponse.json({error:"Analitik verileri okunamadı."},{status:500});}
 }

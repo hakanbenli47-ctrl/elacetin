@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { allowedEvents, analyticsDb, isConsented, sameOrigin, validId, validPath, validTarget } from "@/lib/analytics";
+import { allowedEvents, recordAnalyticsEvent, isConsented, sameOrigin, validId, validPath, validTarget } from "@/lib/analytics";
 import type { AnalyticsEvent } from "@/lib/analytics";
 export const runtime="nodejs";export const dynamic="force-dynamic";
 const bucket=new Map<string,{start:number,count:number}>();
@@ -16,8 +16,7 @@ export async function POST(request:NextRequest){
   if(current.count>=500)return NextResponse.json({error:"Çok fazla olay."},{status:429});
   current.count++;bucket.set(key,current);
   if(bucket.size>2000){for(const [k,v] of bucket){if(now-v.start>3600000)bucket.delete(k)}}
-  const db=analyticsDb();
-  db.prepare("INSERT INTO analytics_events(visitor_id,session_id,event,page,target,duration_sec,created_at) VALUES (?,?,?,?,?,?,?)").run(data.visitorId,data.sessionId,String(data.event),data.page,data.target,data.durationSec,new Date().toISOString());
+  await recordAnalyticsEvent({visitorId:data.visitorId,sessionId:data.sessionId,event:data.event as AnalyticsEvent,page:data.page,target:data.target,durationSec:data.durationSec});
   return new NextResponse(null,{status:204,headers:{"Cache-Control":"no-store"}});
  }catch{return NextResponse.json({error:"Olay kaydedilemedi."},{status:500});}
 }

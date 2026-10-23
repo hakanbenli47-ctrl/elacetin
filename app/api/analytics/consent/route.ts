@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ANALYTICS_COOKIE, analyticsCookieOptions, analyticsDb, consentToken, isConsented, sameOrigin, validId } from "@/lib/analytics";
+import { ANALYTICS_COOKIE, analyticsCookieOptions, removeVisitorAnalytics, consentToken, isConsented, sameOrigin, validId } from "@/lib/analytics";
 export const runtime="nodejs";export const dynamic="force-dynamic";
 export async function POST(request:NextRequest){
  if(!sameOrigin(request))return NextResponse.json({error:"Kaynak doğrulanamadı."},{status:403});
@@ -11,7 +11,7 @@ export async function DELETE(request:NextRequest){
  const approved=isConsented(request);
  try{
   const body=await request.json() as {visitorId?:unknown};
-  if(approved&&validId(body?.visitorId))analyticsDb().prepare("DELETE FROM analytics_events WHERE visitor_id=?").run(body.visitorId);
+  if(approved&&validId(body?.visitorId))await removeVisitorAnalytics(body.visitorId);
  }catch{}
  const res=NextResponse.json({ok:true});
  res.cookies.set(ANALYTICS_COOKIE,"",{...analyticsCookieOptions,maxAge:0});
