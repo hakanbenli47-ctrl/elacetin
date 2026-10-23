@@ -37,3 +37,12 @@ Sepette gramaj/adet ve mevcutsa ürün toplamı görünür. Müşteri ad-soyad v
 ## Yayın öncesi kontrol
 
 Mevcut ürün fotoğrafları temsilîdir. Ürün fiyatları, gerçek görselleri, içerikler, alerjenler, iade/mesafeli satış koşulları, ETBİS/gıda bilgilendirmeleri ve gerçek işletme iletişim/adres bilgilerini tamamlayın. Google ile giriş için OAuth bilgilerini bağlayın. Kalıcı veri depolaması olmadan üretim sipariş süreçlerini kullanmayın.
+
+## Girişler çalışmıyorsa
+
+Vercel → elacetin → Settings → Environment Variables → **Production** içinde aşağıdaki değişkenler eksiksiz bulunmalı; ardından Production yeniden dağıtılmalı.
+
+- Yönetici: `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `AUTH_SECRET`. Kullanıcı adı `benli kuruyemiş` olarak seçilebilir. Canlı yönetici hesabında **123456 kullanmayın**; bunun yerine uzun, benzersiz bir parola belirleyin. `AUTH_SECRET` için de rastgele üretilmiş en az 32 karakter kullanın.
+- Google: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, aynı `AUTH_SECRET`. Google Cloud → OAuth Clients → Web Application. Allowed JavaScript origin: `https://selinay.vercel.app`. Authorized redirect URI: `https://selinay.vercel.app/api/google/callback`. İsterseniz `GOOGLE_REDIRECT_URI` değişkenini aynı callback adresiyle tanımlayın.
+
+Google kimliği için OAuth consent screen düzgün yapılandırılmalı ve test aşamasındaki uygulamada kullanıcı e-postası test kullanıcıları listesine eklenmeli. Google Client Secret ve gerçek admin şifresini GitHub'a commit etmeyin.

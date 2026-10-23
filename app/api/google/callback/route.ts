@@ -8,7 +8,7 @@ export async function GET(req:NextRequest){
  const csrf=untoken<{state:string;nonce:string;verifier:string;exp:number}>(req.cookies.get(oauthCookie)?.value);
  if(!code||!state||!csrf||state!==csrf.state||req.nextUrl.searchParams.get("error"))return err("dogrulama");
  try{
- const redirectUri=new URL("/api/google/callback",req.nextUrl.origin).toString();
+ const redirectUri=process.env.GOOGLE_REDIRECT_URI||new URL("/api/google/callback",req.nextUrl.origin).toString();
  const response=await fetch("https://oauth2.googleapis.com/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({code,client_id:process.env.GOOGLE_CLIENT_ID!,client_secret:process.env.GOOGLE_CLIENT_SECRET!,redirect_uri:redirectUri,grant_type:"authorization_code",code_verifier:csrf.verifier}).toString(),cache:"no-store"});
  if(!response.ok)return err("google");
  const tokens=await response.json() as {id_token?:string};if(!tokens.id_token)return err("google");
