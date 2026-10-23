@@ -17,7 +17,7 @@ export async function POST(request:NextRequest){
   current.count++;bucket.set(key,current);
   if(bucket.size>2000){for(const [k,v] of bucket){if(now-v.start>3600000)bucket.delete(k)}}
   const db=analyticsDb();
-  db.prepare("INSERT INTO analytics_events(visitor_id,session_id,event,page,target,duration_sec,created_at) VALUES (?,?,?,?,?,?,?)").run(data.visitorId,data.sessionId,data.event,data.page,data.target,data.durationSec,new Date().toISOString());
+  db.prepare("INSERT INTO analytics_events(visitor_id,session_id,event,page,target,duration_sec,created_at) VALUES (?,?,?,?,?,?,?)").run(data.visitorId,data.sessionId,String(data.event),data.page,data.target,data.durationSec,new Date().toISOString());
   return new NextResponse(null,{status:204,headers:{"Cache-Control":"no-store"}});
  }catch{return NextResponse.json({error:"Olay kaydedilemedi."},{status:500});}
 }
