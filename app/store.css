@@ -308,3 +308,40 @@
 
 .bm-cookie-link{border:0;background:transparent;padding:0;color:#b8cfbb;cursor:pointer;font-size:10px;text-decoration:underline}
 .bm-cookie-link:hover{color:white}
+
+/* Mağazada canlı arama ve yönetilebilir ürün vitrini */
+.bm-search-shell{position:relative;z-index:45;flex:1;max-width:780px;margin-inline:auto;min-width:160px}
+.bm-search-shell .bm-search{max-width:none;margin:0;height:57px;background:#f7f8f5;border:1.5px solid #dee6db;box-shadow:0 5px 19px #123b1c09;border-radius:13px;padding-left:18px;transition:border-color .2s,box-shadow .2s}
+.bm-search-shell .bm-search-active,.bm-search-shell .bm-search:focus-within{border-color:#72a17b;background:#fff;box-shadow:0 7px 24px #1c593b15}
+.bm-search-shell .bm-search input{font-size:13px;min-height:45px}
+.bm-search-shell .bm-search .bm-search-submit{display:flex;align-items:center;justify-content:center;gap:9px;background:#214d34;border:0;color:white;height:55px;min-width:138px;border-radius:0 11px 11px 0;font-size:12px;font-weight:800;letter-spacing:.025em;cursor:pointer}
+.bm-search-shell .bm-search .bm-search-clear{flex:none;width:31px;height:31px;padding:0;border:0;border-radius:50%;background:#eef1ea;color:#55715f;font-size:20px;cursor:pointer}
+.bm-search-results{position:absolute;top:calc(100% + 9px);left:0;right:0;background:white;border:1px solid #e1e8df;border-radius:14px;box-shadow:0 21px 60px #193c2850;overflow:hidden;z-index:50}
+.bm-search-results-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 11px;border-bottom:1px solid #edf1eb;gap:10px}
+.bm-search-results-head span{font-size:10px;letter-spacing:.16em;font-weight:900;color:#2b5a3b}
+.bm-search-results-head small{font-size:10px;color:#8aa28d}
+.bm-search-result{width:100%;min-width:0;border:0;border-bottom:1px solid #f1f2ed;background:#fff;display:flex;align-items:center;text-align:left;padding:11px 17px;gap:13px;color:#204330;cursor:pointer}
+.bm-search-result.selected,.bm-search-result:hover{background:#f4f8f0}
+.bm-search-thumb{width:53px;height:53px;border-radius:9px;background:#e8ecdf;overflow:hidden;flex:none}
+.bm-search-thumb img{width:100%;height:100%;object-fit:cover}
+.bm-search-result-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.bm-search-result-info strong{font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bm-search-result-info small{font-size:10px;color:#899d8b}
+.bm-search-result-price{display:flex;flex-direction:column;align-items:flex-end;font-size:12px;font-weight:800;color:#25533a;white-space:nowrap}
+.bm-search-result-price small{font-size:10px;color:#9cae9e;font-weight:500}
+.bm-search-empty{text-align:center;color:#758b77;font-size:12px;padding:27px 15px}
+.bm-search-showall{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:0;background:#e8efe6;color:#245335;font-size:11px;font-weight:900;cursor:pointer}
+.bm-spotlight{position:absolute;left:clamp(24px,4vw,65px);bottom:35px;z-index:6;max-width:min(380px,75%);color:#fff}
+.bm-spotlight-kicker{font-size:11px;font-weight:900;letter-spacing:.13em;color:#f8dba8;background:#a9361e;padding:8px 11px;border-radius:5px;display:inline-block;margin-bottom:10px;text-transform:uppercase;box-shadow:0 4px 17px #150b0b30}
+.bm-spotlight>button{border:0;background:#183727b0;border-radius:11px;text-align:left;display:flex;align-items:flex-start;gap:9px;flex-direction:column;padding:15px 18px;color:#fff;cursor:pointer;backdrop-filter:blur(8px);max-width:100%}
+.bm-spotlight>button strong{font:500 clamp(24px,2vw,35px)/1.05 "Playfair Display",Georgia,serif}
+.bm-spotlight>button span{font-size:11px;display:flex;align-items:center;gap:6px;font-weight:800;color:#e7cca0}
+.bm-spotlight-dots{position:absolute;z-index:8;right:30px;bottom:30px;display:flex;align-items:center;gap:7px}
+.bm-spotlight-dots button{background:#ffffff70;border:1px solid #fff8;border-radius:20px;width:8px;height:8px;cursor:pointer;padding:0}
+.bm-spotlight-dots button.active{width:26px;background:#fff}
+.bm-product-badge.bm-badge-promo{background:linear-gradient(120deg,#a92d24,#db4227);color:#fff;font-size:10px;letter-spacing:.06em;border-radius:6px;box-shadow:0 4px 12px #7b2d2340;padding:9px 10px;max-width:calc(100% - 88px);text-align:center;line-height:1.2}
+.bm-noresults strong{display:block;font-size:22px;font-family:"Playfair Display",Georgia,serif;margin:0 0 12px;color:#315541}
+.bm-noresults p{font-size:12px;margin:0 0 12px}
+.bm-load-error strong{color:#a34331}
+@media(max-width:780px){.bm-search-shell{order:3;max-width:unset;flex-basis:100%;margin-top:4px}.bm-search-shell .bm-search{height:49px}.bm-search-shell .bm-search .bm-search-submit{height:47px;min-width:107px;font-size:11px}.bm-spotlight{left:24px;bottom:29px}.bm-spotlight-dots{right:18px;bottom:24px}}
+@media(max-width:550px){.bm-search-shell .bm-search{padding-left:12px}.bm-search-shell .bm-search .bm-search-submit{min-width:49px;font-size:0;gap:0}.bm-search-shell .bm-search .bm-search-submit svg{width:19px;height:19px}.bm-search-shell .bm-search input{font-size:12px}.bm-search-results{width:100%;top:calc(100% + 6px)}.bm-search-result{padding:10px;gap:8px}.bm-search-thumb{width:45px;height:45px}.bm-search-result-price{font-size:10px}.bm-search-result-info strong{font-size:12px}.bm-spotlight{bottom:18px;left:16px;max-width:76%}.bm-spotlight-kicker{font-size:9px;padding:7px 10px}.bm-spotlight>button{padding:12px 13px}.bm-spotlight>button strong{font-size:25px}.bm-spotlight-dots{right:10px;bottom:17px}.bm-product-badge.bm-badge-promo{max-width:calc(100% - 74px);font-size:9px;padding:7px 6px}}
