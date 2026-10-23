@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ConsentAnalytics from "@/components/ConsentAnalytics";
 
 export const metadata: Metadata = {
   title: "Benli Kuruyemiş | Lezzetin En Doğal Hâli",
@@ -16,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) {
-  return <html lang="tr"><body>{children}</body></html>;
+  return <html lang="tr"><body>{children}<ConsentAnalytics/></body></html>;
 }

@@ -305,3 +305,6 @@
  .bm-category{height:190px}
  .bm-product-footer strong{font-size:11px}
 }
+
+.bm-cookie-link{border:0;background:transparent;padding:0;color:#b8cfbb;cursor:pointer;font-size:10px;text-decoration:underline}
+.bm-cookie-link:hover{color:white}

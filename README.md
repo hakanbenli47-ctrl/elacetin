@@ -46,3 +46,12 @@ Vercel → elacetin → Settings → Environment Variables → **Production** i�
 - Google: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, aynı `AUTH_SECRET`. Google Cloud → OAuth Clients → Web Application. Allowed JavaScript origin: `https://selinay.vercel.app`. Authorized redirect URI: `https://selinay.vercel.app/api/google/callback`. İsterseniz `GOOGLE_REDIRECT_URI` değişkenini aynı callback adresiyle tanımlayın.
 
 Google kimliği için OAuth consent screen düzgün yapılandırılmalı ve test aşamasındaki uygulamada kullanıcı e-postası test kullanıcıları listesine eklenmeli. Google Client Secret ve gerçek admin şifresini GitHub'a commit etmeyin.
+
+## Çerez izni ve ziyaretçi analizi
+
+- Yeni ziyaretçilere eşit görünürlükte **Kabul et / Reddet / Tercihler** sunulur. Analitik varsayılan olarak **kapalıdır**. Rıza olmadan ürün/giriş davranışı izlenmez.
+- Yalnızca rıza veren ziyaretçilerde sayfa ve ürün görüntüleme, isimlendirilmiş menü/buton tıklamaları, anonim aktif süre (görünür ve 60 saniye içindeki etkileşim), sepete ekleme, sipariş adımları ölçülür. Form içeriği, Google e-postası, telefon, IP adresi, arama sözcükleri analitik tablosuna eklenmez.
+- Çerez tercihi sayfanın sol altındaki **Çerez ayarları** düğmesiyle geri alınabilir. Ziyaretçi kimliğine ait olayların kaldırılması istenir.
+- Yönetimde **Ziyaretçi Analizi** sayfası 7/30/90 günlük istatistik ve anonimize hareketleri gösterir.
+- /cerez-politikasi sayfasındaki taslak bilgilendirme işletmenin resmî unvanı, adresi, hizmet sağlayıcıları ve KVKK değerlendirmesiyle tamamlanmalıdır.
+- **ÖNEMLİ:** Yerel SQLite Vercel'in geçici /tmp alanında çalıştığından canlı ziyaret istatistikleri **kalıcı saklanmaz**. Kalıcı üretim raporları için kalıcı bir sunucu veya depolama çözümü gereklidir. İzleme altyapısı birinci taraf olup üçüncü taraf reklam izleme kodu içermez.
