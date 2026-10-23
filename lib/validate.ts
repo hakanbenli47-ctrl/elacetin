@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import type { Product, Category } from "./types";
+import type { Product,Category } from "./types";
+import { calculatePrices } from "./pricing";
 const categories:Category[]=["Kuruyemiş","Leblebi","Çekirdek","Kuru Meyve","Karışık"];
 export function parseProduct(raw:unknown):Product|null{
  if(!raw||typeof raw!=="object")return null;
@@ -11,14 +12,14 @@ export function parseProduct(raw:unknown):Product|null{
  const isDataImage=/^data:image\/(png|jpeg|webp);base64,[a-zA-Z0-9+/=]+$/.test(image);
  if(image&&!/^https:\/\//.test(image)&&!isDataImage&&!image.startsWith("/"))return null;
  if(image.startsWith("data:")&&!isDataImage)return null;
- const prices:Record<string,number|null>={};
- for(const key of ["250","500","1000"]){
- const value=(d.prices as Record<string,unknown>|undefined)?.[key];
- if(value===null||value===undefined||value==="")prices[key]=null;
- else if(typeof value==="number"&&Number.isFinite(value)&&value>=0&&value<=10000000)prices[key]=Math.round(value*100)/100;
- else return null;
- }
+ const rawPrices=d.prices&&typeof d.prices==="object"?d.prices as Record<string,unknown>:{};
+ const kgRaw=d.kgPrice!==undefined?d.kgPrice:rawPrices["1000"];
+ const kgPrice=kgRaw===""||kgRaw===null||kgRaw===undefined?null:Number(kgRaw);
+ if(kgPrice!==null&&(!Number.isFinite(kgPrice)||kgPrice<0||kgPrice>10000000))return null;
+ const percent= d.discount5kg===undefined?0:Number(d.discount5kg);
+ if(!Number.isFinite(percent)||percent<0||percent>90)return null;
+ const prices=calculatePrices(kgPrice,percent);
  const stock=Number(d.stock);
  if(!Number.isSafeInteger(stock)||stock<0||stock>1000000000)return null;
- return {id:id||randomUUID(),name,slug,category:d.category as Category,description:str(d.description,6000),image,images:[],unit:"g",prices,stock,active:Boolean(d.active),featured:Boolean(d.featured),badge:str(d.badge,26),ingredients:str(d.ingredients,5000),allergens:str(d.allergens,5000)};
+ return {id:id||randomUUID(),name,slug,category:d.category as Category,description:str(d.description,6000),image,images:[],unit:"g",prices,kgPrice,discount5kg:percent,stock,active:Boolean(d.active),featured:Boolean(d.featured),badge:str(d.badge,26),ingredients:str(d.ingredients,5000),allergens:str(d.allergens,5000)};
 }

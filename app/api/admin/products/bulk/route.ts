@@ -1,6 +1,6 @@
 import { NextRequest,NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
-import { listProducts,saveProduct } from "@/lib/db";
+import { listProducts,saveProductsBatch } from "@/lib/db";
 import { parseProduct } from "@/lib/validate";
 import { baseKgPrice,calculatePrices,roundMoney } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
@@ -28,7 +28,7 @@ export async function POST(request:NextRequest){
     if(slugIds.has(parsed.slug)&&existing?.id!==slugIds.get(parsed.slug))return NextResponse.json({error:"Ürün adı çakışması."},{status:409});
     payload.push(parsed);
    }
-   for(const p of payload)await saveProduct(p);
+   await saveProductsBatch(payload);
    return NextResponse.json({updated:payload.length,skipped:0});
   }
   if(!Array.isArray(body.ids)||body.ids.length===0||body.ids.length>300)return NextResponse.json({error:"Önce işlem uygulanacak ürünleri seçin (en fazla 300)."}, {status:400});
@@ -56,7 +56,7 @@ export async function POST(request:NextRequest){
   };
   const changed:Product[]=[];
   for(const p of targets){const result=update(p);if(result)changed.push(result)}
-  for(const p of changed)await saveProduct(p);
+  await saveProductsBatch(changed);
   return NextResponse.json({updated:changed.length,skipped});
  }catch(e){const msg=e instanceof Error?e.message:"Toplu işlem başarısız.";return NextResponse.json({error:msg},{status:500})}
 }

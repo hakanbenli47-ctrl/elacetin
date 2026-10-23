@@ -45,6 +45,16 @@ export async function saveProduct(p:Product):Promise<void>{
  }
  getDb().prepare("INSERT INTO products(id,payload,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP").run(p.id,JSON.stringify(p));
 }
+export async function saveProductsBatch(products:Product[]):Promise<void>{
+ if(!products.length)return;
+ if(isPersistent){
+  await dbRequest("benli_products?on_conflict=id",{method:"POST",prefer:"resolution=merge-duplicates",body:products.map(p=>({id:p.id,payload:p,updated_at:new Date().toISOString()}))});return;
+ }
+ const db=getDb();
+ const stmt=db.prepare("INSERT INTO products(id,payload,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP");
+ db.exec("BEGIN");
+ try{for(const p of products)stmt.run(p.id,JSON.stringify(p));db.exec("COMMIT")}catch(e){db.exec("ROLLBACK");throw e}
+}
 export async function removeProduct(id:string):Promise<void>{
  if(isPersistent){await dbRequest(`benli_products?id=eq.${encodeURIComponent(id)}`,{method:"DELETE"});return}
  getDb().prepare("DELETE FROM products WHERE id=?").run(id);

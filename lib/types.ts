@@ -1,7 +1,7 @@
 export type Category = "Kuruyemiş" | "Leblebi" | "Çekirdek" | "Kuru Meyve" | "Karışık";
 export type Product = {
   id: string; name: string; slug: string; category: Category; description: string;
-  image: string; images: string[]; unit: string; prices: Record<string, number | null>;
+  image: string; images: string[]; unit: string; prices: Record<string, number | null>; kgPrice?: number|null; discount5kg?: number;
   stock: number; active: boolean; featured: boolean; badge?: string; ingredients: string; allergens: string;
 };
 export type OrderStatus = "whatsapp_bekleniyor" | "yeni" | "onaylandi" | "hazirlaniyor" | "kargoda" | "tamamlandi" | "iptal";
@@ -9,5 +9,5 @@ export type OrderItem = { productId: string; name: string; weight: string; qty: 
 export type Order = {
  id: string; createdAt: string; name: string; phone: string; email: string;
  address: string; note: string; status: OrderStatus; items: OrderItem[];
- total: number | null; carrier: string; trackingNo: string; payment: string; source: string;
+ total: number | null; subtotal?: number|null; campaignDiscount?: number; basketDiscount?: number; discountReason?: string; shippingFee?: number|null; freeShipping?: boolean; couponCode?: string; carrier: string; trackingNo: string; payment: string; source: string;
 };
