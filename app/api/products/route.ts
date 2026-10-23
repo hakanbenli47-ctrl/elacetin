@@ -5,7 +5,7 @@ import { parseProduct } from "@/lib/validate";
 export const runtime="nodejs";export const dynamic="force-dynamic";
 export async function GET(request:NextRequest){
  try{const admin=isAdmin(request);return NextResponse.json({products:await listProducts(admin && request.nextUrl.searchParams.get("all")==="1"),ephemeral},{headers:{"Cache-Control":"no-store"}});}
- catch{return NextResponse.json({error:"Ürünler yüklenemedi."},{status:500});}
+ catch(e){const msg=e instanceof Error&&e.message.startsWith("Supabase veritabanı hatası")?e.message:"Ürünler yüklenemedi.";return NextResponse.json({error:msg},{status:500});}
 }
 export async function POST(request:NextRequest){
  if(!isAdmin(request))return NextResponse.json({error:"Yetkisiz."},{status:401});
