@@ -1,0 +1,23 @@
+.bn-consent{position:fixed;bottom:20px;left:20px;z-index:200;width:min(calc(100vw - 40px),690px);max-height:min(86vh,680px);overflow:auto;background:#fffefa;color:#183c28;border:1px solid #dce4d5;border-radius:14px;box-shadow:0 18px 65px #142c2060;padding:23px 25px;font:400 13px/1.6 "DM Sans",Arial,sans-serif}
+.bn-consent *{box-sizing:border-box}
+.bn-consent-header{display:flex;gap:15px;align-items:flex-start}
+.bn-cookie-mark{display:grid;place-items:center;flex:none;width:42px;height:42px;background:#e8eedf;border-radius:12px;color:#33613f;font-size:23px}
+.bn-consent-header strong{font-weight:800;font-size:16px;line-height:1.5}
+.bn-consent-header p{margin:6px 0 15px;color:#5b7162;font-size:12px}
+.bn-consent-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}
+.bn-consent-actions button{border:1px solid #225338;background:#205235;color:#fff;min-height:43px;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;padding:8px}
+.bn-consent-actions button:first-child,.bn-consent-actions button:nth-child(2){background:#fff;color:#245237;border-color:#869d84}
+.bn-consent-actions button:disabled{opacity:.5}
+.bn-consent-links{display:flex;gap:9px;flex-wrap:wrap;color:#869689;font-size:10px;margin-top:14px}
+.bn-consent-links a{color:#255737;text-decoration:underline}
+.bn-consent-details{border:1px solid #e3e9df;border-radius:8px;overflow:hidden;margin:9px 0}
+.bn-consent-option{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;background:#f8faf5;font-size:11px}
+.bn-consent-option+.bn-consent-option{border-top:1px solid #e5ebe0}
+.bn-consent-option span{display:flex;flex-direction:column;gap:4px}
+.bn-consent-option b{font-size:12px}
+.bn-consent-option small{max-width:445px;color:#68816f;font-size:11px}
+.bn-consent-option>strong{font-size:10px;white-space:nowrap;color:#40674b}
+.bn-consent-option input{width:20px;height:20px;accent-color:#22573a;cursor:pointer;flex:none}
+.bn-consent-tab{position:fixed;bottom:15px;left:15px;z-index:85;background:#234c33;border:1px solid #d2e1d2;border-radius:25px;color:#fff;box-shadow:0 4px 16px #142c2020;padding:10px 16px;font-size:11px;font-weight:800;cursor:pointer}
+@media(max-width:600px){.bn-consent{bottom:8px;left:8px;width:calc(100vw - 16px);padding:16px;border-radius:10px}.bn-consent-header strong{font-size:14px}.bn-consent-header p{font-size:11px}.bn-consent-actions{gap:6px}.bn-consent-actions button{font-size:10px;min-height:40px;padding:5px}.bn-consent-tab{left:9px;bottom:9px;font-size:10px}}
+@media(prefers-reduced-motion:reduce){.bn-consent *{animation:none!important;transition:none!important}}
