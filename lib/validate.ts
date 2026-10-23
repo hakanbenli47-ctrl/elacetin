@@ -21,5 +21,5 @@ export function parseProduct(raw:unknown):Product|null{
  const prices=calculatePrices(kgPrice,percent);
  const stock=Number(d.stock);
  if(!Number.isSafeInteger(stock)||stock<0||stock>1000000000)return null;
- return {id:id||randomUUID(),name,slug,category:d.category as Category,description:str(d.description,6000),image,images:[],unit:"g",prices,kgPrice,discount5kg:percent,stock,active:Boolean(d.active),featured:Boolean(d.featured),badge:str(d.badge,26),ingredients:str(d.ingredients,5000),allergens:str(d.allergens,5000)};
+ return {id:id||randomUUID(),name,slug,category:d.category as Category,description:str(d.description,6000),image,images:[],unit:"g",prices,kgPrice,discount5kg:percent,stock,active:Boolean(d.active),featured:Boolean(d.featured),badge:str(d.badge,26),cardNote:str(d.cardNote,100),ingredients:str(d.ingredients,5000),allergens:str(d.allergens,5000)};
 }

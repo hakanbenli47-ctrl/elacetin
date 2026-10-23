@@ -386,3 +386,5 @@
 @media(max-width:1000px){.bm-monthly-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.bm-monthly-product-grid .bm-product:nth-child(4){display:none}}
 @media(max-width:780px){.bm-monthly-banner{grid-template-columns:1fr}.bm-monthly-art{min-height:210px}.bm-monthly-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bm-monthly-section{margin:22px 15px}.bm-monthly-products{padding:18px}.bm-monthly-product-grid .bm-product:nth-child(4){display:block}}
 @media(max-width:550px){.bm-monthly-copy{padding:26px 22px}.bm-monthly-copy h2{font-size:35px}.bm-monthly-art{min-height:180px}.bm-monthly-products{padding:15px}.bm-monthly-product-title h3{font-size:22px}.bm-product .bm-packs{grid-template-columns:repeat(2,minmax(0,1fr))}.bm-product .bm-packs button{font-size:10px}.bm-monthly-product-grid{gap:9px}}
+
+.bm-card-note{display:inline-block;font-size:11px;color:#365e39;font-weight:750;background:#edf5e6;border-radius:6px;padding:8px 9px;margin:0 0 9px;line-height:1.4}.bm-cart-load-error{background:#ffede7;color:#a43b2b;font-size:11px;padding:9px;border-radius:6px;line-height:1.5}@media(max-width:550px){.bm-card-note{font-size:10px}}

@@ -83,7 +83,7 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
   const data=(hasHeader?rows.slice(1):rows);
   const result:Record<string,unknown>[]=[],errors:string[]=[];
   data.forEach((x,i)=>{
-   const [name,kgStr,stockStr,categoryStr,discountStr,badge,description,image]=x;
+   const [name,kgStr,stockStr,categoryStr,discountStr,badge,description,image,cardNote]=x;
    if(!name||name.length<2){errors.push((i+1)+". satır: Ürün adı gerekli.");return}
    const kgPrice=readNumber(kgStr||"");
    if(!Number.isFinite(kgPrice)||kgPrice<0){errors.push((i+1)+". satır: Kg fiyatı geçersiz.");return}
@@ -92,7 +92,7 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
    const category=categories.includes(categoryStr as Category)?categoryStr as Category:"Kuruyemiş";
    const discount5kg=discountStr?readNumber(discountStr):0;
    if(!Number.isFinite(discount5kg)||discount5kg<0||discount5kg>90){errors.push((i+1)+". satır: 5 kg indirimi %0-90 olmalı.");return}
-   result.push({id:"",name:name.trim(),slug:slugify(name),category,kgPrice,discount5kg,prices:calculatePrices(kgPrice,discount5kg),stock,active:true,featured:false,badge:badge||"",description:description||"",image:image||"",ingredients:"",allergens:""});
+   result.push({id:"",name:name.trim(),slug:slugify(name),category,kgPrice,discount5kg,prices:calculatePrices(kgPrice,discount5kg),stock,active:true,featured:false,badge:badge||"",description:description||"",image:image||"",cardNote:cardNote||"",ingredients:"",allergens:""});
   });
   if(data.length>150)errors.push("Tek seferde en fazla 150 ürün aktarılabilir.");
   setPreview({rows:result,errors});
@@ -116,10 +116,10 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
    <div className="commerce-banner"><span>PRATİK ÜRÜN YÖNETİMİ</span><h2>Onlarca ürünü tek seferde yönetin.</h2><p>Excel veya CSV listenizi yapıştırın, tüm fiyatları ve etiketleri birlikte güncelleyin.</p></div>
    <section className="commerce-panel">
     <h3>1. Excel / CSV ile toplu ürün ekle</h3>
-    <p>Excel&apos;de sütun sırası: <b>Ürün adı · Kg fiyatı · Stok · Kategori · 5 kg indirim (%) · Etiket · Açıklama · Görsel URL</b></p>
+    <p>Excel&apos;de sütun sırası: <b>Ürün adı · Kg fiyatı · Stok · Kategori · 5 kg indirim (%) · Etiket · Açıklama · Görsel URL · Kart kısa notu</b></p>
     <p>Örnek: <code>Kaju;800;35;Kuruyemiş;10;ÇOK SATAN;Taze kavrulmuş kaju;https://...</code></p>
     <div className="commerce-import-actions"><label className="commerce-upload">CSV veya TXT seç<input type="file" accept=".csv,.tsv,.txt,text/csv,text/plain" onChange={async e=>{const f=e.target.files?.[0];if(!f)return;if(f.size>500000){setError("Dosya en fazla 500 KB olabilir.");return}parsePaste(await f.text())}}/></label><button type="button" onClick={()=>parsePaste("")}>Temizle</button></div>
-    <textarea className="commerce-paste" value={paste} onChange={e=>parsePaste(e.target.value)} rows={7} placeholder={"Ürün adı;Kg fiyatı;Stok;Kategori;5 kg indirim;Etiket;Açıklama;Görsel URL\nKaju;800;35;Kuruyemiş;10;ÇOK SATAN;Taze kaju;https://...\nÇiğ Badem;700;25;Kuruyemiş;5;FIRSAT ÜRÜNÜ;...;..."}/>
+    <textarea className="commerce-paste" value={paste} onChange={e=>parsePaste(e.target.value)} rows={7} placeholder={"Ürün adı;Kg fiyatı;Stok;Kategori;5 kg indirim;Etiket;Açıklama;Görsel URL;Kart kısa notu\nKaju;800;35;Kuruyemiş;10;ÇOK SATAN;Taze kaju;https://...\nÇiğ Badem;700;25;Kuruyemiş;5;FIRSAT ÜRÜNÜ;...;..."}/>
     {!!preview.errors.length&&<div className="commerce-preview-errors">{preview.errors.slice(0,8).map((x,i)=><p key={i}>{x}</p>)}</div>}
     {preview.rows.length>0&&<div className="commerce-preview"><b>{preview.rows.length} ürün hazır.</b><span>250 g, 500 g ve 5 kg fiyatları otomatik hesaplanır.</span><ul>{preview.rows.slice(0,5).map((x,i)=><li key={i}>{String(x.name)} — {format(Number(x.kgPrice))}/kg</li>)}</ul></div>}
     <button className="commerce-button" type="button" disabled={saving||!preview.rows.length||!!preview.errors.length} onClick={importProducts}>{saving?"Kaydediliyor...":"Ürünleri topluca kaydet"}</button>
