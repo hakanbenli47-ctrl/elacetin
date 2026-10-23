@@ -137,3 +137,5 @@
 .adm-label-presets button{padding:9px 12px;background:#eaf0e4;border:1px solid #d7e4d2;border-radius:7px;cursor:pointer;color:#24563b;font-size:11px;font-weight:800}
 .adm-label-presets button:hover{background:#d8e9d5}
 .adm-sale-label{display:inline-block;background:#f8eee2;color:#8a4b30;padding:6px 9px;border-radius:5px;font-size:10px;font-weight:800;white-space:nowrap}
+
+.adm-pricing-intro{font-size:12px;color:#70836f;line-height:1.7}.adm-auto-prices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:15px 0 20px}.adm-auto-prices>div{display:flex;flex-direction:column;gap:6px;align-items:center;background:#edf4e7;border-radius:9px;padding:15px 5px}.adm-auto-prices span{font-size:10px;color:#57765e}.adm-auto-prices strong{font-size:15px;color:#214e2f}.adm-product-actions{display:flex;flex-wrap:wrap;gap:10px}.adm-order-totals{display:grid;gap:7px;padding:13px;background:#f3f8ed;margin-top:12px;border-radius:9px}.adm-order-totals>div{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#48654c}@media(max-width:550px){.adm-auto-prices{grid-template-columns:repeat(2,minmax(0,1fr))}.adm-product-actions{width:100%}}
