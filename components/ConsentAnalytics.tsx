@@ -84,7 +84,7 @@ export default function ConsentAnalytics(){
   if(window.location.pathname.startsWith("/admin")){setReady(true);return}
   const saved=storedChoice();
   if(saved){setSelected(saved);if(saved.analytics)void permit().catch(()=>{consented.current=false;setOpen(true)});}
-  else setOpen(true);
+  else {try{localStorage.removeItem(VISITOR_KEY);sessionStorage.removeItem(SESSION_KEY)}catch{}setOpen(true);}
   setReady(true);
   const reopen=()=>{setOpen(true);setCustomize(true)};
   window.addEventListener("benli:cookie-settings",reopen);
