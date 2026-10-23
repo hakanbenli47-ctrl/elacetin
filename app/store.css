@@ -345,3 +345,44 @@
 .bm-load-error strong{color:#a34331}
 @media(max-width:780px){.bm-search-shell{order:3;max-width:unset;flex-basis:100%;margin-top:4px}.bm-search-shell .bm-search{height:49px}.bm-search-shell .bm-search .bm-search-submit{height:47px;min-width:107px;font-size:11px}.bm-spotlight{left:24px;bottom:29px}.bm-spotlight-dots{right:18px;bottom:24px}}
 @media(max-width:550px){.bm-search-shell .bm-search{padding-left:12px}.bm-search-shell .bm-search .bm-search-submit{min-width:49px;font-size:0;gap:0}.bm-search-shell .bm-search .bm-search-submit svg{width:19px;height:19px}.bm-search-shell .bm-search input{font-size:12px}.bm-search-results{width:100%;top:calc(100% + 6px)}.bm-search-result{padding:10px;gap:8px}.bm-search-thumb{width:45px;height:45px}.bm-search-result-price{font-size:10px}.bm-search-result-info strong{font-size:12px}.bm-spotlight{bottom:18px;left:16px;max-width:76%}.bm-spotlight-kicker{font-size:9px;padding:7px 10px}.bm-spotlight>button{padding:12px 13px}.bm-spotlight>button strong{font-size:25px}.bm-spotlight-dots{right:10px;bottom:17px}.bm-product-badge.bm-badge-promo{max-width:calc(100% - 74px);font-size:9px;padding:7px 6px}}
+
+/* Aylık kampanya, 5 kg seçenekleri ve sepet ödeme özeti */
+.bm-monthly-section{margin:40px clamp(22px,3vw,60px) 20px;border-radius:18px;overflow:hidden;background:#fff9f0;border:1px solid #ecdec8;box-shadow:0 15px 36px #553e1414}
+.bm-monthly-banner{display:grid;grid-template-columns:1.2fr .8fr;background:#1f4430;min-height:300px;overflow:hidden}
+.bm-monthly-copy{padding:clamp(26px,4vw,57px);display:flex;align-items:flex-start;justify-content:center;flex-direction:column;color:white}
+.bm-monthly-top{font-size:11px;font-weight:900;letter-spacing:.17em;color:#f0c991}
+.bm-monthly-copy h2{font:500 clamp(32px,4vw,56px)/1.13 "Playfair Display",Georgia,serif;margin:18px 0 10px}
+.bm-monthly-copy p{font-size:13px;line-height:1.65;color:#d3e5d4;max-width:530px}
+.bm-monthly-tags{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:15px 0}
+.bm-monthly-tags span{background:#da4c31;font-size:11px;font-weight:900;letter-spacing:.05em;border-radius:5px;padding:8px 12px}
+.bm-monthly-tags small{color:#e1cb9d;font-size:11px}
+.bm-monthly-copy .bm-btn{margin-top:8px}
+.bm-monthly-art{position:relative;min-height:300px;background:#2d5636}
+.bm-monthly-art:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#1f443022,transparent 40%)}
+.bm-monthly-art img{height:100%;width:100%;object-fit:cover;position:absolute;inset:0}
+.bm-monthly-products{padding:25px 28px 28px;background:#faf6ed}
+.bm-monthly-product-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.bm-monthly-product-title h3{font:500 28px Georgia,serif;color:#285034;margin:0}
+.bm-monthly-product-title span{font-size:11px;color:#648166}
+.bm-monthly-product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.bm-monthly-product-grid .bm-product:nth-child(n+5){display:none}
+.bm-card-campaign{font-size:10px;display:inline-block;align-self:flex-start;font-weight:900;color:#b3361e;background:#fff0e8;border-radius:5px;padding:6px 9px;margin-bottom:10px}
+.bm-product .bm-packs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.bm-product .bm-packs>button{min-width:0;padding:9px 0;font-size:10px}
+.bm-old-price{font-size:10px;color:#a0a6a0;font-weight:500}
+.bm-detail-bulk{background:#f9f0df;border-radius:8px;padding:10px;color:#8b5234;font-size:12px!important;margin:8px 0!important}
+.bm-detail-promo{display:inline-block;background:#c73521;color:#fff;border-radius:5px;font-size:11px;padding:8px 12px;font-weight:900;margin:10px 0}
+.bm-cart-saving span,.bm-cart-saving strong{color:#2b8854}
+.bm-cart-grand{padding-top:12px;border-top:1px solid #c2d2c2;margin-top:7px!important}
+.bm-cart-grand span,.bm-cart-grand strong{font-weight:900!important;color:#173f2c}
+.bm-free-shipping-hint{padding:7px 12px;background:#e9f7e4;font-size:11px;color:#31683a;border-radius:7px}
+.bm-coupon{display:flex;flex-direction:column;gap:7px;font-weight:800;font-size:11px;color:#386144;margin:13px 0}
+.bm-coupon input{padding:12px;border-radius:8px;border:1px solid #cfdccd;color:#234930}
+.bm-coupon small{font-size:10px;color:#6c856c}
+.bm-checkout-breakdown{display:flex;flex-direction:column;gap:10px;margin:16px 0;padding:17px;border-radius:10px;background:#f0f4eb}
+.bm-checkout-breakdown>div{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#3b5b40;gap:10px}
+.bm-checkout-total{padding-top:12px;border-top:1px solid #c9d7c5;font-weight:900}
+.bm-checkout-total strong{font-size:19px}
+@media(max-width:1000px){.bm-monthly-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.bm-monthly-product-grid .bm-product:nth-child(4){display:none}}
+@media(max-width:780px){.bm-monthly-banner{grid-template-columns:1fr}.bm-monthly-art{min-height:210px}.bm-monthly-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bm-monthly-section{margin:22px 15px}.bm-monthly-products{padding:18px}.bm-monthly-product-grid .bm-product:nth-child(4){display:block}}
+@media(max-width:550px){.bm-monthly-copy{padding:26px 22px}.bm-monthly-copy h2{font-size:35px}.bm-monthly-art{min-height:180px}.bm-monthly-products{padding:15px}.bm-monthly-product-title h3{font-size:22px}.bm-product .bm-packs{grid-template-columns:repeat(2,minmax(0,1fr))}.bm-product .bm-packs button{font-size:10px}.bm-monthly-product-grid{gap:9px}}
