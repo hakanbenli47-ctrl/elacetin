@@ -31,6 +31,24 @@ export async function POST(request:NextRequest){
    await saveProductsBatch(payload);
    return NextResponse.json({updated:payload.length,skipped:0});
   }
+  if(body.action==="priceMatrix"){
+   if(!Array.isArray(body.rows)||body.rows.length<1||body.rows.length>300)return NextResponse.json({error:"En fazla 300 ürün fiyatı birlikte kaydedilebilir."},{status:400});
+   const changed:Product[]=[],seen=new Set<string>();
+   for(const raw of body.rows){
+    if(!raw||typeof raw!=="object")return NextResponse.json({error:"Geçersiz fiyat satırı."},{status:400});
+    const row=raw as Record<string,unknown>;
+    const id=str(row.id);
+    if(!id||seen.has(id))return NextResponse.json({error:"Tekrarlanan ürün satırı."},{status:400});
+    seen.add(id);
+    const p=all.find(item=>item.id===id);
+    if(!p)return NextResponse.json({error:"Ürün bulunamadı."},{status:404});
+    const kg=row.kgPrice===""||row.kgPrice===null?null:Number(row.kgPrice);
+    const percent=Number(row.discount5kg);
+    if((kg!==null&&(!Number.isFinite(kg)||kg<0||kg>10000000))||!Number.isFinite(percent)||percent<0||percent>90)return NextResponse.json({error:p.name+" için fiyat/indirim geçersiz."},{status:400});
+    changed.push({...p,kgPrice:kg,discount5kg:percent,prices:calculatePrices(kg,percent)});
+   }
+   await saveProductsBatch(changed);return NextResponse.json({updated:changed.length,skipped:0});
+  }
   if(!Array.isArray(body.ids)||body.ids.length===0||body.ids.length>300)return NextResponse.json({error:"Önce işlem uygulanacak ürünleri seçin (en fazla 300)."}, {status:400});
   const ids=new Set(body.ids.filter((x):x is string=>typeof x==="string"));
   const targets=all.filter(p=>ids.has(p.id));

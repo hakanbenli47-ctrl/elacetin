@@ -44,6 +44,8 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
  const [scope,setScope]=useState("Tümü");
  const [bulkAction,setBulkAction]=useState("pricePercent");
  const [bulkValue,setBulkValue]=useState(0);
+ const [priceDraft,setPriceDraft]=useState<Record<string,{kg:string;discount:string}>>({});
+ useEffect(()=>setPriceDraft(Object.fromEntries(products.map(p=>[p.id,{kg:baseKgPrice(p)===null?"":String(baseKgPrice(p)),discount:String(p.discount5kg||0)}]))),[products]);
  const [bulkText,setBulkText]=useState("ŞOK FİYAT");
  const [bulkEnabled,setBulkEnabled]=useState(true);
  const [paste,setPaste]=useState("");
@@ -64,6 +66,22 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
    const d=await r.json();if(!r.ok)throw Error(d.error||"Ayarlar kaydedilemedi.");
    setSettings(d.settings);setMessage("Kampanya ve kargo ayarları kalıcı kaydedildi.");await onChange();
   }catch(e){setError(e instanceof Error?e.message:"Ayarlar kaydedilemedi")}finally{setSaving(false)}
+ }
+ async function savePriceMatrix(){
+  const changes=products.filter(p=>{
+   const row=priceDraft[p.id];if(!row)return false;
+   const kg=row.kg===""?null:readNumber(row.kg),d=readNumber(row.discount);
+   return kg!==baseKgPrice(p)||d!==(p.discount5kg||0);
+  }).map(p=>({id:p.id,kgPrice:priceDraft[p.id].kg===""?null:readNumber(priceDraft[p.id].kg),discount5kg:readNumber(priceDraft[p.id].discount)}));
+  if(!changes.length){setMessage("Fiyat değişikliği bulunmadı.");return}
+  if(changes.some(p=>(p.kgPrice!==null&&(!Number.isFinite(p.kgPrice)||p.kgPrice<0||p.kgPrice>10000000))||!Number.isFinite(p.discount5kg)||p.discount5kg<0||p.discount5kg>90)){setError("Geçersiz kg fiyatı veya 5 kg indirimi var.");return}
+  if(!confirm(changes.length+" ürünün kg fiyatı / 5 kg indirimi kaydedilecek. Devam edilsin mi?"))return;
+  setSaving(true);setError("");setMessage("");
+  try{
+   const r=await fetch("/api/admin/products/bulk",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"priceMatrix",rows:changes})});
+   const d=await r.json();if(!r.ok)throw Error(d.error||"Fiyatlar kaydedilemedi.");
+   setMessage(d.updated+" ürünün fiyatları güncellendi.");await onChange();
+  }catch(e){setError(e instanceof Error?e.message:"Fiyatlar kaydedilemedi")}finally{setSaving(false)}
  }
  async function applyBulk(){
   if(!selected.length){setError("Önce ürün seçin.");return}
@@ -125,7 +143,13 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
     <button className="commerce-button" type="button" disabled={saving||!preview.rows.length||!!preview.errors.length} onClick={importProducts}>{saving?"Kaydediliyor...":"Ürünleri topluca kaydet"}</button>
    </section>
    <section className="commerce-panel">
-    <h3>2. Seçili ürünlere toplu işlem</h3><p>İstediğiniz ürünleri işaretleyin; fiyat, 5 kg indirimi, etiket, vitrin veya satış durumunu tek işlemde değiştirin.</p>
+    <h3>2. Toplu fiyat tablosu — Excel gibi düzenle</h3>
+    <p>Ürünlerin 1 kg fiyatını ve 5 kg indirimini ayrı ayrı değiştirin. Tek bir kaydetme işlemiyle hepsi kalıcı kaydedilir.</p>
+    {products.length===0?<p>Henüz ürün eklenmedi.</p>:<div className="commerce-table-scroller"><table className="commerce-price-table"><thead><tr><th>Ürün</th><th>1 kg satış (₺)</th><th>5 kg indirim (%)</th><th>5 kg yeni fiyat</th></tr></thead><tbody>{products.map(p=>{const row=priceDraft[p.id]||{kg:"",discount:"0"};const kg=row.kg===""?null:readNumber(row.kg);const discount=readNumber(row.discount);const value=kg!==null&&Number.isFinite(kg)&&Number.isFinite(discount)?calculatePrices(kg,discount)["5000"]:null;return <tr key={p.id}><td><strong>{p.name}</strong><small>{p.category}</small></td><td><input type="number" min={0} step=".01" value={row.kg} placeholder="Kg fiyatı" onChange={e=>setPriceDraft(s=>({...s,[p.id]:{...row,kg:e.target.value}}))}/></td><td><input type="number" min={0} max={90} step=".5" value={row.discount} onChange={e=>setPriceDraft(s=>({...s,[p.id]:{...row,discount:e.target.value}}))}/></td><td><b>{value===null?"—":format(value)}</b></td></tr>})}</tbody></table></div>}
+    <button className="commerce-button" type="button" disabled={saving||!products.length} onClick={savePriceMatrix}>Tüm fiyat değişikliklerini kaydet</button>
+   </section>
+   <section className="commerce-panel">
+    <h3>3. Seçili ürünlere toplu işlem</h3><p>İstediğiniz ürünleri işaretleyin; fiyat, 5 kg indirimi, etiket, vitrin veya satış durumunu tek işlemde değiştirin.</p>
     <div className="commerce-toolbar"><select value={scope} onChange={e=>setScope(e.target.value)}><option>Tümü</option>{categories.map(c=><option key={c}>{c}</option>)}</select><button onClick={selectVisible} type="button">Görünenleri seç</button><button onClick={()=>setSelected([])} type="button">Seçimi temizle</button><strong>{selected.length} seçili</strong></div>
     <div className="commerce-select-grid">{visible.map(p=><label key={p.id} className={checked(p.id)?"checked":""}><input type="checkbox" checked={checked(p.id)} onChange={()=>toggle(p.id)}/><span><b>{p.name}</b><small>{p.category} · {baseKgPrice(p)===null?"Kg fiyatı yok":format(baseKgPrice(p)!)+" / kg"}</small></span></label>)}</div>
     <div className="commerce-action-line"><label>Yapılacak işlem<select value={bulkAction} onChange={e=>setBulkAction(e.target.value)}>
