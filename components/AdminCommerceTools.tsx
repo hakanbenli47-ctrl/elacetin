@@ -13,6 +13,7 @@ function readNumber(value:string):number{
  const x=value.trim().replace(/\s/g,"");
  if(!x)return Number.NaN;
  if(x.includes(",")&&x.includes("."))return Number(x.replace(/\./g,"").replace(",","."));
+ if(/^\d{1,3}(\.\d{3})+$/.test(x))return Number(x.replace(/\./g,""));
  return Number(x.replace(",","."));
 }
 function csvRows(value:string){
