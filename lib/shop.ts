@@ -29,7 +29,7 @@ export function validateShopSettings(raw:unknown):ShopSettings|null{
  campaign:{enabled:Boolean(m.enabled),title:s(m.title,90),subtitle:s(m.subtitle,220),eyebrow:s(m.eyebrow,35),image,startDate,endDate,percent:roundMoney(numeric(m.percent,90)),productIds}};
 }
 export function istanbulDate(){return new Intl.DateTimeFormat("en-CA",{year:"numeric",month:"2-digit",day:"2-digit",timeZone:"Europe/Istanbul"}).format(new Date()).replace(/\//g,"-")}
-export function campaignActive(shop:ShopSettings){const m=shop.campaign,now=istanbulDate();return m.enabled&&!!m.startDate&&!!m.endDate&&m.startDate<=now&&now<=m.endDate}
+export function campaignActive(shop:ShopSettings){const m=shop.campaign,now=istanbulDate();return m.enabled&&m.percent>0&&m.productIds.length>0&&!!m.startDate&&!!m.endDate&&m.startDate<=now&&now<=m.endDate}
 export type QuoteInput={productId:string;weight:string;qty:number};
 export type CheckoutQuote={
  items:OrderItem[];subtotal:number|null;originalSubtotal:number|null;packageDiscount:number;campaignDiscount:number;basketDiscount:number;discountReason:string;
