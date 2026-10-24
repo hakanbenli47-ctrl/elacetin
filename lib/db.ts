@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import type { Product,Order,OrderStatus } from "./types";
 import { dbRequest,isPersistent,isEphemeral } from "./persistence";
+import { uploadedCatalog } from "./user-catalog";
 
 let instance:DatabaseSync|null=null;
 export const ephemeral=isEphemeral;
@@ -19,10 +20,31 @@ export function getDb():DatabaseSync{
  `);
  instance=db;return db;
 }
+type ConfigRow={key:string};
+let restorePromise:Promise<void>|null=null;
+/** The user's CSV is restored exactly once, preserving any already-added products. */
+async function restoreUserCatalogOnce(){
+ if(!isPersistent)return;
+ if(!restorePromise){
+  restorePromise=(async()=>{
+   const marker=await dbRequest<ConfigRow[]>("benli_config?key=eq.uploaded_catalog_20261024&select=key&limit=1");
+   if(marker.length)return;
+   const existing=await dbRequest<{id:string;payload:Product}[]>("benli_products?select=id,payload&limit=3000");
+   const slugs=new Set(existing.map(p=>p.payload.slug));
+   const missing=uploadedCatalog.filter(p=>!slugs.has(p.slug));
+   if(missing.length){
+    await dbRequest("benli_products?on_conflict=id",{method:"POST",prefer:"resolution=ignore-duplicates",body:missing.map(p=>({id:p.id,payload:p,updated_at:new Date().toISOString()}))});
+   }
+   await dbRequest("benli_config?on_conflict=key",{method:"POST",prefer:"resolution=ignore-duplicates",body:[{key:"uploaded_catalog_20261024",value:{source:"benli-urunler.csv",version:1,items:uploadedCatalog.length}}]});
+  })().catch(e=>{restorePromise=null;throw e});
+ }
+ await restorePromise;
+}
 type ProductRow={id:string;payload:Product};
 type OrderRow={id:string;payload:Order};
 export async function listProducts(includeInactive=false):Promise<Product[]>{
  if(isPersistent){
+  await restoreUserCatalogOnce();
   const rows=await dbRequest<ProductRow[]>("benli_products?select=id,payload&order=updated_at.desc&limit=3000");
   const all=rows.map(r=>r.payload);
   return includeInactive?all:all.filter(p=>p.active);
