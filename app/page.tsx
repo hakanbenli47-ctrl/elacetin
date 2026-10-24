@@ -9,6 +9,7 @@ import "./store.css";
 import "./rev.css";
 import "./hero-v3.css";
 import "./hero-v4.css";
+import "./colorful.css";
 const PHONE="905515550302";
 const categories = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Kuru Meyve", "Karışık"] as const;
 type CartLine = {productId:string;weight:string;qty:number};
@@ -198,7 +199,7 @@ export default function Home(){
    </section>
    <div className="rev-marquee" aria-hidden="true"><div className="rev-marquee-track">{Array.from({length:2}).map((_,i)=><span key={i}>ANTEP FISTIĞI <b>✳</b> KAJU <b>✳</b> FINDIK <b>✳</b> KURU MEYVE <b>✳</b> KARIŞIK ÇEREZ <b>✳</b> BİR AVUÇ KEYİF <b>✳</b> </span>)}</div></div>
    <div className="rev-advantages"><div><span className="rev-adv-icon"><Icon type="package" size={22}/></span><div><strong>DİLEDİĞİNİZ GRAMAJ</strong><small>250 g, 500 g, 1 kg ve 5 kg seçenekleri</small></div></div><div><span className="rev-adv-icon"><Icon type="truck" size={24}/></span><div><strong>PTT KARGO</strong><small>Kargo ücreti sepette hesaplanır</small></div></div><div><span className="rev-adv-icon"><Icon type="chat" size={23}/></span><div><strong>WHATSAPP İLE TAMAMLA</strong><small>Siparişinizi mesajla teyit edin</small></div></div></div>
-   <section className="bn-flavor-nav" aria-label="Hızlı kategori keşfi"><div className="bn-flavor-heading"><span>NEYE KEYFİN VAR?</span><strong>Bir tıkla lezzete git <Icon type="arrow" size={17}/></strong></div><div className="bn-flavor-pills"><button type="button" className="bn-flavor-pill bn-flavor-all" onClick={()=>chooseCategory("Tümü")}><span className="bn-flavor-all-icon">✳</span><span>Hepsine bak</span><Icon type="arrow" size={17}/></button>{categoryTiles.map((tile,i)=><button type="button" key={tile.name} className={"bn-flavor-pill bn-flavor-"+i%5} onClick={()=>chooseCategory(tile.name)}><span className="bn-flavor-img"><SafeImage src={tile.photo} alt=""/></span><span>{tile.name}</span><Icon type="arrow" size={16}/></button>)}</div></section>
+   <section className="bn-flavor-nav" aria-label="Hızlı kategori keşfi"><div className="bn-flavor-heading"><span>NEYE KEYFİN VAR?</span><strong>Bir tıkla lezzete git <Icon type="arrow" size={17}/></strong></div><div className="bn-flavor-pills"><button type="button" className="bn-flavor-pill bn-flavor-all" onClick={()=>chooseCategory("Tümü")}><span className="bn-flavor-all-icon">✳</span><span>Hepsine bak</span><Icon type="arrow" size={17}/></button>{categoryTiles.map((tile,i)=><button type="button" key={tile.name} className={"bn-flavor-pill bn-flavor-"+(i%5)} onClick={()=>chooseCategory(tile.name)}><span className="bn-flavor-img"><SafeImage src={tile.photo} alt=""/></span><span>{tile.name}</span><Icon type="arrow" size={16}/></button>)}</div></section>
    <section className="rev-offer-zone" id="firsatlar">
     <div className="rev-offer-topline"><span><i/> BENLİ'NİN FIRSAT KÖŞESİ</span><a href="#urunler">TÜM LEZZETLERE BAK <Icon type="arrow" size={16}/></a></div>
     <div className="rev-offer-body">
