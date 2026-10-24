@@ -24,7 +24,7 @@ export function validateShopSettings(raw:unknown):ShopSettings|null{
  if((startDate&&!endDate)||(!startDate&&endDate)||(startDate&&endDate&&startDate>endDate))return null;
  const productIds=Array.isArray(m.productIds)?[...new Set(m.productIds.filter((a):a is string=>typeof a==="string"&&a.length<=90))].slice(0,300):[];
  return {shippingFee:roundMoney(numeric(v.shippingFee,100000)),freeShippingThreshold:roundMoney(numeric(v.freeShippingThreshold,100000000)),
- basketDiscountThreshold:roundMoney(numeric(v.basketDiscountThreshold,100000000)),basketDiscountPercent:roundMoney(numeric(v.basketDiscountPercent,90)),
+ basketDiscountThreshold:0,basketDiscountPercent:0,
  coupon:{enabled:Boolean(c.enabled),code:s(c.code,25).toLocaleUpperCase("tr-TR").replace(/[^A-Z0-9_-]/g,""),percent:roundMoney(numeric(c.percent,90)),minSubtotal:roundMoney(numeric(c.minSubtotal,100000000))},
  campaign:{enabled:Boolean(m.enabled),title:s(m.title,90),subtitle:s(m.subtitle,220),eyebrow:s(m.eyebrow,35),image,startDate,endDate,percent:roundMoney(numeric(m.percent,90)),productIds}};
 }
@@ -65,14 +65,12 @@ export function quoteCart(lines:QuoteInput[],products:Product[],shop:ShopSetting
   ?roundMoney(items.reduce((n,i)=>n+(i.originalUnitPrice||0)*i.qty,0)):null;
  let basketDiscount=0,discountReason="",couponApplied=false;
  if(subtotal!==null&&eligibleSubtotal>0){
-  // Thresholds use the payable product subtotal. Discount percentages apply only
-  // to otherwise full-price items; already-discounted 5 kg packs are excluded.
-  const eligible=shop.basketDiscountPercent>0&&shop.basketDiscountThreshold>0&&subtotal>=shop.basketDiscountThreshold;
-  if(eligible){basketDiscount=roundMoney(eligibleSubtotal*shop.basketDiscountPercent/100);discountReason="Sepet indirimi"}
+  // There is no automatic percent discount based on the basket amount or
+  // the combined weight of 1 kg packs. Only a selected 5 kg pack receives
+  // its configured package discount. Explicit coupon codes remain available.
   const validCoupon=shop.coupon.enabled&&shop.coupon.percent>0&&!!shop.coupon.code&&couponCode.trim().toLocaleUpperCase("tr-TR")===shop.coupon.code&&subtotal>=shop.coupon.minSubtotal;
   const couponDiscount=validCoupon?roundMoney(eligibleSubtotal*shop.coupon.percent/100):0;
-  if(couponDiscount>basketDiscount){basketDiscount=couponDiscount;discountReason="Kupon indirimi";couponApplied=true}
-  else if(validCoupon&&couponDiscount===basketDiscount&&couponDiscount>0){discountReason="Kupon indirimi";couponApplied=true}
+  if(couponDiscount>0){basketDiscount=couponDiscount;discountReason="Kupon indirimi";couponApplied=true}
  }
  const amount=subtotal===null?null:Math.max(0,roundMoney(subtotal-basketDiscount));
  const freeShipping=amount!==null&&shop.freeShippingThreshold>0&&amount>=shop.freeShippingThreshold;
