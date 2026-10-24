@@ -3,6 +3,7 @@ import { getShopSettings } from "@/lib/shop-db";
 import { listProducts } from "@/lib/db";
 import { quoteCart } from "@/lib/shop";
 import { weightOptions } from "@/lib/pricing";
+import { assertCartStock,StockUnavailable } from "@/lib/stock";
 export const runtime="nodejs";export const dynamic="force-dynamic";
 const hits=new Map<string,{count:number;at:number}>();
 export async function POST(request:NextRequest){
@@ -27,8 +28,9 @@ export async function POST(request:NextRequest){
   const products=await listProducts();
   const ids=new Set(products.map(p=>p.id));
   if(lines.some(l=>!ids.has(l.productId)))return NextResponse.json({error:"Satış dışı ürün mevcut."},{status:400});
+  assertCartStock(lines,products);
   const settings=await getShopSettings();
   const couponCode=typeof data.couponCode==="string"?data.couponCode.slice(0,25):"";
   return NextResponse.json({quote:quoteCart(lines,products,settings,couponCode)},{headers:{"Cache-Control":"no-store"}});
- }catch{return NextResponse.json({error:"Sepet fiyatı hesaplanamadı."},{status:500})}
+ }catch(e){if(e instanceof StockUnavailable)return NextResponse.json({error:e.message},{status:409});return NextResponse.json({error:"Sepet fiyatı hesaplanamadı."},{status:500})}
 }
