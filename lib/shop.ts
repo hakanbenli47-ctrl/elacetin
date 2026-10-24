@@ -40,7 +40,7 @@ export function quoteCart(lines:QuoteInput[],products:Product[],shop:ShopSetting
  let packageDiscount=0,campaignDiscount=0,eligibleSubtotal=0;
  // One product-level discount per line. In particular, the 5 kg package price is
  // already reduced; never apply the monthly campaign or basket/coupon twice to it.
- const items:OrderItem[]=lines.flatMap(l=>{
+ const items:OrderItem[]=lines.flatMap((l):OrderItem[]=>{
   const p=products.find(x=>x.id===l.productId);if(!p)return [];
   const packagePrice=priceFor(p,l.weight);
   const original=l.weight==="5000"?undiscountedFiveKg(p):packagePrice;
