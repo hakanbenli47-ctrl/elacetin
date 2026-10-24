@@ -6,6 +6,7 @@ import { weightLabel,weightOptions,priceFor,undiscountedFiveKg,roundMoney } from
 import { defaultShopSettings,quoteCart,campaignActive } from "@/lib/shop";
 import type { ShopSettings,CheckoutQuote } from "@/lib/shop";
 import "./store.css";
+import "./rev.css";
 const PHONE="905515550302";
 const categories = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Kuru Meyve", "Karışık"] as const;
 type CartLine = {productId:string;weight:string;qty:number};
