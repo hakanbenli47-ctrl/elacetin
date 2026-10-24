@@ -6,6 +6,8 @@ import type {ShopSettings} from "@/lib/shop";
 import {defaultShopSettings} from "@/lib/shop";
 import "./commerce-admin.css";
 type Props={products:Product[];mode:"bulk"|"settings";onChange:()=>Promise<void>};
+type QuickRow={key:number;name:string;kg:string;stock:string;category:Category;discount5kg:string};
+const newQuickRow=(key:number):QuickRow=>({key,name:"",kg:"",stock:"0",category:"Kuruyemiş",discount5kg:"0"});
 const categories:Category[]=["Kuruyemiş","Leblebi","Çekirdek","Kuru Meyve","Karışık"];
 const format=(n:number)=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY"}).format(n);
 function slugify(value:string){return value.toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i").replace(/[^a-z0-9 ]/g,"").trim().replace(/\s+/g,"-")}
@@ -49,6 +51,8 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
  useEffect(()=>setPriceDraft(Object.fromEntries(products.map(p=>[p.id,{kg:baseKgPrice(p)===null?"":String(baseKgPrice(p)),discount:String(p.discount5kg||0)}]))),[products]);
  const [bulkText,setBulkText]=useState("ŞOK FİYAT");
  const [bulkEnabled,setBulkEnabled]=useState(true);
+ const [quickRows,setQuickRows]=useState<QuickRow[]>(()=>[newQuickRow(1),newQuickRow(2),newQuickRow(3)]);
+ const [quickNext,setQuickNext]=useState(4);
  const [paste,setPaste]=useState("");
  const [preview,setPreview]=useState<{rows:Record<string,unknown>[];errors:string[]} >({rows:[],errors:[]});
  useEffect(()=>{
@@ -116,6 +120,34 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
   if(data.length>150)errors.push("Tek seferde en fazla 150 ürün aktarılabilir.");
   setPreview({rows:result,errors});
  }
+ function updateQuickRow(key:number,patch:Partial<QuickRow>){setQuickRows(rows=>rows.map(row=>row.key===key?{...row,...patch}:row))}
+ async function saveQuickRows(){
+  const rows=quickRows.filter(row=>row.name.trim()||row.kg.trim());
+  if(!rows.length){setError("Önce en az bir ürün adı ve kilo fiyatı girin.");return}
+  const errors=rows.flatMap((row,index)=>{
+   const msgs:string[]=[];
+   const price=readNumber(row.kg),stock=Number(row.stock),discount=Number(row.discount5kg);
+   if(row.name.trim().length<2)msgs.push("ürün adı");
+   if(!Number.isFinite(price)||price<0||price>10000000)msgs.push("kg fiyatı");
+   if(!Number.isSafeInteger(stock)||stock<0)msgs.push("stok");
+   if(!Number.isFinite(discount)||discount<0||discount>90)msgs.push("5 kg indirimi");
+   return msgs.length?[(index+1)+". satır: "+msgs.join(", ")+" kontrol edin."]:[];
+  });
+  const slugs=rows.map(row=>slugify(row.name));
+  if(new Set(slugs).size!==slugs.length)errors.push("Aynı isimli ürünleri iki defa yazdınız.");
+  if(errors.length){setError(errors.slice(0,5).join(" "));return}
+  if(!confirm(rows.length+" ürün kaydedilecek. Aynı isimli mevcut ürünler varsa güncellenecek. Devam edilsin mi?"))return;
+  setSaving(true);setError("");setMessage("");
+  try{
+   const payload=rows.map(row=>{const kg=readNumber(row.kg),discount=Number(row.discount5kg);return {id:"",name:row.name.trim(),slug:slugify(row.name),category:row.category,kgPrice:kg,discount5kg:discount,prices:calculatePrices(kg,discount),stock:Number(row.stock),active:true,featured:false,badge:"",description:"",image:"",cardNote:"",ingredients:"",allergens:""}});
+   const response=await fetch("/api/admin/products/bulk",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"import",products:payload})});
+   const body=await response.json();
+   if(!response.ok)throw Error(body.error||"Ürünler kaydedilemedi.");
+   setMessage(body.updated+" ürün başarıyla kaydedildi. Fotoğraflarını Ürün Yönetimi bölümünden ekleyebilirsiniz.");
+   setQuickRows([newQuickRow(1),newQuickRow(2),newQuickRow(3)]);setQuickNext(4);
+   await onChange();
+  }catch(e){setError(e instanceof Error?e.message:"Ürünler kaydedilemedi.")}finally{setSaving(false)}
+ }
  async function importProducts(){
   if(!preview.rows.length||preview.errors.length){setError("Liste hatalarını giderin.");return}
   if(!confirm(preview.rows.length+" ürün aktarılacak. Aynı URL adına sahip ürünlerin bilgileri güncellenecek. Devam edilsin mi?"))return;
@@ -132,9 +164,23 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
   {error&&<div className="commerce-alert error" role="alert">{error}<button type="button" onClick={()=>setError("")}>×</button></div>}
   {message&&<div className="commerce-alert success">{message}</div>}
   {mode==="bulk"?<>
-   <div className="commerce-banner"><span>PRATİK ÜRÜN YÖNETİMİ</span><h2>Onlarca ürünü tek seferde yönetin.</h2><p>Excel veya CSV listenizi yapıştırın, tüm fiyatları ve etiketleri birlikte güncelleyin.</p></div>
-   <section className="commerce-panel">
-    <h3>1. Excel / CSV ile toplu ürün ekle</h3>
+   <div className="commerce-banner"><span>KOLAY TOPLU ÜRÜN EKLEME</span><h2>Ürünleri alt alta yazın, tek seferde kaydedin.</h2><p>Excel dosyası veya özel kod bilmeniz gerekmiyor. Ürün adı, kilogram fiyatı ve stok yeterli.</p></div>
+   <section className="commerce-panel commerce-quick-add">
+     <div className="commerce-quick-heading"><div><h3>1. Kolay toplu ürün ekle</h3><p>Boş satırlar kaydedilmez. İsterseniz yeni satır ekleyin.</p></div><span>250 g · 500 g · 5 kg otomatik</span></div>
+     <div className="commerce-quick-scroll"><table className="commerce-quick-table"><thead><tr><th>Ürün adı *</th><th>1 kg fiyatı (TL) *</th><th>Stok</th><th>Kategori</th><th>5 kg indirim</th><th></th></tr></thead><tbody>{quickRows.map((row,index)=><tr key={row.key}>
+      <td><input type="text" aria-label={(index+1)+". ürünün adı"} maxLength={100} placeholder="Örn. Tuzlu Fıstık" value={row.name} onChange={e=>updateQuickRow(row.key,{name:e.target.value})}/></td>
+      <td><input type="text" inputMode="decimal" aria-label={(index+1)+". ürünün kg fiyatı"} placeholder="Örn. 800" value={row.kg} onChange={e=>updateQuickRow(row.key,{kg:e.target.value})}/></td>
+      <td><input type="number" min={0} aria-label={(index+1)+". ürünün stoğu"} value={row.stock} onChange={e=>updateQuickRow(row.key,{stock:e.target.value})}/></td>
+      <td><select aria-label={(index+1)+". ürünün kategorisi"} value={row.category} onChange={e=>updateQuickRow(row.key,{category:e.target.value as Category})}>{categories.map(cat=><option key={cat}>{cat}</option>)}</select></td>
+      <td><div className="commerce-discount-field"><input type="number" aria-label={(index+1)+". ürünün 5 kg indirim yüzdesi"} min={0} max={90} value={row.discount5kg} onChange={e=>updateQuickRow(row.key,{discount5kg:e.target.value})}/><span>%</span></div></td>
+      <td><button type="button" className="commerce-remove-row" title="Satırı sil" aria-label={(index+1)+". satırı sil"} onClick={()=>setQuickRows(rows=>rows.length===1?[newQuickRow(row.key)]:rows.filter(r=>r.key!==row.key))}>×</button></td>
+     </tr>)}</tbody></table></div>
+     <div className="commerce-quick-actions"><button type="button" className="commerce-add-row" disabled={quickRows.length>=150} onClick={()=>{setQuickRows(rows=>[...rows,newQuickRow(quickNext)]);setQuickNext(n=>n+1)}}>+ Yeni ürün satırı ekle</button><span>{quickRows.filter(r=>r.name.trim()||r.kg.trim()).length} ürün dolduruldu</span></div>
+     <div className="commerce-quick-save"><p>Örneğin kg fiyatı 800 TL → 250 g: 200 TL, 500 g: 400 TL.</p><button type="button" className="commerce-button" disabled={saving||!quickRows.some(r=>r.name.trim()||r.kg.trim())} onClick={saveQuickRows}>{saving?"Kaydediliyor...":"TÜM ÜRÜNLERİ KAYDET"}</button></div>
+   </section>
+   <details className="commerce-optional-import"><summary>Excel / CSV dosyasından ürün aktarmak istiyorum <small>Gelişmiş alternatif</small></summary>
+    <section className="commerce-panel">
+    <h3>Excel / CSV ile toplu ürün ekle</h3>
     <p>Excel&apos;de sütun sırası: <b>Ürün adı · Kg fiyatı · Stok · Kategori · 5 kg indirim (%) · Etiket · Açıklama · Görsel URL · Kart kısa notu</b></p>
     <p>Örnek: <code>Kaju;800;35;Kuruyemiş;10;ÇOK SATAN;Taze kavrulmuş kaju;https://...</code></p>
     <div className="commerce-import-actions"><label className="commerce-upload">CSV veya TXT seç<input type="file" accept=".csv,.tsv,.txt,text/csv,text/plain" onChange={async e=>{const f=e.target.files?.[0];if(!f)return;if(f.size>500000){setError("Dosya en fazla 500 KB olabilir.");return}parsePaste(await f.text())}}/></label><button type="button" onClick={()=>parsePaste("")}>Temizle</button></div>
@@ -142,9 +188,9 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
     {!!preview.errors.length&&<div className="commerce-preview-errors">{preview.errors.slice(0,8).map((x,i)=><p key={i}>{x}</p>)}</div>}
     {preview.rows.length>0&&<div className="commerce-preview"><b>{preview.rows.length} ürün hazır.</b><span>250 g, 500 g ve 5 kg fiyatları otomatik hesaplanır.</span><ul>{preview.rows.slice(0,5).map((x,i)=><li key={i}>{String(x.name)} — {format(Number(x.kgPrice))}/kg</li>)}</ul></div>}
     <button className="commerce-button" type="button" disabled={saving||!preview.rows.length||!!preview.errors.length} onClick={importProducts}>{saving?"Kaydediliyor...":"Ürünleri topluca kaydet"}</button>
-   </section>
+   </section></details>
    <section className="commerce-panel">
-    <h3>2. Toplu fiyat tablosu — Excel gibi düzenle</h3>
+    <h3>2. Mevcut ürünlerin fiyatlarını topluca değiştir</h3>
     <p>Ürünlerin 1 kg fiyatını ve 5 kg indirimini ayrı ayrı değiştirin. Tek bir kaydetme işlemiyle hepsi kalıcı kaydedilir.</p>
     {products.length===0?<p>Henüz ürün eklenmedi.</p>:<div className="commerce-table-scroller"><table className="commerce-price-table"><thead><tr><th>Ürün</th><th>1 kg satış (₺)</th><th>5 kg indirim (%)</th><th>5 kg yeni fiyat</th></tr></thead><tbody>{products.map(p=>{const row=priceDraft[p.id]||{kg:"",discount:"0"};const kg=row.kg===""?null:readNumber(row.kg);const discount=readNumber(row.discount);const value=kg!==null&&Number.isFinite(kg)&&Number.isFinite(discount)?calculatePrices(kg,discount)["5000"]:null;return <tr key={p.id}><td><strong>{p.name}</strong><small>{p.category}</small></td><td><input type="number" min={0} step=".01" value={row.kg} placeholder="Kg fiyatı" onChange={e=>setPriceDraft(s=>({...s,[p.id]:{...row,kg:e.target.value}}))}/></td><td><input type="number" min={0} max={90} step=".5" value={row.discount} onChange={e=>setPriceDraft(s=>({...s,[p.id]:{...row,discount:e.target.value}}))}/></td><td><b>{value===null?"—":format(value)}</b></td></tr>})}</tbody></table></div>}
     <button className="commerce-button" type="button" disabled={saving||!products.length} onClick={savePriceMatrix}>Tüm fiyat değişikliklerini kaydet</button>
