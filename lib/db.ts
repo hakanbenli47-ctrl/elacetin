@@ -27,15 +27,32 @@ async function restoreUserCatalogOnce(){
  if(!isPersistent)return;
  if(!restorePromise){
   restorePromise=(async()=>{
-   const marker=await dbRequest<ConfigRow[]>("benli_config?key=eq.uploaded_catalog_20261024&select=key&limit=1");
+   const marker=await dbRequest<ConfigRow[]>("benli_config?key=eq.uploaded_catalog_images_20261024&select=key&limit=1");
    if(marker.length)return;
    const existing=await dbRequest<{id:string;payload:Product}[]>("benli_products?select=id,payload&limit=3000");
-   const slugs=new Set(existing.map(p=>p.payload.slug));
-   const missing=uploadedCatalog.filter(p=>!slugs.has(p.slug));
-   if(missing.length){
-    await dbRequest("benli_products?on_conflict=id",{method:"POST",prefer:"resolution=ignore-duplicates",body:missing.map(p=>({id:p.id,payload:p,updated_at:new Date().toISOString()}))});
+   const bySlug=new Map(existing.map(row=>[row.payload.slug,row.payload]));
+   const changes:Product[]=[];
+   for(const sample of uploadedCatalog){
+    const found=bySlug.get(sample.slug);
+    if(!found){changes.push(sample);continue}
+    // Never overwrite an owner's photos, prices, stock, badges or custom copy.
+    // Fill only blank descriptions/photo fields in existing CSV-imported products.
+    const merged:Product={...found,
+     image:found.image||sample.image,
+     images:found.images?.length?found.images:sample.images,
+     description:found.description||sample.description,
+     cardNote:found.cardNote||sample.cardNote,
+     ingredients:found.ingredients||sample.ingredients,
+     allergens:found.allergens||sample.allergens,
+     storageTip:found.storageTip||sample.storageTip
+    };
+    if(JSON.stringify(merged)!==JSON.stringify(found))changes.push(merged);
    }
-   await dbRequest("benli_config?on_conflict=key",{method:"POST",prefer:"resolution=ignore-duplicates",body:[{key:"uploaded_catalog_20261024",value:{source:"benli-urunler.csv",version:1,items:uploadedCatalog.length}}]});
+   if(changes.length){
+    const now=new Date().toISOString();
+    await dbRequest("benli_products?on_conflict=id",{method:"POST",prefer:"resolution=merge-duplicates",body:changes.map(p=>({id:p.id,payload:p,updated_at:now}))});
+   }
+   await dbRequest("benli_config?on_conflict=key",{method:"POST",prefer:"resolution=ignore-duplicates",body:[{key:"uploaded_catalog_images_20261024",value:{source:"benli-urunler.csv",version:2,updated:changes.length}}]});
   })().catch(e=>{restorePromise=null;throw e});
  }
  await restorePromise;
