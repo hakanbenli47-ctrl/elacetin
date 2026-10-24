@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Product } from "@/lib/types";
 import { defaultProducts } from "@/lib/seed";
-import { weightLabel,weightOptions,priceFor,undiscountedFiveKg,roundMoney } from "@/lib/pricing";
+import { weightLabel,weightOptions,priceFor,undiscountedFiveKg,roundMoney,discountedProductPrice } from "@/lib/pricing";
 import { defaultShopSettings,quoteCart,campaignActive } from "@/lib/shop";
 import type { ShopSettings,CheckoutQuote } from "@/lib/shop";
 import "./store.css";
@@ -262,7 +262,7 @@ function ProductDetail({product:p,campaignPercent,onClose,onAdd}:{product:Produc
  const [weight,setWeight]=useState("1000");
  const base=priceFor(p,weight);
  const original=weight==="5000"?undiscountedFiveKg(p):base;
- const price=base===null?null:roundMoney(base*(1-campaignPercent/100));
+ const price=discountedProductPrice(p,weight,campaignPercent);
  const save=original!==null&&price!==null&&original>price?roundMoney(original-price):0;
  const stockAvailable=p.stock>0;
  return <section className="bm-detail bm-detail-v2 bm-modal" role="dialog" aria-modal="true" aria-label={p.name}>
@@ -285,7 +285,7 @@ function ProductDetail({product:p,campaignPercent,onClose,onAdd}:{product:Produc
    <div className="bm-detail-select-title"><h3>Gramaj seçin</h3><small>Fiyatlar seçiminize göre güncellenir.</small></div>
    <div className="bm-detail-weight-cards">{amounts.map(w=>{
     const pkg=priceFor(p,w);
-    const paid=pkg===null?null:roundMoney(pkg*(1-campaignPercent/100));
+    const paid=discountedProductPrice(p,w,campaignPercent);
     return <button type="button" key={w} aria-pressed={weight===w} className={`bm-detail-weight ${weight===w?"active":""}`} onClick={()=>setWeight(w)}>
      <span>{weightLabel(w)}</span><strong>{paid===null?"Fiyat sorunuz":format(paid)}</strong>{w==="5000"&&(p.discount5kg||0)>0&&<small>%{p.discount5kg} avantaj</small>}
     </button>
@@ -304,7 +304,7 @@ function ProductDetail({product:p,campaignPercent,onClose,onAdd}:{product:Produc
 function ProductCard({p,add,showDetails,campaignPercent=0}:{p:Product;add:(id:string,weight:string)=>void;showDetails:(p:Product)=>void;campaignPercent?:number}){
  const [weight,setWeight]=useState("1000");
  const base=priceFor(p,weight);
- const price=base===null?null:roundMoney(base*(1-campaignPercent/100));
+ const price=discountedProductPrice(p,weight,campaignPercent);
  const original=weight==="5000"?undiscountedFiveKg(p):base;
  const save=price!==null&&original!==null&&original>price?roundMoney(original-price):0;
  const available=p.stock>0;
