@@ -200,3 +200,15 @@
 .adm-easy-photo{gap:10px}
 .adm-easy-photo-preview{width:76px;height:76px}
 }
+
+.adm-easy-gallery{margin-top:19px;border-top:1px solid #e8eee4;padding-top:16px}
+.adm-easy-gallery-heading{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-bottom:12px}
+.adm-easy-gallery-heading strong{font-size:12px;color:#2b5739}
+.adm-easy-gallery-heading small{font-size:10px;color:#819785}
+.adm-easy-gallery-grid{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.adm-gallery-thumb{width:90px;height:88px;border-radius:10px;position:relative;background:#f0f4ed;overflow:hidden;border:1px solid #dce8d8}
+.adm-gallery-thumb img{height:100%;width:100%;object-fit:cover}
+.adm-gallery-thumb button{position:absolute;top:3px;right:3px;width:23px;height:23px;border:0;border-radius:50%;font-size:15px;background:#c33f2f;color:#fff;cursor:pointer}
+.adm-gallery-upload{display:flex;align-items:center;justify-content:center;gap:5px;flex-direction:column;width:90px;height:88px;border:1.5px dashed #9ab99a;color:#2e6644;background:#f4f9f1;border-radius:10px;font-size:20px;font-weight:800;cursor:pointer;text-align:center}
+.adm-gallery-upload span{font-size:9px;font-weight:700}
+.adm-gallery-upload input{display:none}
