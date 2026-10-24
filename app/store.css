@@ -424,7 +424,7 @@
 
 /* Modern ürün detay sayfası: fotoğraf galerisi, içerik, indirimli gramaj kartları */
 .bm-detail-v2{width:min(95vw,1080px);display:grid;grid-template-columns:minmax(0,45%) minmax(0,55%);border-radius:18px;overflow:auto;max-height:94dvh;background:#fff;box-shadow:0 25px 80px #051e1760}
-.bm-detail-v2 .bm-detail-close{position:sticky;top:12px;float:right;right:13px;margin-right:-40px;margin-bottom:-50px;background:#fff;box-shadow:0 3px 18px #0002;width:38px;height:38px;display:grid;place-items:center;border:0;border-radius:50%;z-index:15;cursor:pointer}
+.bm-detail-v2 .bm-detail-close{position:absolute;top:15px;right:15px;background:#fff;box-shadow:0 3px 18px #0002;width:38px;height:38px;display:grid;place-items:center;border:0;border-radius:50%;z-index:15;cursor:pointer}
 .bm-detail-gallery{background:#edf1e8;padding:26px 25px 15px;position:relative;display:flex;flex-direction:column;min-width:0;gap:13px}
 .bm-detail-main-photo{width:100%;aspect-ratio:1/1.05;border-radius:16px;overflow:hidden;position:relative;background:#e0e8dc;box-shadow:0 9px 28px #213a2320}
 .bm-detail-main-photo img{width:100%;height:100%;object-fit:cover}
@@ -513,3 +513,5 @@
 .bm-detail-weight>span{font-size:10px}
 .bm-detail-weight>strong{font-size:9px}
 }
+
+.bm-detail-v2{position:relative}
