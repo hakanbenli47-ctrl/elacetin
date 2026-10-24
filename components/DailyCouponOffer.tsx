@@ -27,8 +27,8 @@ function DailyRenewalClock(){
  const m=seconds===null?"--":value(Math.floor(seconds%3600/60));
  const s=seconds===null?"--":value(seconds%60);
  return <div className="dc-clock-wrap">
-  <span className="dc-clock-title">BUGÜNKÜ FIRSATIN YENİLENMESİNE</span>
-  <div className="dc-clock" role="timer" aria-label="Bugünkü kupon fırsatının yenilenmesine kalan süre"><span><b>{h}</b><small>SAAT</small></span><i>:</i><span><b>{m}</b><small>DAKİKA</small></span><i>:</i><span><b>{s}</b><small>SANİYE</small></span></div>
+  <span className="dc-clock-title">BUGÜNÜN FIRSATININ BİTMESİNE</span>
+  <div className="dc-clock" role="timer" aria-label="Bugünün kupon fırsatının bitmesine kalan süre"><span><b>{h}</b><small>SAAT</small></span><i>:</i><span><b>{m}</b><small>DAKİKA</small></span><i>:</i><span><b>{s}</b><small>SANİYE</small></span></div>
  </div>;
 }
 
@@ -53,7 +53,6 @@ export default function DailyCouponOffer({coupon,variant,onApply,selected=false}
     <button type="button" className="dc-code" onClick={copy} aria-label="Kupon kodunu kopyala"><span>{coupon.code}</span><small>{copied?"KOPYALANDI":"KODU KOPYALA ↗"}</small></button>
     <button type="button" className="dc-apply" onClick={onApply}>{selected?"KOD GİRİLDİ ✓":variant==="home"?"FIRSATI KULLAN →":"SEPETE UYGULA →"}</button>
    </div>
-   <small className="dc-renew-note">Bu günlük fırsatın sayacı her gece 00.00’da yenilenir. Kod, kampanya aktif kaldığı sürece ertesi gün de kullanılabilir.</small>
   </div>
  </section>;
 }

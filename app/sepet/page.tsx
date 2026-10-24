@@ -61,7 +61,20 @@ export default function CartPage(){
   setCart(a=>{const e=a.find(x=>x.productId===p.id&&x.weight==="1000");return e?a.map(x=>x===e?{...x,qty:x.qty+1}:x):[...a,{productId:p.id,weight:"1000",qty:1}]});setTip(p.name+" sepete eklendi.");
  }
  function updateWeight(id:string,w:string,next:string){
-  if(w===next)return;setCart(a=>{const active=a.find(l=>l.productId===id&&l.weight===w);if(!active)return a;const same=a.find(l=>l.productId===id&&l.weight===next);const amount=active.qty+(same?.qty||0);return [...a.filter(l=>!(l.productId===id&&(l.weight===w||l.weight===next))),{productId:id,weight:next,qty:Math.min(99,amount)}]});
+  if(w===next||!weightOptions.includes(next as typeof weightOptions[number]))return;
+  // Keep the edited product in the exact same row. Previously the updated
+  // variant was appended to the end, so changing weight reordered the cart.
+  setCart(lines=>{
+   const editedIndex=lines.findIndex(l=>l.productId===id&&l.weight===w);
+   if(editedIndex<0)return lines;
+   const otherIndex=lines.findIndex((l,i)=>i!==editedIndex&&l.productId===id&&l.weight===next);
+   const total=lines[editedIndex].qty+(otherIndex>=0?lines[otherIndex].qty:0);
+   return lines.flatMap((line,i)=>{
+    if(i===editedIndex)return [{...line,weight:next,qty:Math.min(99,total)}];
+    if(i===otherIndex)return [];
+    return [line];
+   });
+  });
  }
  return <main className="sc"><header className="sc-head"><a href="/" className="sc-brand"><span className="sc-brand-symbol">B</span><strong>BENLİ <small>KURUYEMİŞ</small></strong></a><a href="/#urunler" className="sc-back">← ALIŞVERİŞE DEVAM ET</a></header>
  <div className="sc-hero"><div><span>✳ BENLİ KURUYEMİŞ · ALIŞVERİŞ SEPETİ</span><h1>Sepetin,<br/><em>keyfinin adresi.</em></h1><p>Seçtiğin lezzetlere göz at, gramajları değiştir, yeni ürünler keşfet.</p></div><div className="sc-bag"><Icon name="cart"/><strong>{count}</strong><span>PAKET</span></div></div>

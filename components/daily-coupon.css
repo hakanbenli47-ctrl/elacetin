@@ -31,7 +31,7 @@
 .dc-code small{font-size:8px;font-weight:850}
 .dc-apply{flex:1.2;min-height:46px;padding:10px 12px;background:#244c38;color:#fff;font-size:10px;font-weight:950;white-space:nowrap}
 .dc-apply:hover{background:#ed6538}
-.dc-renew-note{font-size:9px;color:#8b724a;line-height:1.5;text-align:center}
+
 .dc-cart{flex-direction:column;align-items:stretch}
 .dc-cart .dc-graphic{width:65px;height:65px;position:absolute;right:14px;top:13px;transform:rotate(10deg);box-shadow:0 4px 0 #b94a2b}
 .dc-cart .dc-graphic b{font-size:24px}
@@ -42,10 +42,10 @@
 .dc-cart .dc-copy p{font-size:12px}
 .dc-cart .dc-copy>small{font-size:9px}
 .dc-cart .dc-right{width:100%}
-.dc-cart .dc-renew-note{font-size:9px}
-@media(max-width:1100px){.dc-home{gap:15px;padding:18px 24px}.dc-home .dc-graphic{width:75px;height:75px}.dc-home .dc-graphic>b{font-size:27px}.dc-home .dc-copy h2{font-size:29px}.dc-home .dc-right{width:275px}.dc-home .dc-copy p{font-size:12px}.dc-home .dc-renew-note{font-size:8px}}
-@media(max-width:810px){.dc-home{display:grid;grid-template-columns:65px 1fr;gap:11px;padding:16px 18px}.dc-home .dc-graphic{width:62px;height:62px}.dc-home .dc-graphic>b{font-size:24px}.dc-home .dc-graphic>small{font-size:7px}.dc-home .dc-copy h2{font-size:27px}.dc-home .dc-copy>small{font-size:9px}.dc-home .dc-right{width:auto;grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:11px}.dc-home .dc-clock-title{font-size:8px}.dc-home .dc-clock b{font-size:18px}.dc-home .dc-clock>span{min-width:47px;padding:5px 3px}.dc-home .dc-clock span small{font-size:7px}.dc-home .dc-renew-note{grid-column:1/-1;text-align:left}.dc-home .dc-action-row{max-width:370px}.dc-home .dc-apply{min-width:125px}}
-@media(max-width:540px){.dc-home{padding:13px 12px 13px;gap:10px}.dc-home .dc-copy h2{font-size:23px}.dc-home .dc-copy p{font-size:11px}.dc-home .dc-copy>small{font-size:9px}.dc-home .dc-eyebrow{font-size:8px}.dc-home .dc-right{display:flex;flex-direction:column;gap:7px}.dc-home .dc-clock-wrap{display:flex;justify-content:space-between;align-items:center;gap:10px}.dc-home .dc-clock-title{white-space:normal;text-align:left;max-width:110px;line-height:1.5}.dc-home .dc-clock{margin:0;gap:3px}.dc-home .dc-clock>span{min-width:46px}.dc-home .dc-action-row{width:100%;max-width:none;min-height:44px}.dc-home .dc-renew-note{font-size:8px}.dc-cart .dc-copy h2{font-size:24px}}
+.dc-cart 
+@media(max-width:1100px){.dc-home{gap:15px;padding:18px 24px}.dc-home .dc-graphic{width:75px;height:75px}.dc-home .dc-graphic>b{font-size:27px}.dc-home .dc-copy h2{font-size:29px}.dc-home .dc-right{width:275px}.dc-home .dc-copy p{font-size:12px}.dc-home }
+@media(max-width:810px){.dc-home{display:grid;grid-template-columns:65px 1fr;gap:11px;padding:16px 18px}.dc-home .dc-graphic{width:62px;height:62px}.dc-home .dc-graphic>b{font-size:24px}.dc-home .dc-graphic>small{font-size:7px}.dc-home .dc-copy h2{font-size:27px}.dc-home .dc-copy>small{font-size:9px}.dc-home .dc-right{width:auto;grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:11px}.dc-home .dc-clock-title{font-size:8px}.dc-home .dc-clock b{font-size:18px}.dc-home .dc-clock>span{min-width:47px;padding:5px 3px}.dc-home .dc-clock span small{font-size:7px}.dc-home .dc-home .dc-action-row{max-width:370px}.dc-home .dc-apply{min-width:125px}}
+@media(max-width:540px){.dc-home{padding:13px 12px 13px;gap:10px}.dc-home .dc-copy h2{font-size:23px}.dc-home .dc-copy p{font-size:11px}.dc-home .dc-copy>small{font-size:9px}.dc-home .dc-eyebrow{font-size:8px}.dc-home .dc-right{display:flex;flex-direction:column;gap:7px}.dc-home .dc-clock-wrap{display:flex;justify-content:space-between;align-items:center;gap:10px}.dc-home .dc-clock-title{white-space:normal;text-align:left;max-width:110px;line-height:1.5}.dc-home .dc-clock{margin:0;gap:3px}.dc-home .dc-clock>span{min-width:46px}.dc-home .dc-action-row{width:100%;max-width:none;min-height:44px}.dc-home .dc-cart .dc-copy h2{font-size:24px}}
 @media(max-width:360px){.dc-home .dc-graphic{width:54px;height:54px}.dc-home .dc-graphic>b{font-size:20px}.dc-home .dc-copy h2{font-size:21px}.dc-home .dc-clock>span{min-width:41px}}
 @media(prefers-reduced-motion:reduce){.dc-action-row button{transition:none}}
 
@@ -72,7 +72,7 @@
 .dc-code{background:#fff8e7;border-color:#d47c42!important}
 .dc-apply{background:#e44f34;box-shadow:0 4px 0 #b03928}
 .dc-apply:hover{background:#c93e2c}
-.dc-renew-note{color:#866045;font-size:9px;font-weight:650}
+
 @keyframes dc-promo-bounce{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(-4deg) translateY(-5px)}}
 @media(max-width:1100px){.dc-copy h2{font-size:clamp(25px,2.85vw,36px)}.dc-clock b{font-size:22px}}
 @media(max-width:810px){.dc-copy h2{font-size:29px}.dc-clock b{font-size:20px}}
