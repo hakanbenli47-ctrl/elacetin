@@ -292,4 +292,6 @@
 .rev .bn-cart-float>button{padding:9px 7px}
 }
 @media(prefers-reduced-motion:reduce){.rev .bn-cart-float{animation:none!important}}
-\n/* Çerez tercihleri açıkken küçük ekranlarda sepet çubuğu üst üste binmesin. */\nbody:has(.bn-consent) .bn-cart-float{display:none}\n
+
+/* Çerez tercihleri açıkken küçük ekranlarda sepet çubuğu üst üste binmesin. */
+body:has(.bn-consent) .bn-cart-float{display:none}
