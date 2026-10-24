@@ -1,5 +1,5 @@
 import "server-only";
-import type { Product } from "./types";
+import type { Product,OrderItem } from "./types";
 import { dbRequest,isPersistent } from "./persistence";
 import { getDb } from "./db";
 import type {QuoteInput} from "./shop";
@@ -73,4 +73,10 @@ export async function reserveCartStock(lines:QuoteInput[]):Promise<{products:Pro
   throw e;
  }
  return {products,release};
+}
+
+/** İptal edilen yeni siparişlerde ayrılan paket stoklarını iade eder. */
+export async function releaseOrderStock(items:OrderItem[]):Promise<void>{
+ const quantities=groupCartQuantities(items.map(item=>({productId:item.productId,weight:item.weight,qty:item.qty})));
+ for(const [id,qty] of quantities)await adjustStock(id,qty);
 }
