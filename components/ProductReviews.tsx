@@ -6,7 +6,7 @@ export type ReviewSummary={count:number;average:number};
 const DATE=(s:string)=>new Date(s).toLocaleDateString("tr-TR",{year:"numeric",month:"long",day:"numeric"});
 export function RatingBadge({summary,large=false}:{summary?:ReviewSummary;large?:boolean}){
  return <span className={"rv-rating "+(large?"large":"")} title={summary?.count?`${summary.average} / 5 · ${summary.count} yorum`:"Henüz puanlama yok"}>
-  <span className="rv-rating-stars" aria-hidden="true">★★★★★</span>
+  <span className="rv-rating-stars" aria-hidden="true">{summary?.count?"★".repeat(Math.max(0,Math.min(5,Math.round(summary.average))))+"☆".repeat(5-Math.max(0,Math.min(5,Math.round(summary.average)))):"☆☆☆☆☆"}</span>
   {summary?.count?<><strong>{summary.average.toLocaleString("tr-TR")}</strong><small>({summary.count} yorum)</small></>:<small>İlk değerlendiren sen ol</small>}
  </span>;
 }
