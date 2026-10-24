@@ -48,3 +48,33 @@
 @media(max-width:540px){.dc-home{padding:13px 12px 13px;gap:10px}.dc-home .dc-copy h2{font-size:23px}.dc-home .dc-copy p{font-size:11px}.dc-home .dc-copy>small{font-size:9px}.dc-home .dc-eyebrow{font-size:8px}.dc-home .dc-right{display:flex;flex-direction:column;gap:7px}.dc-home .dc-clock-wrap{display:flex;justify-content:space-between;align-items:center;gap:10px}.dc-home .dc-clock-title{white-space:normal;text-align:left;max-width:110px;line-height:1.5}.dc-home .dc-clock{margin:0;gap:3px}.dc-home .dc-clock>span{min-width:46px}.dc-home .dc-action-row{width:100%;max-width:none;min-height:44px}.dc-home .dc-renew-note{font-size:8px}.dc-cart .dc-copy h2{font-size:24px}}
 @media(max-width:360px){.dc-home .dc-graphic{width:54px;height:54px}.dc-home .dc-graphic>b{font-size:20px}.dc-home .dc-copy h2{font-size:21px}.dc-home .dc-clock>span{min-width:41px}}
 @media(prefers-reduced-motion:reduce){.dc-action-row button{transition:none}}
+
+/* Today-focused promotional treatment: genuine daily refresh, no fake expiry claim. */
+.dc-offer{background:linear-gradient(115deg,#ffe16a 0%,#ffd480 41%,#ffb478 100%);border-color:#f6b14c}
+.dc-home{border-bottom:5px solid #e96b38}
+.dc-cart{background:linear-gradient(135deg,#fff0ab,#ffc891);border:3px solid #f1b15a}
+.dc-offer:after{content:"";position:absolute;pointer-events:none;z-index:-1;width:220px;height:220px;border:1px dashed #fffdf570;border-radius:50%;right:25%;bottom:-165px}
+.dc-graphic{background:linear-gradient(140deg,#fa4c34,#c93039);box-shadow:0 7px 0 #9c3136,0 17px 25px #8f3c3044;animation:dc-promo-bounce 2.7s ease-in-out infinite}
+.dc-graphic>span{color:#fff17b}
+.dc-eyebrow{color:#9b3629;letter-spacing:.13em;font-size:10px}
+.dc-eyebrow i{background:#ed573a;box-shadow:0 0 0 4px #fff1b5}
+.dc-live-dot{margin-left:4px;background:#a7372b;color:#fffbe3;border-radius:20px;padding:5px 9px;letter-spacing:.1em;font-size:8px;white-space:nowrap;box-shadow:0 3px 0 #852d2b}
+.dc-copy h2{font-size:clamp(27px,3.05vw,47px);line-height:1.1;color:#283f2f}
+.dc-copy h2 em{font-weight:600;font-style:italic;color:#d84733}
+.dc-copy p{font-size:14px;font-weight:750;color:#544631}
+.dc-copy p b{font-size:15px;color:#c23c2f}
+.dc-copy .dc-threshold{display:inline-block;font-weight:850;color:#6e532d}
+.dc-copy>small{font-size:10px;color:#765f43;font-weight:700}
+.dc-clock-title{color:#9a4032;font-size:10px;font-weight:950}
+.dc-clock>span{background:#fffaf1;border:2px solid #f3ca8c;box-shadow:0 4px 0 #e3b278}
+.dc-clock b{color:#b63e34;font-size:27px;font-weight:700}
+.dc-clock i{color:#b83f30}
+.dc-code{background:#fff8e7;border-color:#d47c42!important}
+.dc-apply{background:#e44f34;box-shadow:0 4px 0 #b03928}
+.dc-apply:hover{background:#c93e2c}
+.dc-renew-note{color:#866045;font-size:9px;font-weight:650}
+@keyframes dc-promo-bounce{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(-4deg) translateY(-5px)}}
+@media(max-width:1100px){.dc-copy h2{font-size:clamp(25px,2.85vw,36px)}.dc-clock b{font-size:22px}}
+@media(max-width:810px){.dc-copy h2{font-size:29px}.dc-clock b{font-size:20px}}
+@media(max-width:540px){.dc-home .dc-copy h2{font-size:24px}.dc-copy .dc-threshold{font-size:10px}.dc-home .dc-eyebrow{font-size:8px}.dc-live-dot{font-size:7px;padding:4px 6px}.dc-home .dc-clock b{font-size:18px}.dc-cart .dc-copy h2{font-size:25px}}
+@media(prefers-reduced-motion:reduce){.dc-graphic{animation:none}}

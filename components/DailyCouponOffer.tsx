@@ -27,8 +27,8 @@ function DailyRenewalClock(){
  const m=seconds===null?"--":value(Math.floor(seconds%3600/60));
  const s=seconds===null?"--":value(seconds%60);
  return <div className="dc-clock-wrap">
-  <span className="dc-clock-title">GÜNLÜK SAYACIN YENİLENMESİNE</span>
-  <div className="dc-clock" role="timer" aria-label="Günlük kod sayacının yenilenmesine kalan süre"><span><b>{h}</b><small>SAAT</small></span><i>:</i><span><b>{m}</b><small>DAKİKA</small></span><i>:</i><span><b>{s}</b><small>SANİYE</small></span></div>
+  <span className="dc-clock-title">BUGÜNKÜ FIRSATIN YENİLENMESİNE</span>
+  <div className="dc-clock" role="timer" aria-label="Bugünkü kupon fırsatının yenilenmesine kalan süre"><span><b>{h}</b><small>SAAT</small></span><i>:</i><span><b>{m}</b><small>DAKİKA</small></span><i>:</i><span><b>{s}</b><small>SANİYE</small></span></div>
  </div>;
 }
 
@@ -42,18 +42,18 @@ export default function DailyCouponOffer({coupon,variant,onApply,selected=false}
  return <section className={"dc-offer dc-"+variant} aria-label="Günlük kupon kodu">
   <div className="dc-graphic" aria-hidden="true"><span>✳</span><b>%{coupon.percent.toLocaleString("tr-TR")}</b><small>İNDİRİM</small></div>
   <div className="dc-copy">
-   <span className="dc-eyebrow"><i/> GÜNÜN KUPONU · HER GÜN YENİLENİR</span>
-   <h2>{variant==="home"?"Sepetinde küçük bir sürpriz var!":"Sepetinde kupon fırsatı!"}</h2>
-   <p><strong>{coupon.code}</strong> koduyla indirimsiz ürünlerde <b>%{coupon.percent.toLocaleString("tr-TR")} indirim</b>{coupon.minSubtotal>0?<> · <b>{tl.format(coupon.minSubtotal)} ve üzeri</b> sepetlerde</>:null}.</p>
-   <small>5 kg paket veya başka kampanya indirimi uygulanmış ürünlerle birleşmez.</small>
+   <span className="dc-eyebrow"><i/> BUGÜNE ÖZEL KUPON FIRSATI <span className="dc-live-dot">● AKTİF</span></span>
+   <h2>{variant==="home"?<>Bugün alışverişin <em>%{coupon.percent.toLocaleString("tr-TR")} daha avantajlı!</em></>:<>Bugünün fırsatını <em>sepette yakala!</em></>}</h2>
+   <p><strong>{coupon.code}</strong> kodunu sepette kullan, indirimsiz ürünlerde <b>%{coupon.percent.toLocaleString("tr-TR")} kazan!</b>{coupon.minSubtotal>0?<> <span className="dc-threshold">{tl.format(coupon.minSubtotal)} ve üzeri sepetlerde geçerli.</span></>:null}</p>
+   <small>5 kg paket indirimi ve diğer kampanyalarla birleşmez.</small>
   </div>
   <div className="dc-right">
    <DailyRenewalClock/>
    <div className="dc-action-row">
-    <button type="button" className="dc-code" onClick={copy} aria-label="Kupon kodunu kopyala"><span>{coupon.code}</span><small>{copied?"KOPYALANDI":"KOPYALA ↗"}</small></button>
-    <button type="button" className="dc-apply" onClick={onApply}>{selected?"KOD GİRİLDİ ✓":variant==="home"?"SEPETTE KULLAN →":"KODU UYGULA →"}</button>
+    <button type="button" className="dc-code" onClick={copy} aria-label="Kupon kodunu kopyala"><span>{coupon.code}</span><small>{copied?"KOPYALANDI":"KODU KOPYALA ↗"}</small></button>
+    <button type="button" className="dc-apply" onClick={onApply}>{selected?"KOD GİRİLDİ ✓":variant==="home"?"FIRSATI KULLAN →":"SEPETE UYGULA →"}</button>
    </div>
-   <small className="dc-renew-note">Sayaç her gün Türkiye saatiyle 00.00'da yenilenir; kupon yönetim panelinde açık kaldığı sürece kullanılabilir.</small>
+   <small className="dc-renew-note">Bu günlük fırsatın sayacı her gece 00.00’da yenilenir. Kod, kampanya aktif kaldığı sürece ertesi gün de kullanılabilir.</small>
   </div>
  </section>;
 }
