@@ -10,6 +10,7 @@ import "./rev.css";
 import "./hero-v3.css";
 import "./hero-v4.css";
 import "./colorful.css";
+import "./cart-experience.css";
 const PHONE="905515550302";
 const categories = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Kuru Meyve", "Karışık"] as const;
 type CartLine = {productId:string;weight:string;qty:number};
@@ -51,6 +52,37 @@ function CampaignCountdown({endDate}:{endDate:string}){
 function Money({price}:{price:number|null}){return <>{price===null?"Fiyat sorunuz":format(price)}</>}
 function InfoTitle({eyebrow,title,sub}:{eyebrow:string;title:React.ReactNode;sub?:string}){return <div className="bm-heading"><span>{eyebrow}</span><h2>{title}</h2>{sub&&<p>{sub}</p>}</div>}
 
+/** Tutar hesaplamasını yalnızca sunucuyla aynı sepet teklifinden yapar. */
+function ShippingProgress({shop,quote,compact=false}:{shop:ShopSettings;quote:CheckoutQuote;compact?:boolean}){
+ if(quote.items.length===0)return null;
+ const net=quote.subtotal===null?null:Math.max(0,roundMoney(quote.subtotal-quote.basketDiscount));
+ const threshold=shop.freeShippingThreshold;
+ const progress=threshold>0&&net!==null?Math.min(100,Math.round(net/threshold*100)):0;
+ const remaining=net===null?null:Math.max(0,roundMoney(threshold-net));
+ const free=net!==null&&(shop.shippingFee===0||(threshold>0&&remaining===0));
+ if(threshold<=0){
+  return <div className={`bx-ship-progress ${compact?"compact":""} ${shop.shippingFee===0?"complete":""}`}>
+   <span className="bx-ship-icon"><Icon type="truck" size={compact?16:20}/></span>
+   <span className="bx-ship-info"><strong>{shop.shippingFee===0?"Kargon ücretsiz!":"PTT kargo ücreti"}</strong><small>{shop.shippingFee===0?"Bu siparişte kargo bedava.":format(shop.shippingFee)+" · Sepette hesaplandı"}</small></span>
+  </div>
+ }
+ return <div className={`bx-ship-progress ${compact?"compact":""} ${free?"complete":""}`}>
+  <span className="bx-ship-icon"><Icon type={free?"check":"truck"} size={compact?17:22}/></span>
+  <div className="bx-ship-progress-main">
+   <strong>{net===null?"Kargo bedeli hesaplanıyor":free?"Harika! Kargon ücretsiz!":<>{format(remaining!)} daha alışveriş yap, <em>kargo bedava!</em></>}</strong>
+   {!compact&&<small>{free?"Kargo ücretini biz karşılıyoruz.":"Ücretsiz kargo sınırı: "+format(threshold)}</small>}
+   <div className="bx-ship-meter" role="progressbar" aria-label="Ücretsiz kargo ilerlemesi" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{width:progress+"%"}}/></div>
+  </div>
+  {!compact&&<span className="bx-ship-percentage">{progress}%</span>}
+ </div>
+}
+function AddToCartCelebration({name}:{name:string}){
+ return <div className="bx-added-celebration" role="status" aria-live="polite">
+  <div className="bx-celebration-particles" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i}/>)}</div>
+  <div className="bx-gift" aria-hidden="true"><span className="bx-gift-bow">✦</span><span className="bx-gift-lid"/><span className="bx-gift-box"/></div>
+  <div className="bx-celebration-text"><strong>Sepete eklendi!</strong><span>{name}</span><small>Bir avuç keyif daha ✳</small></div>
+ </div>
+}
 export default function Home(){
  const [products,setProducts]=useState<Product[]>([]);
  const [productsLoaded,setProductsLoaded]=useState(false);
@@ -79,6 +111,7 @@ export default function Home(){
  const [sending,setSending]=useState(false);
  const [error,setError]=useState("");
  const [notice,setNotice]=useState("");
+ const [giftPop,setGiftPop]=useState<{id:number;name:string}|null>(null);
 
  useEffect(()=>{
   fetch("/api/products",{cache:"no-store"}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error||"Ürünler yüklenemedi.");if(!Array.isArray(d.products))throw Error("Ürün listesi alınamadı.");setProducts(d.products);}).catch(e=>setProductsError(e instanceof Error?e.message:"Ürünler yüklenemedi.")).finally(()=>setProductsLoaded(true));
@@ -90,6 +123,7 @@ export default function Home(){
  useEffect(()=>{if(loaded)localStorage.setItem("benli-cart",JSON.stringify(cart))},[cart,loaded]);
  useEffect(()=>{document.body.style.overflow=(drawer||detail||checkout)?"hidden":"";return()=>{document.body.style.overflow=""}},[drawer,detail,checkout]);
  useEffect(()=>{if(!notice)return;const t=setTimeout(()=>setNotice(""),3000);return()=>clearTimeout(t)},[notice]);
+ useEffect(()=>{if(!giftPop)return;const t=setTimeout(()=>setGiftPop(null),2100);return()=>clearTimeout(t)},[giftPop]);
  const show=useMemo(()=>products.filter(p=>p.active&&(category==="Tümü"||p.category===category)&&`${p.name} ${p.category} ${p.description}`.toLocaleLowerCase("tr-TR").includes(search.toLocaleLowerCase("tr-TR").trim())),[products,category,search]);
  const catalogCategories=useMemo(()=>categories.filter(c=>c==="Tümü"||products.some(p=>p.active&&p.category===c)),[products]);
  const categoryTiles=useMemo(()=>catalogCategories.filter(c=>c!=="Tümü").map(cat=>{const members=products.filter(p=>p.active&&p.category===cat);return {name:cat,photo:members[0]?.image||"",count:members.length,note:cat==="Kuruyemiş"?"SEVİLEN KLASİKLER":cat==="Karışık"?"BİR ARADA LEZZET":cat==="Kuru Meyve"?"MEYVEDEN GELEN TAT":cat==="Çekirdek"?"SOHBETLİK LEZZETLER":"ÇITIR MOLALAR"}}),[catalogCategories,products]);
@@ -120,7 +154,14 @@ export default function Home(){
   return()=>{clearTimeout(t);controller.abort()};
  },[quoteKey,couponCode,cart,shopLoaded]);
  const expanded=cart.map(l=>{const p=products.find(x=>x.id===l.productId);const item=quote.items.find(q=>q.productId===l.productId&&q.weight===l.weight);return p?{...l,p,unit:item?.unitPrice??null,originalUnit:item?.originalUnitPrice??item?.unitPrice??null,discountType:item?.discountType??null,discountAmount:item?.discountAmount??0}:null}).filter((x):x is NonNullable<typeof x>=>x!==null);
- const total=quote.total;
+ const recommendations=useMemo(()=>{
+  const inCart=new Set(cart.map(l=>l.productId));
+  const alreadyCategories=new Set(products.filter(p=>inCart.has(p.id)).map(p=>p.category));
+  return products.filter(p=>p.active&&p.stock>0&&!inCart.has(p.id)&&priceFor(p,"1000")!==null)
+   .sort((a,b)=>Number(!alreadyCategories.has(b.category))-Number(!alreadyCategories.has(a.category))||Number(b.featured)-Number(a.featured)||a.name.localeCompare(b.name,"tr"))
+   .slice(0,5);
+ },[products,cart]);
+  const total=quote.total;
  const activeCampaign=campaignActive(shop)?shop.campaign:null;
  const campaignProducts=activeCampaign?products.filter(p=>p.active&&activeCampaign.productIds.includes(p.id)):[];
  function add(id:string,weight:string){
@@ -129,7 +170,7 @@ export default function Home(){
   const inCart=cart.filter(l=>l.productId===id).reduce((n,l)=>n+l.qty,0);
   if(inCart>=p.stock){setNotice(p.name+" için stok sınırına ulaştınız.");return}
   setCart(lines=>{const exists=lines.find(x=>x.productId===id&&x.weight===weight);return exists?lines.map(x=>x===exists?{...x,qty:Math.min(99,x.qty+1)}:x):[...lines,{productId:id,weight,qty:1}]});
-  track("add_to_cart",p.slug);setNotice("Ürün sepete eklendi");
+  track("add_to_cart",p.slug);setNotice("Ürün sepete eklendi");setGiftPop(previous=>({id:(previous?.id||0)+1,name:p.name}));
  }
  function changeQty(id:string,weight:string,by:number){
   const p=products.find(x=>x.id===id);
@@ -252,13 +293,56 @@ export default function Home(){
    <section className="rev-contact-banner"><div><span className="rev-kicker">İŞLETMELERE ÖZEL</span><h2>Toptan mı lazım?<br/><em>Konuşalım.</em></h2><p>İşletmeniz için kuruyemiş alımlarında teklif almak isterseniz bize yazabilirsiniz.</p></div><a href="https://wa.me/905515550302?text=Merhaba%2C%20toptan%20kuruyemi%C5%9F%20i%C3%A7in%20fiyat%20teklifi%20almak%20istiyorum." target="_blank" rel="noreferrer" className="rev-button rev-button-light">TEKLİF AL <Icon type="up" size={18}/></a></section>
   </main>
   <footer className="rev-footer"><div className="rev-footer-top"><div className="rev-footer-brand"><Logo/><p>Bir avuç iyi şey.<br/>Bolca keyif.</p></div><div><strong>MAĞAZA</strong><a href="#urunler">Tüm ürünler</a><a href="#koleksiyon">Koleksiyon</a><a href="#kategoriler">Kategoriler</a><a href="#nasil-calisir">Sipariş rehberi</a></div><div><strong>İLETİŞİM</strong><a href="tel:+905515550302">0551 555 03 02</a><a href="https://wa.me/905515550302" target="_blank" rel="noreferrer">WhatsApp ↗</a><a href="/giris">Müşteri girişi</a></div><div className="rev-footer-cta"><span>KEYFİNİZ YERİNDE OLSUN.</span><a href="#urunler">Bir avuç mutluluk seç. <Icon type="arrow" size={22}/></a></div></div><div className="rev-footer-bottom"><span>© {new Date().getFullYear()} BENLİ KURUYEMİŞ · TÜM HAKLARI SAKLIDIR</span><div><span>Ödeme ve sipariş ayrıntıları WhatsApp üzerinden teyit edilir.</span><a href="/cerez-politikasi">Gizlilik & çerezler</a><button type="button" onClick={()=>window.dispatchEvent(new Event("benli:cookie-settings"))}>Çerez ayarları</button><a href="/admin">Yönetim</a></div></div></footer>
-  {count>0&&!drawer&&!checkout&&!detail&&<aside className="bn-cart-float" aria-label="Sepet özeti"><span className="bn-cart-float-icon"><Icon type="bag" size={21}/><b>{count}</b></span><div><strong>Sepetin hazır!</strong><span>{quote.total===null?"Fiyat hesaplanıyor":format(quote.total)} {shop.freeShippingThreshold>0&&quote.subtotal!==null&&!quote.freeShipping?"· "+format(Math.max(0,shop.freeShippingThreshold-(quote.subtotal-quote.basketDiscount)))+" daha, kargo ücretsiz":""}</span></div><button type="button" onClick={()=>setDrawer(true)}>SEPETİ GÖR <Icon type="arrow" size={17}/></button></aside>}
+  {count>0&&!drawer&&!checkout&&!detail&&<aside key="floating-cart" className="bn-cart-float bx-float" aria-label="Sepet ve kargo özeti">
+   <span className="bn-cart-float-icon bx-float-icon"><Icon type="bag" size={22}/><b>{count}</b></span>
+   <div className="bx-float-copy"><strong>{quote.freeShipping||shop.shippingFee===0?"Kargo ücretsiz!":"Sepetin büyüyor!"}</strong><small>{quote.total===null?"Fiyat hesaplanıyor":format(quote.total)} · {count} paket</small><ShippingProgress shop={shop} quote={quote} compact/></div>
+   <button type="button" className="bx-float-button" onClick={()=>setDrawer(true)} aria-label="Sepeti aç"><span>SEPETİ AÇ</span><Icon type="arrow" size={17}/></button>
+  </aside>}
   <div className={`bm-mobile-dock ${drawer||detail||checkout?"hidden":""}`}><a href="#urunler" onClick={()=>setMenu(false)}><Icon type="search" size={18}/><span>Ürünler</span></a><button type="button" onClick={()=>setDrawer(true)}><Icon type="bag" size={18}/><span>Sepetim {count>0?`(${count})`:""}</span></button><a href="https://wa.me/905515550302" target="_blank" rel="noreferrer"><Icon type="chat" size={18}/><span>Destek</span></a></div>
+  {giftPop&&<AddToCartCelebration key={giftPop.id} name={giftPop.name}/>}
   {notice&&<div className="bm-toast" role="status"><Icon type="check" size={17}/>{notice}</div>}
   {detail&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setDetail(null)}/>
      <ProductDetail product={detail} campaignPercent={activeCampaign?.productIds.includes(detail.id)?activeCampaign.percent:0} onClose={()=>setDetail(null)} onAdd={weight=>{add(detail.id,weight);setDetail(null);setDrawer(true)}}/>
    </div>}
-  {drawer&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setDrawer(false)}/><aside role="dialog" aria-modal="true" aria-labelledby="bm-cart-title" className="bm-drawer"><div className="bm-drawer-header"><div><span>BENLİ KURUYEMİŞ</span><h2 id="bm-cart-title">Sepetim ({count})</h2></div><button type="button" className="bm-close" onClick={()=>setDrawer(false)} aria-label="Kapat"><Icon type="x"/></button></div><div className="bm-cart-lines">{!expanded.length?<div className="bm-emptycart"><Icon type="bag" size={49}/><h3>Sepetiniz henüz boş.</h3><p>Sevdiğiniz lezzetleri eklemek için ürünlere göz atın.</p><button type="button" className="bm-btn dark" onClick={()=>setDrawer(false)}>ALIŞVERİŞE DEVAM</button></div>:expanded.map(l=><div className="bm-cart-line" key={l.productId+":"+l.weight}><div className="bm-cart-thumb"><SafeImage src={l.p.image} alt={l.p.name}/></div><div><strong>{l.p.name}</strong><small>{weightLabel(l.weight)}</small><span className="bm-cart-original-price"><Money price={l.originalUnit}/></span>{l.discountType==="package"&&<small className="bm-cart-item-discount">5 kg indirimi: {format(roundMoney(l.discountAmount/l.qty))} × {l.qty} = −{format(l.discountAmount)}</small>}{l.discountType==="campaign"&&<small className="bm-cart-item-discount">Kampanya indirimi aşağıda düşülecek</small>}<div className="bm-qty"><button type="button" onClick={()=>changeQty(l.productId,l.weight,-1)}><Icon type="minus" size={16}/></button>{l.qty}<button type="button" onClick={()=>changeQty(l.productId,l.weight,1)}><Icon type="plus" size={16}/></button></div></div><button type="button" className="bm-remove" onClick={()=>setCart(a=>a.filter(x=>x.productId!==l.productId||x.weight!==l.weight))}>Sil</button></div>)}</div>{expanded.length>0&&<div className="bm-cart-summary">{shopError&&<div className="bm-cart-load-error">Kargo ve kampanya bilgilerine erişilemiyor. Sipariş şu an oluşturulamaz.</div>}<div><span>Ürünlerin indirimsiz toplamı</span><strong>{quote.originalSubtotal===null?"Fiyat sorunuz":format(quote.originalSubtotal)}</strong></div>{quote.packageDiscount>0&&<div className="bm-cart-saving"><span>5 kg paket indirimi</span><strong>−{format(quote.packageDiscount)}</strong></div>}{quote.campaignDiscount>0&&<div className="bm-cart-saving"><span>Aylık kampanya indirimi</span><strong>−{format(quote.campaignDiscount)}</strong></div>}{quote.basketDiscount>0&&<div className="bm-cart-saving"><span>{quote.discountReason}</span><strong>−{format(quote.basketDiscount)}</strong></div>}<div className="bm-cart-net-subtotal"><span>İndirim sonrası ürün tutarı</span><strong>{quote.subtotal===null?"Fiyat sorunuz":format(Math.max(0,roundMoney(quote.subtotal-quote.basketDiscount)))}</strong></div><div><span>PTT Kargo</span><strong>{quote.freeShipping?"BEDAVA":quote.shippingFee===null?"—":format(quote.shippingFee)}</strong></div>{shop.freeShippingThreshold>0&&!quote.freeShipping&&quote.subtotal!==null&&<div className="bm-free-shipping-hint">{format(shop.freeShippingThreshold)} ve üzeri net sepette kargo ücretsiz.</div>}<label className="bm-coupon">İndirim kuponu<input value={couponCode} maxLength={25} placeholder="Kupon kodunuz" onChange={e=>setCouponCode(e.target.value.toLocaleUpperCase("tr-TR"))}/>{couponCode&&<small>{couponChecking||verifiedQuote?.key!==quoteKey?"Kupon kontrol ediliyor...":quote.couponApplied?"Kupon uygulandı.":"Kupon geçersiz veya otomatik indirim daha avantajlı."}</small>}</label><div className="bm-cart-grand"><span>GENEL TOPLAM</span><strong>{total===null?"Fiyat sorunuz":format(total)}</strong></div><p>Sepet tutarı ve PTT kargo bedeli yönetici ayarlarına göre hesaplanır. Sipariş WhatsApp ile teyit edilir.</p><button data-track="checkout" className="bm-btn dark" type="button" onClick={()=>{track("checkout_started","checkout");setDrawer(false);setCheckout(true)}}>SİPARİŞ TALEBİ OLUŞTUR <Icon type="arrow"/></button></div>}</aside></div>}
+  {drawer&&<div className="bm-modal-root bx-cart-modal">
+   <div className="bm-backdrop bx-cart-backdrop" onClick={()=>setDrawer(false)}/>
+   <aside role="dialog" aria-modal="true" aria-labelledby="bm-cart-title" className="bm-drawer bx-cart-drawer">
+    <div className="bm-drawer-header bx-cart-header">
+     <div className="bx-header-title"><div className="bx-cart-header-kicker"><Icon type="bag" size={17}/> BENLİ KURUYEMİŞ · ALIŞVERİŞ SEPETİN</div><h2 id="bm-cart-title">Sepetim <span>{count} paket</span></h2><p>Sevdiğin lezzetler bir arada.</p></div>
+     <button type="button" className="bm-close bx-cart-close" onClick={()=>setDrawer(false)} aria-label="Sepeti kapat"><Icon type="x" size={19}/></button>
+    </div>
+    {expanded.length>0&&<div className="bx-cart-shipping"><ShippingProgress shop={shop} quote={quote}/></div>}
+    <div className="bm-cart-lines bx-cart-scroller">
+     {!expanded.length?<div className="bm-emptycart bx-cart-empty"><span className="bx-empty-graphic"><Icon type="bag" size={45}/><i>✳</i></span><h3>Sepetin biraz sessiz...</h3><p>En sevilen lezzetlerden birini seç, keyifli alışveriş başlasın.</p><button type="button" onClick={()=>setDrawer(false)}>ÜRÜNLERİ KEŞFET <Icon type="arrow" size={16}/></button></div>:<div className="bx-cart-items"><div className="bx-cart-section-title"><span>SEÇTİĞİN LEZZETLER</span><small>{count} paket</small></div>{expanded.map(l=><div className="bm-cart-line bx-cart-item" key={l.productId+":"+l.weight}>
+       <button type="button" className="bm-cart-thumb bx-cart-thumb" aria-label={l.p.name+" ürününü incele"} onClick={()=>{setDrawer(false);openDetail(l.p)}}><SafeImage src={l.p.image} alt={l.p.name}/></button>
+       <div className="bx-cart-item-details"><strong>{l.p.name}</strong><small className="bx-cart-weight">{weightLabel(l.weight)} paket</small><span className="bm-cart-original-price"><Money price={l.originalUnit}/></span>{l.discountType==="package"&&<small className="bm-cart-item-discount">{format(roundMoney(l.discountAmount/l.qty))} × {l.qty} = −{format(l.discountAmount)} paket indirimi</small>}{l.discountType==="campaign"&&<small className="bm-cart-item-discount">Kampanya indirimi aşağıda düşülecek</small>}
+        <div className="bm-qty bx-cart-qty"><button type="button" onClick={()=>changeQty(l.productId,l.weight,-1)} aria-label={l.p.name+" adedini azalt"}><Icon type="minus" size={15}/></button><span>{l.qty}</span><button type="button" onClick={()=>changeQty(l.productId,l.weight,1)} disabled={cart.filter(x=>x.productId===l.productId).reduce((n,x)=>n+x.qty,0)>=l.p.stock} aria-label={l.p.name+" adedini artır"}><Icon type="plus" size={15}/></button></div>
+       </div><button type="button" className="bm-remove bx-cart-remove" onClick={()=>setCart(lines=>lines.filter(x=>x.productId!==l.productId||x.weight!==l.weight))} aria-label={l.p.name+" ürününü sepetten çıkar"}>Sil</button>
+      </div>)}</div>}
+     {recommendations.length>0&&<section className="bx-recommend" aria-label="Beğenebileceğiniz ürünler">
+      <div className="bx-recommend-heading"><span className="bx-recommend-spark">✳</span><div><small>KEYİFLİ BİR ÖNERİ</small><h3>Bunlar da hoşuna gidebilir!</h3></div></div>
+      <div className="bx-recommend-list">{recommendations.map(p=><article className="bx-recommend-item" key={p.id}>
+       <button type="button" className="bx-recommend-photo" aria-label={p.name+" ürününü incele"} onClick={()=>{setDrawer(false);openDetail(p)}}><SafeImage src={p.image} alt={p.name}/></button>
+       <div className="bx-recommend-info"><small>{p.category}</small><strong>{p.name}</strong><span>1 kg · {format(priceFor(p,"1000")!)}</span></div>
+       <button type="button" className="bx-recommend-add" aria-label={p.name+" 1 kg sepete ekle"} onClick={()=>add(p.id,"1000")}><Icon type="plus" size={19}/></button>
+      </article>)}</div><small className="bx-recommend-footnote">Tüm öneriler 1 kg seçili eklenir; gramajı ürün detayından değiştirebilirsin.</small>
+     </section>}
+    </div>
+    {expanded.length>0&&<div className="bm-cart-summary bx-cart-summary">
+     {shopError&&<div className="bm-cart-load-error">Kargo ve kampanya bilgileri yüklenemedi. Şimdilik sipariş oluşturulamaz.</div>}
+     <div className="bx-cart-price-row"><span>Ürünlerin indirimsiz toplamı</span><strong>{quote.originalSubtotal===null?"Fiyat sorunuz":format(quote.originalSubtotal)}</strong></div>
+     {quote.packageDiscount>0&&<div className="bm-cart-saving"><span>5 kg paket indirimi</span><strong>−{format(quote.packageDiscount)}</strong></div>}
+     {quote.campaignDiscount>0&&<div className="bm-cart-saving"><span>Aylık kampanya indirimi</span><strong>−{format(quote.campaignDiscount)}</strong></div>}
+     {quote.basketDiscount>0&&<div className="bm-cart-saving"><span>{quote.discountReason}</span><strong>−{format(quote.basketDiscount)}</strong></div>}
+     <div className="bm-cart-net-subtotal"><span>İndirim sonrası ürünler</span><strong>{quote.subtotal===null?"Fiyat sorunuz":format(Math.max(0,roundMoney(quote.subtotal-quote.basketDiscount)))}</strong></div>
+     <div className="bx-cart-price-row"><span>PTT kargo</span><strong className={quote.freeShipping?"bx-free-text":""}>{quote.freeShipping?"ÜCRETSİZ":quote.shippingFee===null?"—":format(quote.shippingFee)}</strong></div>
+     <details className="bx-cart-coupon"><summary>İndirim kuponun var mı? <span>+</span></summary><label>Kupon kodu<input value={couponCode} maxLength={25} placeholder="Kupon kodunuz" onChange={e=>setCouponCode(e.target.value.toLocaleUpperCase("tr-TR"))}/></label>{couponCode&&<small>{couponChecking||verifiedQuote?.key!==quoteKey?"Kupon kontrol ediliyor...":quote.couponApplied?"Kupon uygulandı.":"Kupon geçersiz."}</small>}</details>
+     <div className="bm-cart-grand bx-cart-grand"><span>GENEL TOPLAM</span><strong>{total===null?"Fiyat sorunuz":format(total)}</strong></div>
+     <button data-track="checkout" className="bm-btn dark bx-checkout-button" type="button" disabled={!shopLoaded||quote.total===null||expanded.some(l=>!l.p.active||cart.filter(x=>x.productId===l.productId).reduce((n,x)=>n+x.qty,0)>l.p.stock)} onClick={()=>{track("checkout_started","checkout");setDrawer(false);setCheckout(true)}}>SİPARİŞE DEVAM ET <Icon type="arrow" size={20}/></button>
+     <small className="bx-checkout-caption"><Icon type="check" size={13}/> Ödeme ve sipariş WhatsApp üzerinden teyit edilir.</small>
+    </div>}
+   </aside>
+  </div>}
   {checkout&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setCheckout(false)}/><section className="bm-checkout bm-modal" role="dialog" aria-modal="true" aria-label="Sipariş talebi"><button className="bm-close" onClick={()=>setCheckout(false)} type="button" aria-label="Kapat"><Icon type="x"/></button><span className="bm-overline">WHATSAPP İLE SİPARİŞ</span><h2>Sipariş talebiniz</h2><p>Bilgilerinizi girin. Talebiniz oluşturulduktan sonra WhatsApp&apos;a yönlendirileceksiniz. <strong>WhatsApp mesajını göndermeden sipariş kesinleşmez.</strong></p>{google&&<div className="bm-user-chip"><Icon type="check" size={17}/> Google ile giriş yapıldı: {google.email}</div>}<div className="bm-formgrid"><label>Ad Soyad *<input value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})} placeholder="Adınız soyadınız"/></label><label>Telefon *<input value={customer.phone} onChange={e=>setCustomer({...customer,phone:e.target.value})} placeholder="05xx xxx xx xx"/></label><label>E-posta<input type="email" value={customer.email} onChange={e=>setCustomer({...customer,email:e.target.value})} placeholder="ornek@gmail.com"/></label><label>Teslimat adresi (opsiyonel)<input value={customer.address} onChange={e=>setCustomer({...customer,address:e.target.value})} placeholder="İl / ilçe / adres"/></label><label className="wide">Sipariş notu<textarea rows={3} value={customer.note} onChange={e=>setCustomer({...customer,note:e.target.value})} placeholder="Varsa özel talebiniz..."/></label></div><div className="bm-checkout-breakdown">{shopError&&<p className="bm-cart-load-error">Kargo ayarları yüklenemedi. Sipariş şu an oluşturulamaz.</p>}<div><span>Ürünlerin indirimsiz toplamı</span><strong>{quote.originalSubtotal===null?"Fiyat sorunuz":format(quote.originalSubtotal)}</strong></div>{quote.packageDiscount>0&&<div className="bm-cart-saving"><span>5 kg paket indirimi</span><strong>−{format(quote.packageDiscount)}</strong></div>}{quote.campaignDiscount>0&&<div className="bm-cart-saving"><span>Aylık kampanya indirimi</span><strong>−{format(quote.campaignDiscount)}</strong></div>}{quote.basketDiscount>0&&<div><span>{quote.discountReason}</span><strong>−{format(quote.basketDiscount)}</strong></div>}<div className="bm-cart-net-subtotal"><span>İndirim sonrası ürün tutarı</span><strong>{quote.subtotal===null?"Fiyat sorunuz":format(Math.max(0,roundMoney(quote.subtotal-quote.basketDiscount)))}</strong></div><div><span>PTT kargo</span><strong>{quote.freeShipping?"ÜCRETSİZ":quote.shippingFee===null?"—":format(quote.shippingFee)}</strong></div><div className="bm-checkout-total"><span>Genel toplam</span><strong>{total===null?"Fiyat sorunuz":format(total)}</strong></div></div><p className="bm-privacy-note">Bilgileriniz sipariş görüşmesi için kullanılacaktır. Bu aşamada online ödeme alınmaz.</p>{error&&<div className="bm-form-error" role="alert">{error}</div>}<button data-track="send_order" className="bm-btn dark" type="button" disabled={sending||!shopLoaded||quote.total===null||couponChecking} onClick={sendOrder}>{sending?"HAZIRLANIYOR...":"WHATSAPP'A DEVAM ET"} <Icon type="arrow"/></button></section></div>}
  </div>
 }
