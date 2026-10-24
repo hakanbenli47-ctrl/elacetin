@@ -124,7 +124,12 @@ export default function Home(){
   setLoaded(true);
  },[]);
  useEffect(()=>{if(loaded)localStorage.setItem("benli-cart",JSON.stringify(cart))},[cart,loaded]);
- useEffect(()=>{fetch("/api/reviews",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(d=>setReviewsSummary(d.summaries||{})).catch(()=>{})},[]);
+ useEffect(()=>{
+  const refresh=()=>{fetch("/api/reviews",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()).then(d=>setReviewsSummary(d.summaries||{})).catch(()=>{})};
+  refresh();
+  window.addEventListener("benli:reviews-updated",refresh);
+  return()=>window.removeEventListener("benli:reviews-updated",refresh);
+ },[]);
  useEffect(()=>{
   if(!loaded||!shopLoaded)return;
   const wantsCheckout=new URLSearchParams(window.location.search).get("checkout")==="1";

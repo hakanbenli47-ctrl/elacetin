@@ -1,5 +1,4 @@
 import { NextRequest,NextResponse } from "next/server";
-import { isAdmin } from "@/lib/auth";
 import { listProducts } from "@/lib/db";
 import { listReviews,saveReview,newReview,summariesFor } from "@/lib/reviews";
 export const runtime="nodejs";export const dynamic="force-dynamic";
@@ -31,7 +30,8 @@ export async function POST(req:NextRequest){
   if(attempts.size>6000){for(const [k,v] of attempts)if(now-v.time>3600000)attempts.delete(k)}
   const entry=current&&now-current.time<3600000?{time:current.time,count:current.count+1}:{time:now,count:1};
   attempts.set(key,entry);
-  await saveReview(newReview(productId,name,rating,comment));
-  return NextResponse.json({ok:true,message:"Yorumunuz yönetici onayına gönderildi."},{status:201});
+  const review=newReview(productId,name,rating,comment);
+  await saveReview(review);
+  return NextResponse.json({ok:true,message:"Yorumunuz yayımlandı.",review},{status:201});
  }catch{return NextResponse.json({error:"Yorum kaydedilemedi."},{status:500})}
 }

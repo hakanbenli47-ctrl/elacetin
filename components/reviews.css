@@ -13,3 +13,7 @@
 .rev .bm-detail-v2 .rv-section .rv-form label{font-size:11px}
 .rev .bm-detail-v2 .rv-section .rv-form .rv-star-input button{color:#c3c6b3}
 .rev .bm-detail-v2 .rv-section .rv-form .rv-star-input button.selected{color:#eaa63a}
+
+/* Review moderation removed: only answer and delete remain in admin. */
+.ar-actions .ar-delete-review{background:#fff4f1;color:#a75142;border-color:#f5dbd6}
+.ar-actions .ar-delete-review:hover{background:#fae4df}

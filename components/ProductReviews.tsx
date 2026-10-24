@@ -10,7 +10,7 @@ export function RatingBadge({summary,large=false}:{summary?:ReviewSummary;large?
   {summary?.count?<><strong>{summary.average.toLocaleString("tr-TR")}</strong><small>({summary.count} yorum)</small></>:<small>İlk değerlendiren sen ol</small>}
  </span>;
 }
-export default function ProductReviews({productId,productName,onApproved}:{productId:string;productName:string;onApproved?:()=>void}){
+export default function ProductReviews({productId,productName,onPosted}:{productId:string;productName:string;onPosted?:()=>void}){
  const [reviews,setReviews]=useState<Review[]>([]),[summary,setSummary]=useState<ReviewSummary>();
  const [rating,setRating]=useState(5),[name,setName]=useState(""),[comment,setComment]=useState("");
  const [company,setCompany]=useState(""),[busy,setBusy]=useState(false),[status,setStatus]=useState(""),[error,setError]=useState("");
@@ -27,8 +27,12 @@ export default function ProductReviews({productId,productName,onApproved}:{produ
   try{
    const r=await fetch("/api/reviews",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({productId,name,rating,text:comment,company})});
    const d=await r.json();if(!r.ok)throw Error(d.error||"Yorum gönderilemedi.");
-   setStatus("Değerlendirmeniz alındı. Yönetici onayından sonra yayımlanacak.");
-   setComment("");setRating(5);onApproved?.();
+   setStatus("Değerlendirmeniz yayımlandı. Teşekkürler!");
+   setComment("");setRating(5);
+   // Refresh the public list immediately instead of waiting for a page reload.
+   const latest=await fetch("/api/reviews?productId="+encodeURIComponent(productId),{cache:"no-store"});
+   if(latest.ok){const next=await latest.json();setReviews(next.reviews||[]);setSummary(next.summaries?.[productId]);}
+   window.dispatchEvent(new Event("benli:reviews-updated"));onPosted?.();
   }catch(e){setError(e instanceof Error?e.message:"Yorum gönderilemedi.")}finally{setBusy(false)}
  }
  return <section className="rv-section" id="urun-yorumlari">
@@ -39,7 +43,7 @@ export default function ProductReviews({productId,productName,onApproved}:{produ
     <p>{r.text}</p>{r.reply&&<div className="rv-owner-reply"><strong>Benli Kuruyemiş yanıtladı</strong><p>{r.reply}</p></div>}
    </article>)}
   </div>
-  <form onSubmit={submit} className="rv-form"><h4>Ürünü değerlendir</h4><p>Ürünle ilgili deneyimini paylaş. Yorumların kontrol edildikten sonra görüntülenir.</p>
+  <form onSubmit={submit} className="rv-form"><h4>Ürünü değerlendir</h4><p>Ürünle ilgili deneyimini paylaş. Yorumun gönderir göndermez ürün sayfasında görünür.</p>
    <label>Puanın <span className="rv-star-input">{[1,2,3,4,5].map(n=><button key={n} type="button" aria-label={n+" yıldız"} aria-pressed={rating===n} className={n<=rating?"selected":""} onClick={()=>setRating(n)}>★</button>)}</span></label>
    <label>Adın<input required minLength={2} maxLength={55} value={name} onChange={e=>setName(e.target.value)} placeholder="Adınız" autoComplete="name"/></label>
    <label>Yorumun<textarea required minLength={15} maxLength={1000} rows={3} value={comment} onChange={e=>setComment(e.target.value)} placeholder="Ürün hakkında neler düşünüyorsunuz?"/></label>
