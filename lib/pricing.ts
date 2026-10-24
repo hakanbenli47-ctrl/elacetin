@@ -16,3 +16,13 @@ export function priceFor(p:Product,weight:string):number|null{
  return p.prices?.[weight]??null;
 }
 export function undiscountedFiveKg(p:Product):number|null{const kg=baseKgPrice(p);return kg===null?null:roundMoney(kg*5)}
+
+/** Shopper-facing price must match the server quote: a discounted 5 kg pack
+ * never receives the monthly campaign discount a second time. */
+export function discountedProductPrice(p:Product,weight:string,campaignPercent=0):number|null{
+ const packagePrice=priceFor(p,weight);
+ if(packagePrice===null)return null;
+ const hasPackageDiscount=weight==="5000"&&undiscountedFiveKg(p)!==null&&(undiscountedFiveKg(p) as number)>packagePrice;
+ const percent=hasPackageDiscount?0:Math.max(0,Math.min(90,campaignPercent));
+ return roundMoney(packagePrice*(1-percent/100));
+}
