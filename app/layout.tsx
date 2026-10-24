@@ -3,15 +3,15 @@ import "./globals.css";
 import ConsentAnalytics from "@/components/ConsentAnalytics";
 
 export const metadata: Metadata = {
-  title: "Benli Kuruyemiş | Lezzetin En Doğal Hâli",
-  description: "Benli Kuruyemiş'in yeni dijital vitrini. Kuruyemiş, leblebi, çekirdek ve karışık kuruyemiş çeşitlerini keşfedin.",
+  title: "Benli Kuruyemiş | Bir Avuç İyi Şey, Bolca Keyif",
+  description: "Benli Kuruyemiş'te Antep fıstığı, kaju, fındık, kuru meyve ve karışık çerezleri keşfedin. 250 g, 500 g, 1 kg veya 5 kg seçin; siparişinizi WhatsApp ile tamamlayın.",
   applicationName: "Benli Kuruyemiş",
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     locale: "tr_TR",
     title: "Benli Kuruyemiş",
-    description: "Toptan kuruyemiş ticaretindeki tecrübemiz şimdi yeni dijital vitrinimizde.",
+    description: "Bir avuç iyi şey, bolca keyif. Benli Kuruyemiş ürünlerini keşfedin, gramaj seçin ve siparişinizi kolayca oluşturun.",
   },
   icons: { icon: "/favicon.svg" },
 };
