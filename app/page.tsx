@@ -54,7 +54,6 @@ export default function Home(){
  const [drawer,setDrawer]=useState(false);
  const [menu,setMenu]=useState(false);
  const [detail,setDetail]=useState<Product|null>(null);
- const [selectedWeight,setSelectedWeight]=useState("500");
  const [checkout,setCheckout]=useState(false);
  const [customer,setCustomer]=useState({name:"",phone:"",email:"",address:"",note:""});
  const [google,setGoogle]=useState<{name:string;email:string}|null>(null);
@@ -110,7 +109,7 @@ export default function Home(){
  }
  function changeQty(id:string,weight:string,by:number){setCart(a=>a.map(l=>{const p=products.find(x=>x.id===id);return l.productId===id&&l.weight===weight?{...l,qty:Math.min(l.qty+by,p?.stock||99)}:l}).filter(l=>l.qty>0));}
  function chooseCategory(cat:string){setCategory(cat);const target:Record<string,string>={"Tümü":"tumu","Kuruyemiş":"kuruyemis","Leblebi":"leblebi","Çekirdek":"cekirdek","Kuru Meyve":"kuru_meyve","Karışık":"karisik"};track("category_view",target[cat]||"tumu");document.getElementById("urunler")?.scrollIntoView({behavior:"smooth"})}
- function openDetail(p:Product){track("product_view",p.slug);setDetail(p);setSelectedWeight("500")}
+ function openDetail(p:Product){track("product_view",p.slug);setDetail(p)}
  async function sendOrder(){
   if(sending)return;
   if(!customer.name.trim()||customer.phone.replace(/\D/g,"").length<10){setError("Ad soyad ve geçerli telefon numaranızı girin.");return}
@@ -167,14 +166,84 @@ export default function Home(){
   </main>
   <footer className="bm-footer"><div className="bm-footer-cols"><div><Logo/><p>Lezzetin Benli hâli.</p></div><div><h4>HIZLI ERİŞİM</h4><a href="#urunler" data-track="footer_products">Ürünlerimiz</a><a href="#kategoriler">Kategoriler</a><a href="#hikayemiz">Hakkımızda</a><a href="/giris">Google ile giriş</a></div><div><h4>KATEGORİLER</h4>{categories.slice(1,5).map(c=><a href="#urunler" key={c} onClick={()=>setCategory(c)}>{c}</a>)}</div><div><h4>İLETİŞİM</h4><a href="tel:+905515550302">0551 555 03 02</a><a href="https://wa.me/905515550302" target="_blank" rel="noreferrer">WhatsApp ile yazın ↗</a><p>İşletme adresi ve yasal satış bilgileri yayına alınmadan önce tamamlanmalıdır.</p></div></div><div className="bm-footer-bottom"><span>© {new Date().getFullYear()} BENLİ KURUYEMİŞ</span><span>Siparişler WhatsApp ile teyit edilir.</span><a data-track="privacy" href="/cerez-politikasi">Çerez ve Gizlilik Politikası</a><button data-track="cookie_settings" className="bm-cookie-link" type="button" onClick={()=>window.dispatchEvent(new Event("benli:cookie-settings"))}>Çerez Ayarları</button><a href="/admin">Yönetim</a></div></footer>
   {notice&&<div className="bm-toast" role="status"><Icon type="check" size={17}/>{notice}</div>}
-  {detail&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setDetail(null)}/><section className="bm-detail bm-modal" role="dialog" aria-modal="true" aria-label={detail.name}><button type="button" className="bm-close" onClick={()=>setDetail(null)} aria-label="Kapat"><Icon type="x"/></button><div className="bm-detail-image"><SafeImage src={detail.image} alt={detail.name}/></div><div className="bm-detail-copy"><span className="bm-overline">{detail.category}</span><h2>{detail.name}</h2><p>{detail.description}</p>{detail.badge&&<div className="bm-detail-promo">{detail.badge}</div>}{detail.discount5kg&&detail.discount5kg>0&&<p className="bm-detail-bulk">5 kg alımında %{detail.discount5kg} paket indirimi!</p>}{activeCampaign&&activeCampaign.productIds.includes(detail.id)&&activeCampaign.percent>0&&<p className="bm-detail-bulk">Aylık kampanya: %{activeCampaign.percent} ek indirim.</p>}<h4>GRAMAJ SEÇİN</h4><div className="bm-weight-options">{amounts.map(w=><button type="button" className={selectedWeight===w?"active":""} key={w} onClick={()=>setSelectedWeight(w)}>{weightLabel(w)}</button>)}</div><div className="bm-pricebig"><Money price={priceFor(detail,selectedWeight)===null?null:roundMoney((priceFor(detail,selectedWeight)||0)*(1-(activeCampaign?.productIds.includes(detail.id)?activeCampaign.percent:0)/100))}/></div>{selectedWeight==="5000"&&(detail.discount5kg||0)>0&&<p className="bm-detail-bulk">5 kg normal fiyat: {format(undiscountedFiveKg(detail)||0)} · %{detail.discount5kg} indirim</p>}<button type="button" disabled={detail.stock<1} className="bm-btn dark" onClick={()=>{add(detail.id,selectedWeight);setDetail(null);setDrawer(true)}}>{detail.stock<1?"STOKTA YOK":"SEPETE EKLE"} <Icon type="bag"/></button><div className="bm-detail-extra"><h4>Ürün açıklaması</h4><p>{detail.description||"Ürün bilgileri hazırlanıyor."}</p><h4>İçindekiler</h4><p>{detail.ingredients||"Ürün içerik bilgisi eklenecek."}</p><h4>Alerjen bilgisi</h4><p>{detail.allergens||"Alerjen bilgisi doğrulanacak."}</p></div></div></section></div>}
+  {detail&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setDetail(null)}/>
+     <ProductDetail product={detail} campaignPercent={activeCampaign?.productIds.includes(detail.id)?activeCampaign.percent:0} onClose={()=>setDetail(null)} onAdd={weight=>{add(detail.id,weight);setDetail(null);setDrawer(true)}}/>
+   </div>}
   {drawer&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setDrawer(false)}/><aside role="dialog" aria-modal="true" aria-labelledby="bm-cart-title" className="bm-drawer"><div className="bm-drawer-header"><div><span>BENLİ KURUYEMİŞ</span><h2 id="bm-cart-title">Sepetim ({count})</h2></div><button type="button" className="bm-close" onClick={()=>setDrawer(false)} aria-label="Kapat"><Icon type="x"/></button></div><div className="bm-cart-lines">{!expanded.length?<div className="bm-emptycart"><Icon type="bag" size={49}/><h3>Sepetiniz henüz boş.</h3><p>Sevdiğiniz lezzetleri eklemek için ürünlere göz atın.</p><button type="button" className="bm-btn dark" onClick={()=>setDrawer(false)}>ALIŞVERİŞE DEVAM</button></div>:expanded.map(l=><div className="bm-cart-line" key={l.productId+":"+l.weight}><div className="bm-cart-thumb"><SafeImage src={l.p.image} alt={l.p.name}/></div><div><strong>{l.p.name}</strong><small>{weightLabel(l.weight)}</small><span><Money price={l.unit}/></span><div className="bm-qty"><button type="button" onClick={()=>changeQty(l.productId,l.weight,-1)}><Icon type="minus" size={16}/></button>{l.qty}<button type="button" onClick={()=>changeQty(l.productId,l.weight,1)}><Icon type="plus" size={16}/></button></div></div><button type="button" className="bm-remove" onClick={()=>setCart(a=>a.filter(x=>x.productId!==l.productId||x.weight!==l.weight))}>Sil</button></div>)}</div>{expanded.length>0&&<div className="bm-cart-summary">{shopError&&<div className="bm-cart-load-error">Kargo ve kampanya bilgilerine erişilemiyor. Sipariş şu an oluşturulamaz.</div>}<div><span>Ürün tutarı (kampanya dahil)</span><strong>{quote.subtotal===null?"Fiyat sorunuz":format(quote.subtotal)}</strong></div>{quote.campaignDiscount>0&&<div className="bm-cart-saving"><span>Aylık kampanya kazancınız</span><strong>{format(quote.campaignDiscount)}</strong></div>}{quote.basketDiscount>0&&<div className="bm-cart-saving"><span>{quote.discountReason}</span><strong>−{format(quote.basketDiscount)}</strong></div>}<div><span>PTT Kargo</span><strong>{quote.freeShipping?"BEDAVA":quote.shippingFee===null?"—":format(quote.shippingFee)}</strong></div>{shop.freeShippingThreshold>0&&!quote.freeShipping&&quote.subtotal!==null&&<div className="bm-free-shipping-hint">{format(shop.freeShippingThreshold)} ve üzeri net sepette kargo ücretsiz.</div>}<label className="bm-coupon">İndirim kuponu<input value={couponCode} maxLength={25} placeholder="Kupon kodunuz" onChange={e=>setCouponCode(e.target.value.toLocaleUpperCase("tr-TR"))}/>{couponCode&&<small>{couponChecking||verifiedQuote?.key!==quoteKey?"Kupon kontrol ediliyor...":quote.couponApplied?"Kupon uygulandı.":"Kupon geçersiz veya otomatik indirim daha avantajlı."}</small>}</label><div className="bm-cart-grand"><span>GENEL TOPLAM</span><strong>{total===null?"Fiyat sorunuz":format(total)}</strong></div><p>Sepet tutarı ve PTT kargo bedeli yönetici ayarlarına göre hesaplanır. Sipariş WhatsApp ile teyit edilir.</p><button data-track="checkout" className="bm-btn dark" type="button" onClick={()=>{track("checkout_started","checkout");setDrawer(false);setCheckout(true)}}>SİPARİŞ TALEBİ OLUŞTUR <Icon type="arrow"/></button></div>}</aside></div>}
   {checkout&&<div className="bm-modal-root"><div className="bm-backdrop" onClick={()=>setCheckout(false)}/><section className="bm-checkout bm-modal" role="dialog" aria-modal="true" aria-label="Sipariş talebi"><button className="bm-close" onClick={()=>setCheckout(false)} type="button" aria-label="Kapat"><Icon type="x"/></button><span className="bm-overline">WHATSAPP İLE SİPARİŞ</span><h2>Sipariş talebiniz</h2><p>Bilgilerinizi girin. Talebiniz oluşturulduktan sonra WhatsApp&apos;a yönlendirileceksiniz. <strong>WhatsApp mesajını göndermeden sipariş kesinleşmez.</strong></p>{google&&<div className="bm-user-chip"><Icon type="check" size={17}/> Google ile giriş yapıldı: {google.email}</div>}<div className="bm-formgrid"><label>Ad Soyad *<input value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})} placeholder="Adınız soyadınız"/></label><label>Telefon *<input value={customer.phone} onChange={e=>setCustomer({...customer,phone:e.target.value})} placeholder="05xx xxx xx xx"/></label><label>E-posta<input type="email" value={customer.email} onChange={e=>setCustomer({...customer,email:e.target.value})} placeholder="ornek@gmail.com"/></label><label>Teslimat adresi (opsiyonel)<input value={customer.address} onChange={e=>setCustomer({...customer,address:e.target.value})} placeholder="İl / ilçe / adres"/></label><label className="wide">Sipariş notu<textarea rows={3} value={customer.note} onChange={e=>setCustomer({...customer,note:e.target.value})} placeholder="Varsa özel talebiniz..."/></label></div><div className="bm-checkout-breakdown">{shopError&&<p className="bm-cart-load-error">Kargo ayarları yüklenemedi. Sipariş şu an oluşturulamaz.</p>}<div><span>Ürün tutarı</span><strong>{quote.subtotal===null?"Fiyat sorunuz":format(quote.subtotal)}</strong></div>{quote.basketDiscount>0&&<div><span>{quote.discountReason}</span><strong>−{format(quote.basketDiscount)}</strong></div>}<div><span>PTT kargo</span><strong>{quote.freeShipping?"ÜCRETSİZ":quote.shippingFee===null?"—":format(quote.shippingFee)}</strong></div><div className="bm-checkout-total"><span>Genel toplam</span><strong>{total===null?"Fiyat sorunuz":format(total)}</strong></div></div><p className="bm-privacy-note">Bilgileriniz sipariş görüşmesi için kullanılacaktır. Bu aşamada online ödeme alınmaz.</p>{error&&<div className="bm-form-error" role="alert">{error}</div>}<button data-track="send_order" className="bm-btn dark" type="button" disabled={sending||!shopLoaded||quote.total===null||couponChecking} onClick={sendOrder}>{sending?"HAZIRLANIYOR...":"WHATSAPP'A DEVAM ET"} <Icon type="arrow"/></button></section></div>}
  </div>
 }
+function ProductDetail({product:p,campaignPercent,onClose,onAdd}:{product:Product;campaignPercent:number;onClose:()=>void;onAdd:(weight:string)=>void}){
+ const pictures=[p.image,...(p.images||[])].filter(Boolean);
+ const [photo,setPhoto]=useState(pictures[0]||"");
+ const [weight,setWeight]=useState("500");
+ const base=priceFor(p,weight);
+ const original=weight==="5000"?undiscountedFiveKg(p):base;
+ const price=base===null?null:roundMoney(base*(1-campaignPercent/100));
+ const save=original!==null&&price!==null&&original>price?roundMoney(original-price):0;
+ const stockAvailable=p.stock>0;
+ return <section className="bm-detail bm-detail-v2 bm-modal" role="dialog" aria-modal="true" aria-label={p.name}>
+  <button type="button" className="bm-close bm-detail-close" onClick={onClose} aria-label="Ürün ayrıntılarını kapat"><Icon type="x"/></button>
+  <div className="bm-detail-gallery">
+   <div className="bm-detail-main-photo"><SafeImage src={photo||p.image} alt={p.name}/>
+    {p.badge&&<span className="bm-detail-photo-badge">{p.badge}</span>}
+    {!stockAvailable&&<span className="bm-detail-photo-stock">STOKTA YOK</span>}
+   </div>
+   {pictures.length>1&&<div className="bm-detail-thumbnails">{pictures.map((picture,i)=><button key={i} type="button" className={(photo||pictures[0])===picture?"active":""} onClick={()=>setPhoto(picture)} aria-label={`${i+1}. fotoğrafı göster`} aria-pressed={(photo||pictures[0])===picture}><SafeImage src={picture} alt={`${p.name} - fotoğraf ${i+1}`}/></button>)}</div>}
+   <div className="bm-detail-gallery-caption">BENLİ KURUYEMİŞ · ÖZENLE SEÇİLEN LEZZETLER</div>
+  </div>
+  <div className="bm-detail-copy bm-detail-content">
+   <span className="bm-detail-kicker">BENLİ KURUYEMİŞ / {p.category.toLocaleUpperCase("tr-TR")}</span>
+   <h2>{p.name}</h2>
+   <div className="bm-detail-highlight-row">{p.badge&&<span className="bm-detail-highlight-badge">{p.badge}</span>}{p.origin&&<span>{p.origin}</span>}{stockAvailable?<span className="bm-detail-available">● Stokta</span>:<span className="bm-detail-unavailable">Stokta yok</span>}</div>
+   {(p.cardNote||p.description)&&<p className="bm-detail-intro">{p.cardNote||p.description}</p>}
+   {(p.origin||p.roasting)&&<div className="bm-detail-specs">{p.origin&&<div><span>MENŞEİ</span><strong>{p.origin}</strong></div>}{p.roasting&&<div><span>ÜRÜN TÜRÜ</span><strong>{p.roasting}</strong></div>}</div>}
+   {(campaignPercent>0||(p.discount5kg||0)>0)&&<div className="bm-detail-offer-row">{campaignPercent>0&&<div><strong>AYLIK FIRSAT</strong> %{campaignPercent} kampanya indirimi</div>}{(p.discount5kg||0)>0&&<div><strong>5 KG AVANTAJI</strong> %{p.discount5kg} paket indirimi</div>}</div>}
+   <div className="bm-detail-select-title"><h3>Gramaj seçin</h3><small>Fiyatlar seçiminize göre güncellenir.</small></div>
+   <div className="bm-detail-weight-cards">{amounts.map(w=>{
+    const pkg=priceFor(p,w);
+    const paid=pkg===null?null:roundMoney(pkg*(1-campaignPercent/100));
+    return <button type="button" key={w} aria-pressed={weight===w} className={`bm-detail-weight ${weight===w?"active":""}`} onClick={()=>setWeight(w)}>
+     <span>{weightLabel(w)}</span><strong>{paid===null?"Fiyat sorunuz":format(paid)}</strong>{w==="5000"&&(p.discount5kg||0)>0&&<small>%{p.discount5kg} avantaj</small>}
+    </button>
+   })}</div>
+   <div className="bm-detail-buy-row"><div className="bm-detail-buy-price"><span>SEÇİLEN PAKET · {weightLabel(weight)}</span>{save>0&&original!==null&&<del>{format(original)}</del>}<strong><Money price={price}/></strong>{save>0&&<small>{format(save)} avantaj</small>}</div><button type="button" disabled={!stockAvailable||price===null} className="bm-btn dark bm-detail-add" onClick={()=>onAdd(weight)}><Icon type="bag" size={19}/>{!stockAvailable?"STOKTA YOK":price===null?"FİYAT BEKLENİYOR":"SEPETE EKLE"}</button></div>
+   {(p.description||p.ingredients||p.allergens||p.storageTip)&&<details className="bm-detail-more"><summary>Ürün hakkında detaylı bilgi <span>＋</span></summary>
+      {p.description&&<div><h4>Ürün açıklaması</h4><p>{p.description}</p></div>}
+      {p.ingredients&&<div><h4>İçindekiler</h4><p>{p.ingredients}</p></div>}
+      {p.allergens&&<div><h4>Alerjenler</h4><p>{p.allergens}</p></div>}
+      {p.storageTip&&<div><h4>Saklama önerisi</h4><p>{p.storageTip}</p></div>}
+    </details>}
+  </div>
+ </section>
+}
+
 function ProductCard({p,add,showDetails,campaignPercent=0}:{p:Product;add:(id:string,weight:string)=>void;showDetails:(p:Product)=>void;campaignPercent?:number}){
  const [weight,setWeight]=useState("500");
  const base=priceFor(p,weight);
  const price=base===null?null:roundMoney(base*(1-campaignPercent/100));
- return <article className="bm-product"><div className="bm-product-image"><button data-track="product_open" type="button" onClick={()=>showDetails(p)} aria-label={p.name+" detaylarını görüntüle"}><SafeImage src={p.image} alt={p.name}/></button>{(p.badge||p.featured)&&<span className={`bm-product-badge ${p.badge?"bm-badge-promo":""}`}>{p.badge||"ÖNE ÇIKAN"}</span>}{p.stock<1&&<span className="bm-outofstock">STOKTA YOK</span>}</div><div className="bm-product-body"><small>{p.category}</small><button data-track="product_open" className="bm-product-title" onClick={()=>showDetails(p)} type="button">{p.name}</button><p>{p.description}</p>{p.cardNote&&<span className="bm-card-note">{p.cardNote}</span>}{campaignPercent>0&&<span className="bm-card-campaign">AYLIK KAMPANYA %{campaignPercent}</span>}<div className="bm-packs">{amounts.map(w=><button type="button" aria-pressed={weight===w} className={weight===w?"active":""} key={w} onClick={()=>setWeight(w)}>{weightLabel(w)}</button>)}</div><div className="bm-product-footer"><div><span>{weightLabel(weight)}</span>{base!==null&&(campaignPercent>0||(weight==="5000"&&(p.discount5kg||0)>0))&&<del className="bm-old-price">{format(weight==="5000"?(undiscountedFiveKg(p)||base):base)}</del>}<strong><Money price={price}/></strong></div><button data-track="product_add" type="button" disabled={p.stock<1} onClick={()=>add(p.id,weight)} aria-label={p.name+" sepete ekle"}><Icon type="plus" size={22}/></button></div></div></article>
+ const original=weight==="5000"?undiscountedFiveKg(p):base;
+ const save=price!==null&&original!==null&&original>price?roundMoney(original-price):0;
+ const available=p.stock>0;
+ return <article className="bm-product bm-product-v2">
+  <div className="bm-product-image bm-card-photo">
+   <button data-track="product_open" type="button" className="bm-card-photo-btn" onClick={()=>showDetails(p)} aria-label={p.name+" ürününün ayrıntılarını aç"}><SafeImage src={p.image} alt={p.name}/><span className="bm-card-photo-overlay">Ürünü incele <Icon type="arrow" size={16}/></span></button>
+   {p.badge&&<span className="bm-product-badge bm-badge-promo">{p.badge}</span>}
+   {!p.badge&&p.featured&&<span className="bm-product-badge">ÖNE ÇIKAN</span>}
+   {!available&&<span className="bm-outofstock">STOKTA YOK</span>}
+   {campaignPercent>0&&<span className="bm-card-sale">-%{campaignPercent}</span>}
+  </div>
+  <div className="bm-product-body bm-card-info">
+   <div className="bm-card-category"><span>{p.category}</span>{p.origin&&<small>{p.origin}</small>}</div>
+   <button type="button" data-track="product_open" className="bm-product-title" onClick={()=>showDetails(p)}>{p.name}</button>
+   {(p.cardNote||p.description)&&<p className="bm-card-subtitle">{p.cardNote||p.description}</p>}
+   {(p.discount5kg||0)>0&&<div className="bm-card-deal" role="note">5 KG PAKETTE %{p.discount5kg} AVANTAJ</div>}
+   <div className="bm-card-weight-label">PAKET SEÇİMİ</div>
+   <div className="bm-packs bm-card-weights">{amounts.map(w=><button type="button" aria-pressed={weight===w} className={weight===w?"active":""} key={w} onClick={()=>setWeight(w)}>{weightLabel(w)}</button>)}</div>
+   <div className="bm-card-checkout">
+    <div className="bm-card-cost"><small>{weightLabel(weight)} fiyatı</small>{save>0&&original!==null&&<del>{format(original)}</del>}<strong><Money price={price}/></strong></div>
+    <button type="button" className="bm-card-add" data-track="product_add" disabled={!available||price===null} onClick={()=>add(p.id,weight)}><Icon type="bag" size={17}/><span>{!available?"Tükendi":price===null?"Fiyat bekleniyor":"Sepete ekle"}</span></button>
+   </div>
+  </div>
+ </article>
 }
