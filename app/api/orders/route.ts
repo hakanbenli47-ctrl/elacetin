@@ -42,18 +42,20 @@ export async function POST(request:NextRequest){
  // Başarılı sipariş talebinde paket adedi düşülür; çakışan stok güncellemeleri reddedilir.
  const reservation=await reserveCartStock(lines);
  let finalQuote=quote;
+ let savedOrderId="";
  try{
   finalQuote=quoteCart(lines,reservation.products,settings,couponCode);
   if(finalQuote.total===null)throw new StockUnavailable("Sepetteki ürünün satış fiyatı güncellendi. Lütfen sepetinizi kontrol edin.");
  const order:Order={id:"BN-"+crypto.randomUUID().slice(0,8).toUpperCase(),createdAt:new Date().toISOString(),name,phone,email,address,note,status:"whatsapp_bekleniyor",items:finalQuote.items,total:finalQuote.total,subtotal:finalQuote.subtotal,originalSubtotal:finalQuote.originalSubtotal,packageDiscount:finalQuote.packageDiscount,campaignDiscount:finalQuote.campaignDiscount,basketDiscount:finalQuote.basketDiscount,discountReason:finalQuote.discountReason,shippingFee:finalQuote.shippingFee,freeShipping:finalQuote.freeShipping,couponCode:quote.couponApplied?couponCode:"",carrier:"PTT Kargo",trackingNo:"",payment:payment||"WhatsApp ile görüşülecek",source:"web",stockReserved:true};
   await saveOrder(order);
+  savedOrderId=order.id;
  }catch(e){
   // Sipariş yazılamadıysa ayrılan paketleri geri stokla.
   try{await reservation.release()}catch{return NextResponse.json({error:"Sipariş kaydedilemedi. Stok kontrolü için mağazayla iletişime geçin."},{status:500})}
   throw e;
  }
  curr.count++;rate.set(ip,curr);
- return NextResponse.json({orderId:order.id,quote:finalQuote,ephemeral},{status:201,headers:{"Cache-Control":"no-store"}});
+ return NextResponse.json({orderId:savedOrderId,quote:finalQuote,ephemeral},{status:201,headers:{"Cache-Control":"no-store"}});
  }catch(e){
   if(e instanceof StockUnavailable)return NextResponse.json({error:e.message},{status:409,headers:{"Cache-Control":"no-store"}});
   return NextResponse.json({error:"Talep oluşturulamadı. Daha sonra tekrar deneyin."},{status:500});
