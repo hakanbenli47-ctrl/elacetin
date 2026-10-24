@@ -12,6 +12,7 @@ import "./hero-v4.css";
 import "./colorful.css";
 import "./cart-experience.css";
 import ProductReviews,{RatingBadge} from "@/components/ProductReviews";
+import DailyCouponOffer from "@/components/DailyCouponOffer";
 import type {ReviewSummary} from "@/components/ProductReviews";
 const PHONE="905515550302";
 const categories = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Kuru Meyve", "Karışık"] as const;
@@ -236,6 +237,7 @@ export default function Home(){
    {menu&&<nav className="rev-mobile-links" aria-label="Mobil menü"><a onClick={()=>setMenu(false)} href="#urunler">Ürünlerimiz <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#koleksiyon">Koleksiyon <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#nasil-calisir">Nasıl alışveriş yapılır? <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#hakkimizda">Hakkımızda <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="/giris">Giriş yap <Icon type="arrow" size={17}/></a></nav>}
   </header>
   <main>
+   <DailyCouponOffer coupon={shop.coupon} variant="home" onApply={()=>{try{localStorage.setItem("benli-coupon",shop.coupon.code)}catch{}window.location.assign("/sepet")}}/>
    <section className="bn-hero" aria-label="Benli Kuruyemiş ana vitrin">
      <div className="bn-hero-backdrop"><SafeImage src="https://images.pexels.com/photos/36285399/pexels-photo-36285399.jpeg?auto=compress&cs=tinysrgb&w=1800" alt="Ahşap kaselerde kuruyemiş çeşitleri" priority/></div>
      <div className="bn-hero-shade" aria-hidden="true"/>
