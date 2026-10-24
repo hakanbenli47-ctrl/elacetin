@@ -155,14 +155,35 @@ export default function Home(){
    {menu&&<nav className="rev-mobile-links" aria-label="Mobil menü"><a onClick={()=>setMenu(false)} href="#urunler">Ürünlerimiz <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#koleksiyon">Koleksiyon <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#nasil-calisir">Nasıl alışveriş yapılır? <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#hakkimizda">Hakkımızda <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="/giris">Giriş yap <Icon type="arrow" size={17}/></a></nav>}
   </header>
   <main>
-   <section className="rev-hero" aria-label="Benli Kuruyemiş koleksiyonu"><div className="rev-hero-copy"><div className="rev-eyebrow"><span className="rev-eyebrow-mark">✳</span> BENLİ'DEN SOFRANIZA</div><h1>Bir avuç<br/><em>iyi şey.</em><br/>Bolca keyif<span>.</span></h1><p>En sevilen kuruyemişler, kuru meyveler ve karşı koyamadığınız atıştırmalıklar. Burada kendi lezzetinizi seçiyorsunuz.</p><div className="rev-hero-buttons"><a href="#urunler" className="rev-button rev-button-dark" data-track="hero_products">HEMEN KEŞFET <Icon type="arrow" size={21}/></a><a href="#koleksiyon" className="rev-hero-link">Koleksiyona göz at <Icon type="up" size={17}/></a></div><div className="rev-hero-stats"><span><strong>{productsLoaded?String(products.filter(p=>p.active).length).padStart(2,"0"):"09"}</strong><small>SEÇİLİ ÜRÜN</small></span><i/><span><strong>1 kg</strong><small>BAŞLANGIÇ SEÇİMİ</small></span><i/><span><strong>4</strong><small>GRAMAJ SEÇENEĞİ</small></span></div></div>
-    <div className="rev-hero-art">
-     <div className="rev-orbit rev-orbit-one"/><div className="rev-orbit rev-orbit-two"/>
-     <div className="rev-hero-photo rev-hero-photo-main"><SafeImage src={spotlight?.image||products[0]?.image||img} alt={spotlight?.name||"Benli Kuruyemiş ürünleri"} priority/></div>
-     <div className="rev-hero-photo rev-hero-photo-second"><SafeImage src={featuredProducts[1]?.image||products[1]?.image||img} alt={featuredProducts[1]?.name||"Kuruyemiş çeşitleri"} priority/></div>
-     <div className="rev-hero-stamp"><span>BENLİ</span><strong>✦</strong><span>KURUYEMİŞ</span></div>
-     {spotlight&&<button type="button" className="rev-hero-product" onClick={()=>openDetail(spotlight)} aria-label={spotlight.name+" ürününü incele"}><span className="rev-hero-product-eyebrow">VİTRİNDEN SEÇTİK <Icon type="arrow" size={15}/></span><strong>{spotlight.name}</strong><span className="rev-hero-product-pricing">{priceFor(spotlight,"1000")!==null?format(priceFor(spotlight,"1000")!)+" / 1 kg":"Fiyat için tıklayın"}</span></button>}
-     <span className="rev-hero-art-caption">KÜÇÜK MOLALARIN BÜYÜK KEYFİ ↗</span>
+   <section className="rev-hero rev-hero-v3" aria-label="Benli Kuruyemiş - lezzetin keyifli hali">
+    <div className="rev-v3-copy">
+     <div className="rev-v3-eyebrow"><span className="rev-v3-spark">✳</span><span>BENLİ KURUYEMİŞ</span><i/><span>LEZZET KOLEKSİYONU</span></div>
+     <h1>Keyfin<br/><em>en çıtır</em><br/>hâli<span>.</span></h1>
+     <p>Bir avuçla başlayan güzel molalar. Antep fıstığı, kaju, fındık ve daha fazlası — dilediğin gramajda, tam senin keyfine göre.</p>
+     <div className="rev-v3-actions">
+      <a href="#urunler" data-track="hero_products" className="rev-v3-primary">LEZZETLERİ KEŞFET <Icon type="arrow" size={21}/></a>
+      <a href="#koleksiyon" className="rev-v3-secondary"><span className="rev-v3-secondary-icon"><Icon type="up" size={17}/></span> Koleksiyona göz at</a>
+     </div>
+     <div className="rev-v3-assurance" aria-label="Sipariş avantajları">
+      <span><Icon type="check" size={16}/> 1 kg seçili gelir</span>
+      <span><Icon type="check" size={16}/> Gramajı sen değiştir</span>
+      <span><Icon type="check" size={16}/> PTT kargo</span>
+     </div>
+     <div className="rev-v3-copy-counter"><span className="rev-v3-counter-line"/><strong>{productsLoaded?String(products.filter(p=>p.active).length).padStart(2,"0"):"—"}</strong><span>FARKLI LEZZET<br/>BİR ARADA</span></div>
+    </div>
+    <div className="rev-v3-stage">
+      <div className="rev-v3-art-backdrop"/>
+      <span className="rev-v3-art-label">BENLİ SEÇKİSİ · 2026</span>
+      <div className="rev-v3-main-image"><SafeImage src={spotlight?.image||products[0]?.image||img} alt={spotlight?.name||"Benli Kuruyemiş ürünleri"} priority/></div>
+      <div className="rev-v3-floating-image"><SafeImage src={featuredProducts[(spotlightIndex+1)%Math.max(1,featuredProducts.length)]?.image||products[1]?.image||img} alt="Kuruyemiş koleksiyonumuzdan bir lezzet"/></div>
+      <div className="rev-v3-seal" aria-hidden="true"><span>BİR AVUÇ</span><strong>✳</strong><span>KEYİF</span></div>
+      {spotlight&&<div className="rev-v3-feature" aria-label="Vitrinde öne çıkan ürün">
+        <div className="rev-v3-feature-heading"><span>✳ BUGÜN VİTRİNDE</span><span>01 / {String(featuredProducts.length).padStart(2,"0")}</span></div>
+        <button type="button" className="rev-v3-feature-name" onClick={()=>openDetail(spotlight)}><strong>{spotlight.name}</strong><Icon type="arrow" size={22}/></button>
+        <div className="rev-v3-feature-bottom"><div><span>BAŞLANGIÇ PAKETİ · 1 KG</span><strong>{priceFor(spotlight,"1000")===null?"Fiyat için incele":format(priceFor(spotlight,"1000")!)}</strong></div><button type="button" onClick={()=>add(spotlight.id,"1000")} disabled={spotlight.stock<1||priceFor(spotlight,"1000")===null} aria-label={spotlight.name+" 1 kg sepete ekle"}><Icon type="bag" size={20}/><span>SEPETE EKLE</span></button></div>
+      </div>}
+      {featuredProducts.length>1&&<div className="rev-v3-slide-controls" aria-label="Vitrin ürünleri">{featuredProducts.slice(0,5).map((p,i)=><button type="button" key={p.id} onClick={()=>setSpotlightIndex(i)} className={spotlightIndex%featuredProducts.length===i?"active":""} aria-label={p.name+" vitrin görselini göster"} aria-pressed={spotlightIndex%featuredProducts.length===i}><SafeImage src={p.image} alt={p.name}/></button>)}</div>}
+      <span className="rev-v3-vertical-label">KÜÇÜK MOLALARIN BÜYÜK KEYFİ</span>
     </div>
    </section>
    <div className="rev-marquee" aria-hidden="true"><div className="rev-marquee-track">{Array.from({length:2}).map((_,i)=><span key={i}>ANTEP FISTIĞI <b>✳</b> KAJU <b>✳</b> FINDIK <b>✳</b> KURU MEYVE <b>✳</b> KARIŞIK ÇEREZ <b>✳</b> BİR AVUÇ KEYİF <b>✳</b> </span>)}</div></div>
