@@ -1,0 +1,50 @@
+/* A real, explicitly renewable daily coupon, only visible when enabled in admin. */
+.dc-offer{box-sizing:border-box;position:relative;isolation:isolate;overflow:hidden;color:#294832;background:linear-gradient(112deg,#fff0aa 0%,#ffe3a1 46%,#ffd485 100%);border:3px solid #ffd05e;display:flex;gap:25px;align-items:center;padding:24px clamp(18px,3.3vw,46px);font-family:"DM Sans",Arial,sans-serif}
+.dc-offer *{box-sizing:border-box}
+.dc-home{margin:0;border-left:0;border-right:0;box-shadow:inset 0 -5px 0 #d6824a16}
+.dc-cart{border-radius:15px;box-shadow:0 7px 0 #efcd8f;margin:0 0 23px;background:linear-gradient(135deg,#fff0aa,#ffe6b3);padding:19px 16px;gap:15px}
+.dc-offer:before{content:"";position:absolute;z-index:-1;width:280px;height:280px;border:2px solid #fff8d569;border-radius:50%;left:-110px;top:-130px;box-shadow:0 0 0 33px #ffffff1b,0 0 0 68px #ffffff14}
+.dc-graphic{flex:none;width:98px;height:98px;border-radius:50%;background:#ed6335;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 7px 0 #b94a2b;transform:rotate(-8deg);position:relative}
+.dc-graphic>span{position:absolute;font-size:21px;right:10px;top:2px;color:#ffe4a1}
+.dc-graphic>b{font:800 33px/.98 "Playfair Display",Georgia,serif}
+.dc-graphic>small{font-size:10px;letter-spacing:.12em;font-weight:950}
+.dc-copy{flex:1;min-width:0}
+.dc-eyebrow{font-size:10px;letter-spacing:.13em;color:#a65834;font-weight:950;display:inline-flex;align-items:center;gap:9px}
+.dc-eyebrow i{height:8px;width:8px;background:#68a25a;border-radius:50%;box-shadow:0 0 0 3px #a6d78177}
+.dc-copy h2{font:600 clamp(25px,2.65vw,41px)/1.13 "Playfair Display",Georgia,serif;letter-spacing:-.04em;color:#275039;margin:8px 0 8px}
+.dc-copy p{font-size:14px;line-height:1.55;color:#524b2b;margin:0}
+.dc-copy p>strong{display:inline-block;border-radius:5px;padding:2px 7px;background:#ffffffa1;border:1px dashed #d7883e;font-size:14px;letter-spacing:.05em;color:#ad4d28}
+.dc-copy p>b{color:#be5132}
+.dc-copy>small{display:block;font-size:10px;margin-top:8px;color:#866a45;line-height:1.5}
+.dc-right{flex:none;width:min(300px,28vw);display:flex;flex-direction:column;gap:11px;align-items:stretch}
+.dc-clock-title{display:block;text-align:center;font-size:9px;font-weight:950;letter-spacing:.07em;color:#84693a;white-space:nowrap}
+.dc-clock{display:flex;align-items:center;justify-content:center;gap:6px;margin:6px 0 0}
+.dc-clock>span{min-width:67px;background:#fff9e5;border:1px solid #efd4a1;border-radius:9px;padding:7px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 3px 0 #ead39b}
+.dc-clock b{font:600 24px/1.1 "Playfair Display",Georgia,serif;color:#31543c;font-variant-numeric:tabular-nums}
+.dc-clock span small{color:#997746;font-size:8px;font-weight:950;letter-spacing:.08em}
+.dc-clock i{font-size:18px;font-style:normal;font-weight:950;color:#bc7247}
+.dc-action-row{display:flex;gap:7px}
+.dc-action-row button{border-radius:9px;border:0;cursor:pointer;transition:transform .2s,background .2s}
+.dc-action-row button:hover{transform:translateY(-2px)}
+.dc-code{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 10px;gap:3px;background:#fff9e4;color:#bc6035;border:1px dashed #dba365!important;min-width:0;flex:1}
+.dc-code span{font-size:12px;font-weight:950;letter-spacing:.04em;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+.dc-code small{font-size:8px;font-weight:850}
+.dc-apply{flex:1.2;min-height:46px;padding:10px 12px;background:#244c38;color:#fff;font-size:10px;font-weight:950;white-space:nowrap}
+.dc-apply:hover{background:#ed6538}
+.dc-renew-note{font-size:9px;color:#8b724a;line-height:1.5;text-align:center}
+.dc-cart{flex-direction:column;align-items:stretch}
+.dc-cart .dc-graphic{width:65px;height:65px;position:absolute;right:14px;top:13px;transform:rotate(10deg);box-shadow:0 4px 0 #b94a2b}
+.dc-cart .dc-graphic b{font-size:24px}
+.dc-cart .dc-graphic small{font-size:7px}
+.dc-cart .dc-graphic>span{font-size:13px}
+.dc-cart .dc-copy{padding-right:58px}
+.dc-cart .dc-copy h2{font-size:25px;line-height:1.05;max-width:260px}
+.dc-cart .dc-copy p{font-size:12px}
+.dc-cart .dc-copy>small{font-size:9px}
+.dc-cart .dc-right{width:100%}
+.dc-cart .dc-renew-note{font-size:9px}
+@media(max-width:1100px){.dc-home{gap:15px;padding:18px 24px}.dc-home .dc-graphic{width:75px;height:75px}.dc-home .dc-graphic>b{font-size:27px}.dc-home .dc-copy h2{font-size:29px}.dc-home .dc-right{width:275px}.dc-home .dc-copy p{font-size:12px}.dc-home .dc-renew-note{font-size:8px}}
+@media(max-width:810px){.dc-home{display:grid;grid-template-columns:65px 1fr;gap:11px;padding:16px 18px}.dc-home .dc-graphic{width:62px;height:62px}.dc-home .dc-graphic>b{font-size:24px}.dc-home .dc-graphic>small{font-size:7px}.dc-home .dc-copy h2{font-size:27px}.dc-home .dc-copy>small{font-size:9px}.dc-home .dc-right{width:auto;grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:11px}.dc-home .dc-clock-title{font-size:8px}.dc-home .dc-clock b{font-size:18px}.dc-home .dc-clock>span{min-width:47px;padding:5px 3px}.dc-home .dc-clock span small{font-size:7px}.dc-home .dc-renew-note{grid-column:1/-1;text-align:left}.dc-home .dc-action-row{max-width:370px}.dc-home .dc-apply{min-width:125px}}
+@media(max-width:540px){.dc-home{padding:13px 12px 13px;gap:10px}.dc-home .dc-copy h2{font-size:23px}.dc-home .dc-copy p{font-size:11px}.dc-home .dc-copy>small{font-size:9px}.dc-home .dc-eyebrow{font-size:8px}.dc-home .dc-right{display:flex;flex-direction:column;gap:7px}.dc-home .dc-clock-wrap{display:flex;justify-content:space-between;align-items:center;gap:10px}.dc-home .dc-clock-title{white-space:normal;text-align:left;max-width:110px;line-height:1.5}.dc-home .dc-clock{margin:0;gap:3px}.dc-home .dc-clock>span{min-width:46px}.dc-home .dc-action-row{width:100%;max-width:none;min-height:44px}.dc-home .dc-renew-note{font-size:8px}.dc-cart .dc-copy h2{font-size:24px}}
+@media(max-width:360px){.dc-home .dc-graphic{width:54px;height:54px}.dc-home .dc-graphic>b{font-size:20px}.dc-home .dc-copy h2{font-size:21px}.dc-home .dc-clock>span{min-width:41px}}
+@media(prefers-reduced-motion:reduce){.dc-action-row button{transition:none}}
