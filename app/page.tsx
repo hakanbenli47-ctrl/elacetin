@@ -8,6 +8,7 @@ import type { ShopSettings,CheckoutQuote } from "@/lib/shop";
 import "./store.css";
 import "./rev.css";
 import "./hero-v3.css";
+import "./hero-v4.css";
 const PHONE="905515550302";
 const categories = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Kuru Meyve", "Karışık"] as const;
 type CartLine = {productId:string;weight:string;qty:number};
@@ -170,36 +171,30 @@ export default function Home(){
    {menu&&<nav className="rev-mobile-links" aria-label="Mobil menü"><a onClick={()=>setMenu(false)} href="#urunler">Ürünlerimiz <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#koleksiyon">Koleksiyon <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#nasil-calisir">Nasıl alışveriş yapılır? <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="#hakkimizda">Hakkımızda <Icon type="arrow" size={17}/></a><a onClick={()=>setMenu(false)} href="/giris">Giriş yap <Icon type="arrow" size={17}/></a></nav>}
   </header>
   <main>
-   <section className="rev-hero rev-hero-v3" aria-label="Benli Kuruyemiş - lezzetin keyifli hali">
-    <div className="rev-v3-copy">
-     <div className="rev-v3-eyebrow"><span className="rev-v3-spark">✳</span><span>BENLİ KURUYEMİŞ</span><i/><span>LEZZET KOLEKSİYONU</span></div>
-     <h1>Keyfin<br/><em>en çıtır</em><br/>hâli<span>.</span></h1>
-     <p>Bir avuçla başlayan güzel molalar. Antep fıstığı, kaju, fındık ve daha fazlası — dilediğin gramajda, tam senin keyfine göre.</p>
-     <div className="rev-v3-actions">
-      <a href="#urunler" data-track="hero_products" className="rev-v3-primary">LEZZETLERİ KEŞFET <Icon type="arrow" size={21}/></a>
-      <a href="#koleksiyon" className="rev-v3-secondary"><span className="rev-v3-secondary-icon"><Icon type="up" size={17}/></span> Koleksiyona göz at</a>
+   <section className="bn-hero" aria-label="Benli Kuruyemiş ana vitrin">
+     <div className="bn-hero-backdrop"><SafeImage src="https://images.pexels.com/photos/36285399/pexels-photo-36285399.jpeg?auto=compress&cs=tinysrgb&w=1800" alt="Ahşap kaselerde kuruyemiş çeşitleri" priority/></div>
+     <div className="bn-hero-shade" aria-hidden="true"/>
+     <div className="bn-hero-content">
+       <div className="bn-hero-label"><span className="bn-hero-label-star">✦</span> BENLİ KURUYEMİŞ <span className="bn-hero-label-line"/> HER AVUÇTA KEYİF</div>
+       <h1>Çıtır bir<br/><em>mutluluk</em><br/>molası<span>.</span></h1>
+       <p>Fıstık, kaju, fındık ve daha fazlası. Sevdiğin kuruyemişi seç, gramajını belirle, keyfine bak.</p>
+       <div className="bn-hero-buttons">
+         <a href="#urunler" data-track="hero_products" className="bn-hero-cta">ALIŞVERİŞE BAŞLA <Icon type="arrow" size={21}/></a>
+         <a href="#firsatlar" className="bn-hero-cta-secondary"><span className="bn-hero-cta-secondary-icon"><Icon type="up" size={16}/></span> Fırsat köşesini keşfet</a>
+       </div>
+       <div className="bn-hero-trust"><span><Icon type="check" size={16}/> 1 kg seçili fiyat</span><i/><span><Icon type="package" size={17}/> 4 gramaj seçeneği</span><i/><span><Icon type="truck" size={18}/> PTT Kargo</span></div>
      </div>
-     <div className="rev-v3-assurance" aria-label="Sipariş avantajları">
-      <span><Icon type="check" size={16}/> 1 kg seçili gelir</span>
-      <span><Icon type="check" size={16}/> Gramajı sen değiştir</span>
-      <span><Icon type="check" size={16}/> PTT kargo</span>
+     <div className="bn-hero-feature">
+       <div className="bn-hero-feature-top"><span><b/> VİTRİNDEN SEÇTİK</span><small>{productsLoaded?String(products.filter(p=>p.active).length).padStart(2,"0")+" ÜRÜN":"BENLİ SEÇKİSİ"}</small></div>
+       {spotlight&&<><button type="button" className="bn-hero-feature-body" onClick={()=>openDetail(spotlight)}>
+         <span className="bn-hero-feature-thumb"><SafeImage src={spotlight.image} alt={spotlight.name}/></span>
+         <span className="bn-hero-feature-detail"><small>{spotlight.category.toLocaleUpperCase("tr-TR")}</small><strong>{spotlight.name}</strong><span>1 KG · {priceFor(spotlight,"1000")===null?"Fiyat bilgisi için incele":format(priceFor(spotlight,"1000")!)}</span></span>
+         <Icon type="arrow" size={19}/>
+       </button>
+       <div className="bn-hero-feature-foot"><span>ŞİMDİ SEPETİNE EKLE</span><button type="button" onClick={()=>add(spotlight.id,"1000")} disabled={spotlight.stock<1||priceFor(spotlight,"1000")===null}><Icon type="bag" size={18}/> 1 KG EKLE</button></div></>}
      </div>
-     <div className="rev-v3-copy-counter"><span className="rev-v3-counter-line"/><strong>{productsLoaded?String(products.filter(p=>p.active).length).padStart(2,"0"):"—"}</strong><span>FARKLI LEZZET<br/>BİR ARADA</span></div>
-    </div>
-    <div className="rev-v3-stage">
-      <div className="rev-v3-art-backdrop"/>
-      <span className="rev-v3-art-label">BENLİ SEÇKİSİ · 2026</span>
-      <div className="rev-v3-main-image"><SafeImage src={spotlight?.image||products[0]?.image||img} alt={spotlight?.name||"Benli Kuruyemiş ürünleri"} priority/></div>
-      <div className="rev-v3-floating-image"><SafeImage src={featuredProducts[(spotlightIndex+1)%Math.max(1,featuredProducts.length)]?.image||products[1]?.image||img} alt="Kuruyemiş koleksiyonumuzdan bir lezzet"/></div>
-      <div className="rev-v3-seal" aria-hidden="true"><span>BİR AVUÇ</span><strong>✳</strong><span>KEYİF</span></div>
-      {spotlight&&<div className="rev-v3-feature" aria-label="Vitrinde öne çıkan ürün">
-        <div className="rev-v3-feature-heading"><span>✳ BUGÜN VİTRİNDE</span><span>01 / {String(featuredProducts.length).padStart(2,"0")}</span></div>
-        <button type="button" className="rev-v3-feature-name" onClick={()=>openDetail(spotlight)}><strong>{spotlight.name}</strong><Icon type="arrow" size={22}/></button>
-        <div className="rev-v3-feature-bottom"><div><span>BAŞLANGIÇ PAKETİ · 1 KG</span><strong>{priceFor(spotlight,"1000")===null?"Fiyat için incele":format(priceFor(spotlight,"1000")!)}</strong></div><button type="button" onClick={()=>add(spotlight.id,"1000")} disabled={spotlight.stock<1||priceFor(spotlight,"1000")===null} aria-label={spotlight.name+" 1 kg sepete ekle"}><Icon type="bag" size={20}/><span>SEPETE EKLE</span></button></div>
-      </div>}
-      {featuredProducts.length>1&&<div className="rev-v3-slide-controls" aria-label="Vitrin ürünleri">{featuredProducts.slice(0,5).map((p,i)=><button type="button" key={p.id} onClick={()=>setSpotlightIndex(i)} className={spotlightIndex%featuredProducts.length===i?"active":""} aria-label={p.name+" vitrin görselini göster"} aria-pressed={spotlightIndex%featuredProducts.length===i}><SafeImage src={p.image} alt={p.name}/></button>)}</div>}
-      <span className="rev-v3-vertical-label">KÜÇÜK MOLALARIN BÜYÜK KEYFİ</span>
-    </div>
+     {activeCampaign&&activeCampaign.percent>0&&<a href="#firsatlar" className="bn-hero-live-campaign"><span>BU AYA ÖZEL</span><strong>%{activeCampaign.percent}</strong><small>SEÇİLİ ÜRÜNLERDE</small></a>}
+     <div className="bn-hero-bottomline"><span>BENLİ / TAZE BİR ALIŞVERİŞ DENEYİMİ</span><span className="bn-hero-bottomline-scroll">AŞAĞI KAYDIR <span>↓</span></span></div>
    </section>
    <div className="rev-marquee" aria-hidden="true"><div className="rev-marquee-track">{Array.from({length:2}).map((_,i)=><span key={i}>ANTEP FISTIĞI <b>✳</b> KAJU <b>✳</b> FINDIK <b>✳</b> KURU MEYVE <b>✳</b> KARIŞIK ÇEREZ <b>✳</b> BİR AVUÇ KEYİF <b>✳</b> </span>)}</div></div>
    <div className="rev-advantages"><div><span className="rev-adv-icon"><Icon type="package" size={22}/></span><div><strong>DİLEDİĞİNİZ GRAMAJ</strong><small>250 g, 500 g, 1 kg ve 5 kg seçenekleri</small></div></div><div><span className="rev-adv-icon"><Icon type="truck" size={24}/></span><div><strong>PTT KARGO</strong><small>Kargo ücreti sepette hesaplanır</small></div></div><div><span className="rev-adv-icon"><Icon type="chat" size={23}/></span><div><strong>WHATSAPP İLE TAMAMLA</strong><small>Siparişinizi mesajla teyit edin</small></div></div></div>
