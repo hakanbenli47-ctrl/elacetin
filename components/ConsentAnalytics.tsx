@@ -130,7 +130,7 @@ export default function ConsentAnalytics(){
  if(!ready||typeof window==="undefined"||window.location.pathname.startsWith("/admin"))return null;
  return <>
  {open&&<div className="bn-consent" role="dialog" aria-modal="false" aria-label="Çerez tercihleri">
-  <div className="bn-consent-header"><div className="bn-cookie-mark">✦</div><div><strong>Gizlilik tercihlerinizi siz seçin.</strong><p>Sitenin çalışması için gerekli kayıtları kullanıyoruz. İzin verirseniz hangi ürünlere bakıldığını, tıklamaları ve sitede geçirilen aktif süreyi anonim olarak ölçeriz. Reddetseniz de alışverişe devam edebilirsiniz.</p></div></div>
+  <div className="bn-consent-header"><div className="bn-cookie-mark">✦</div><div><strong>Gizlilik tercihlerinizi siz seçin.</strong><p>Alışveriş için gerekli çerezleri kullanıyoruz. İzninizle anonim ziyaretleri, ürün tıklamalarını ve aktif süreyi ölçeriz. Reddetseniz de alışverişe devam edebilirsiniz.</p></div></div>
   {customize&&<div className="bn-consent-details">
    <label className="bn-consent-option"><span><b>Zorunlu</b><small>Oturum, sepet ve seçiminizi hatırlama.</small></span><strong>Her zaman açık</strong></label>
    <label className="bn-consent-option"><span><b>Anonim analiz</b><small>Sayfa/ürün görüntüleme, tıklamalar ve aktif süre; ad, e-posta ve yazdıklarınız kaydedilmez.</small></span><input type="checkbox" checked={customAnalytics} onChange={e=>setCustomAnalytics(e.target.checked)}/></label>
