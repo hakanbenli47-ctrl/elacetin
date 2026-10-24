@@ -31,6 +31,20 @@ function Icon({type,size=21}:{type:string;size?:number}){
 }
 function Logo(){return <a href="/" className="bm-logo"><span className="bm-symbol">B<em>✦</em></span><span className="bm-logotext"><strong>BENLİ</strong><small>KURUYEMİŞ</small></span></a>}
 function SafeImage({src,alt,className="",priority=false}:{src:string;alt:string;className?:string;priority?:boolean}){return <img src={src||"/images/nuts-fallback.svg"} alt={alt} className={className} loading={priority?"eager":"lazy"} fetchPriority={priority?"high":"auto"} onError={e=>{const image=e.currentTarget;if(image.dataset.fallback)return;image.dataset.fallback="1";image.src="/images/nuts-fallback.svg";}}/>}
+function CampaignCountdown({endDate}:{endDate:string}){
+ const [remaining,setRemaining]=useState<number|null>(null);
+ useEffect(()=>{
+  const end=new Date(endDate+"T23:59:59+03:00").getTime();
+  const update=()=>setRemaining(Math.max(0,Math.floor((end-Date.now())/1000)));
+  update();const timer=setInterval(update,1000);return()=>clearInterval(timer);
+ },[endDate]);
+ const pad=(n:number)=>String(n).padStart(2,"0");
+ const days=remaining===null?"--":pad(Math.floor(remaining/86400));
+ const hours=remaining===null?"--":pad(Math.floor((remaining%86400)/3600));
+ const mins=remaining===null?"--":pad(Math.floor((remaining%3600)/60));
+ const secs=remaining===null?"--":pad(remaining%60);
+ return <div className="rev-offer-time" role="timer" aria-label="Kampanyanın bitmesine kalan süre"><span><strong>{days}</strong><small>GÜN</small></span><b>:</b><span><strong>{hours}</strong><small>SAAT</small></span><b>:</b><span><strong>{mins}</strong><small>DAKİKA</small></span><b>:</b><span><strong>{secs}</strong><small>SANİYE</small></span></div>
+}
 function Money({price}:{price:number|null}){return <>{price===null?"Fiyat sorunuz":format(price)}</>}
 function InfoTitle({eyebrow,title,sub}:{eyebrow:string;title:React.ReactNode;sub?:string}){return <div className="bm-heading"><span>{eyebrow}</span><h2>{title}</h2>{sub&&<p>{sub}</p>}</div>}
 
@@ -188,8 +202,32 @@ export default function Home(){
    </section>
    <div className="rev-marquee" aria-hidden="true"><div className="rev-marquee-track">{Array.from({length:2}).map((_,i)=><span key={i}>ANTEP FISTIĞI <b>✳</b> KAJU <b>✳</b> FINDIK <b>✳</b> KURU MEYVE <b>✳</b> KARIŞIK ÇEREZ <b>✳</b> BİR AVUÇ KEYİF <b>✳</b> </span>)}</div></div>
    <div className="rev-advantages"><div><span className="rev-adv-icon"><Icon type="package" size={22}/></span><div><strong>DİLEDİĞİNİZ GRAMAJ</strong><small>250 g, 500 g, 1 kg ve 5 kg seçenekleri</small></div></div><div><span className="rev-adv-icon"><Icon type="truck" size={24}/></span><div><strong>PTT KARGO</strong><small>Kargo ücreti sepette hesaplanır</small></div></div><div><span className="rev-adv-icon"><Icon type="chat" size={23}/></span><div><strong>WHATSAPP İLE TAMAMLA</strong><small>Siparişinizi mesajla teyit edin</small></div></div></div>
+   <section className="rev-offer-zone" id="firsatlar">
+    <div className="rev-offer-topline"><span><i/> BENLİ'NİN FIRSAT KÖŞESİ</span><a href="#urunler">TÜM LEZZETLERE BAK <Icon type="arrow" size={16}/></a></div>
+    <div className="rev-offer-body">
+      <div className="rev-offer-intro">
+        <span className="rev-offer-eyebrow">{activeCampaign?(activeCampaign.eyebrow||"AYIN KAMPANYASI"):"BU AY BENLİ'DE"}</span>
+        <h2>{activeCampaign?(activeCampaign.title||"Bu ayın fırsatları") : <>Lezzet dolu<br/><em>seçimler!</em></>}</h2>
+        <p>{activeCampaign?(activeCampaign.subtitle||"Bu aya özel ürünlerimizi keşfedin."):"Gözünüz burada olsun. Size özel kampanyalarımız ve seçili ürünlerimiz bu köşede buluşuyor."}</p>
+        {activeCampaign?<div className="rev-offer-clock"><span>KAMPANYA BİTİŞİNE KALAN</span><CampaignCountdown endDate={activeCampaign.endDate}/></div>:<div className="rev-offer-bubble"><span>✳</span><strong>İlk seçiminiz<br/>her zaman 1 kg!</strong></div>}
+        <a className="rev-offer-link" href={activeCampaign&&campaignProducts.length?"#kampanyali-urunler":"#urunler"}>{activeCampaign?"KAMPANYALI ÜRÜNLERE GİT":"ÜRÜNLERE GÖZ AT"} <Icon type="arrow" size={17}/></a>
+      </div>
+      <div className="rev-offer-cards">
+        {(activeCampaign&&campaignProducts.length?campaignProducts:featuredProducts).slice(0,3).map((p,i)=>{
+          const isDeal=Boolean(activeCampaign&&activeCampaign.productIds.includes(p.id)&&activeCampaign.percent>0);
+          const full=priceFor(p,"1000");
+          const sale=full===null?null:Math.round(full*(1-(isDeal?activeCampaign!.percent:0)/100)*100)/100;
+          return <article className="rev-offer-card" key={p.id}>
+            <div className="rev-offer-photo"><button type="button" onClick={()=>openDetail(p)} aria-label={p.name+" ayrıntılarını görüntüle"}><SafeImage src={p.image} alt={p.name}/></button><span className="rev-offer-badge">{isDeal?"%"+activeCampaign!.percent+" FIRSAT":"BENLİ SEÇKİSİ"}</span></div>
+            <div className="rev-offer-card-info"><span className="rev-offer-card-category">{p.category.toLocaleUpperCase("tr-TR")}</span><button type="button" onClick={()=>openDetail(p)} className="rev-offer-card-name">{p.name}</button><div className="rev-offer-card-bottom"><div><small>1 KG FİYATI</small>{isDeal&&full!==null&&<del>{format(full)}</del>}<strong>{sale===null?"Fiyat sorunuz":format(sale)}</strong></div><button className="rev-offer-add" type="button" onClick={()=>add(p.id,"1000")} disabled={p.stock<1||sale===null} aria-label={p.name+" 1 kg sepete ekle"}><Icon type="bag" size={18}/></button></div></div>
+          </article>;
+        })}
+      </div>
+    </div>
+    <div className="rev-offer-footer"><span>✳ HER LEZZET BİR MOLAYA DEĞER.</span><span>SEÇ · SEPETE EKLE · WHATSAPP'TA TAMAMLA</span></div>
+   </section>
    <section className="rev-discover" id="koleksiyon"><div className="rev-section-header"><div><span className="rev-kicker">✳  BENLİ KOLEKSİYONU  /  01</span><h2>Canın ne <em>çekti?</em></h2><p>Birini seçmek zor. Biz de seçmenizi kolaylaştıralım dedik.</p></div><a href="#urunler" className="rev-text-link">TÜM ÜRÜNLER <Icon type="arrow" size={20}/></a></div><div className="rev-discover-grid">{featuredProducts.slice(0,3).map((p,i)=><button key={p.id} type="button" className={"rev-discover-card rev-discover-"+i} onClick={()=>openDetail(p)}><div className="rev-discover-picture"><SafeImage src={p.image} alt={p.name}/></div><span className="rev-discover-number">0{i+1}</span><span className="rev-discover-copy"><small>{p.category.toLocaleUpperCase("tr-TR")}</small><strong>{p.name}</strong><span>{priceFor(p,"1000")!==null?format(priceFor(p,"1000")!)+" / 1 kg":"Fiyatı incele"} <Icon type="arrow" size={16}/></span></span></button>)}</div></section>
-   {activeCampaign&&<section className="rev-campaign" id="aylik-kampanya"><div className="rev-campaign-copy"><span className="rev-kicker">✳ {activeCampaign.eyebrow||"BU AYA ÖZEL"}</span><h2>{activeCampaign.title||"Ayın fırsatları"}</h2><p>{activeCampaign.subtitle||"Seçili ürünlerde bu aya özel fırsatlar."}</p>{activeCampaign.percent>0&&<div className="rev-campaign-percent">-%{activeCampaign.percent}<small>SEÇİLİ ÜRÜNLERDE</small></div>}<a href="#kampanyali-urunler" className="rev-button rev-button-light">ÜRÜNLERİ İNCELE <Icon type="arrow" size={19}/></a><span className="rev-campaign-date">{activeCampaign.endDate} tarihine kadar</span></div><div className="rev-campaign-art"><SafeImage src={activeCampaign.image||campaignProducts[0]?.image||img} alt="Aylık kampanya"/></div></section>}
+
    {activeCampaign&&campaignProducts.length>0&&<section id="kampanyali-urunler" className="rev-campaign-products"><div className="rev-section-header"><div><span className="rev-kicker">BU AYA ÖZEL</span><h2>Kampanyalı <em>lezzetler.</em></h2></div></div><div className="rev-product-grid">{campaignProducts.slice(0,3).map(p=><ProductCard key={p.id} p={p} campaignPercent={activeCampaign.percent} add={add} showDetails={openDetail}/>)}</div></section>}
    <section className="rev-products-section" id="urunler"><div className="rev-section-header rev-shop-title"><div><span className="rev-kicker">✳  MAĞAZAMIZ  /  02</span><h2>Birini seç. <em>Keyfine bak.</em></h2><p>Fiyatlar ilk olarak <b>1 kg</b> için gösterilir. Dilerseniz gramajı anında değiştirebilirsiniz.</p></div><div className="rev-product-count"><strong>{productsLoaded?show.length:"—"}</strong><span>ÜRÜN</span></div></div>
     <div className="rev-controls"><div className="rev-category-chips">{catalogCategories.map(cat=><button key={cat} type="button" data-track="category_filter" onClick={()=>{setCategory(cat);track("category_view",cat)}} className={category===cat?"active":""}>{cat}</button>)}</div><label className="rev-sort-label"><span>SIRALA</span><select value={sortMode} onChange={e=>setSortMode(e.target.value as typeof sortMode)} aria-label="Ürünleri sırala"><option value="featured">Önerilen</option><option value="priceLow">Fiyat: artan</option><option value="priceHigh">Fiyat: azalan</option><option value="name">İsme göre</option></select></label></div>
