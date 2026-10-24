@@ -7,6 +7,7 @@ import { defaultShopSettings,quoteCart,campaignActive } from "@/lib/shop";
 import type { ShopSettings,CheckoutQuote } from "@/lib/shop";
 import "./store.css";
 import "./rev.css";
+import "./hero-v3.css";
 const PHONE="905515550302";
 const categories = ["Tümü", "Kuruyemiş", "Leblebi", "Çekirdek", "Kuru Meyve", "Karışık"] as const;
 type CartLine = {productId:string;weight:string;qty:number};
