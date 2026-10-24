@@ -21,3 +21,16 @@
 .bn-consent-tab{position:fixed;bottom:15px;left:15px;z-index:85;background:#234c33;border:1px solid #d2e1d2;border-radius:25px;color:#fff;box-shadow:0 4px 16px #142c2020;padding:10px 16px;font-size:11px;font-weight:800;cursor:pointer}
 @media(max-width:600px){.bn-consent{bottom:8px;left:8px;width:calc(100vw - 16px);padding:16px;border-radius:10px}.bn-consent-header strong{font-size:14px}.bn-consent-header p{font-size:11px}.bn-consent-actions{gap:6px}.bn-consent-actions button{font-size:10px;min-height:40px;padding:5px}.bn-consent-tab{left:9px;bottom:9px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){.bn-consent *{animation:none!important;transition:none!important}}
+
+/* Compact notice: visible choice without obscuring the storefront or purchase CTAs */
+.bn-consent{width:min(calc(100vw - 28px),445px);padding:15px 17px;bottom:16px;left:16px;background:#fffdf5;border:2px solid #f3dc9f;border-radius:13px;box-shadow:0 11px 0 #edce804d,0 16px 43px #1f332442;font-size:12px}
+.bn-cookie-mark{width:32px;height:32px;font-size:18px;border-radius:9px;background:#ffe390;color:#ab5832}
+.bn-consent-header{gap:9px}
+.bn-consent-header strong{font-size:13px;line-height:1.2;color:#26462f}
+.bn-consent-header p{font-size:10.5px;line-height:1.55;margin:4px 0 6px;color:#6e7667}
+.bn-consent-actions{gap:7px;margin-top:8px}
+.bn-consent-actions button{min-height:36px;font-size:10.5px;border-radius:7px}
+.bn-consent-actions button:last-child{background:#27563a;border-color:#27563a}
+.bn-consent-actions button:first-child,.bn-consent-actions button:nth-child(2){border-color:#c5d1b6}
+.bn-consent-links{font-size:9px;margin-top:8px}
+@media(max-width:600px){.bn-consent{left:8px;bottom:8px;width:calc(100vw - 16px);padding:11px 13px;border-radius:11px}.bn-consent-header strong{font-size:12px}.bn-consent-header p{font-size:10px;margin:3px 0}.bn-consent-actions button{min-height:36px;font-size:10px}.bn-cookie-mark{width:28px;height:28px}}
