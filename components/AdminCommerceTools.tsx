@@ -2,12 +2,13 @@
 import {useEffect,useMemo,useState} from "react";
 import type {Product,Category} from "@/lib/types";
 import {calculatePrices,baseKgPrice} from "@/lib/pricing";
+import {prepareProductImage} from "@/lib/client-image";
 import type {ShopSettings} from "@/lib/shop";
 import {defaultShopSettings} from "@/lib/shop";
 import "./commerce-admin.css";
 type Props={products:Product[];mode:"bulk"|"settings";onChange:()=>Promise<void>};
-type QuickRow={key:number;name:string;kg:string;stock:string;category:Category;discount5kg:string};
-const newQuickRow=(key:number):QuickRow=>({key,name:"",kg:"",stock:"0",category:"Kuruyemiş",discount5kg:"0"});
+type QuickRow={key:number;name:string;kg:string;stock:string;category:Category;discount5kg:string;image:string};
+const newQuickRow=(key:number):QuickRow=>({key,name:"",kg:"",stock:"0",category:"Kuruyemiş",discount5kg:"0",image:""});
 const categories:Category[]=["Kuruyemiş","Leblebi","Çekirdek","Kuru Meyve","Karışık"];
 const format=(n:number)=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY"}).format(n);
 function slugify(value:string){return value.toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i").replace(/[^a-z0-9 ]/g,"").trim().replace(/\s+/g,"-")}
@@ -121,6 +122,14 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
   setPreview({rows:result,errors});
  }
  function updateQuickRow(key:number,patch:Partial<QuickRow>){setQuickRows(rows=>rows.map(row=>row.key===key?{...row,...patch}:row))}
+ async function addQuickPhoto(key:number,file?:File){
+  if(!file)return;
+  setError("");
+  try{
+   const image=await prepareProductImage(file,600,115000);
+   updateQuickRow(key,{image});
+  }catch(err){setError(err instanceof Error?err.message:"Fotoğraf eklenemedi.")}
+ }
  async function saveQuickRows(){
   const rows=quickRows.filter(row=>row.name.trim()||row.kg.trim());
   if(!rows.length){setError("Önce en az bir ürün adı ve kilo fiyatı girin.");return}
@@ -139,11 +148,25 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
   if(!confirm(rows.length+" ürün kaydedilecek. Aynı isimli mevcut ürünler varsa güncellenecek. Devam edilsin mi?"))return;
   setSaving(true);setError("");setMessage("");
   try{
-   const payload=rows.map(row=>{const kg=readNumber(row.kg),discount=Number(row.discount5kg);return {id:"",name:row.name.trim(),slug:slugify(row.name),category:row.category,kgPrice:kg,discount5kg:discount,prices:calculatePrices(kg,discount),stock:Number(row.stock),active:true,featured:false,badge:"",description:"",image:"",cardNote:"",ingredients:"",allergens:""}});
-   const response=await fetch("/api/admin/products/bulk",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"import",products:payload})});
-   const body=await response.json();
-   if(!response.ok)throw Error(body.error||"Ürünler kaydedilemedi.");
-   setMessage(body.updated+" ürün başarıyla kaydedildi. Fotoğraflarını Ürün Yönetimi bölümünden ekleyebilirsiniz.");
+   const payload=rows.map(row=>{const kg=readNumber(row.kg),discount=Number(row.discount5kg);return {id:"",name:row.name.trim(),slug:slugify(row.name),category:row.category,kgPrice:kg,discount5kg:discount,prices:calculatePrices(kg,discount),stock:Number(row.stock),active:true,featured:false,badge:"",description:"",image:row.image,cardNote:"",ingredients:"",allergens:""}});
+   // Büyük fotoğrafları tek istekte göndermek Vercel'in istek boyutu sınırını aşabilir.
+   // Her partinin boyutunu sınırlayarak fotoğrafları ürünlerle birlikte kaydediyoruz.
+   let batch:typeof payload=[];let bytes=0;
+   const groups:(typeof payload)[]=[];
+   for(const product of payload){
+    const size=JSON.stringify(product).length;
+    if(batch.length&&(batch.length>=12||bytes+size>1_650_000)){groups.push(batch);batch=[];bytes=0}
+    batch.push(product);bytes+=size;
+   }
+   if(batch.length)groups.push(batch);
+   let saved=0;
+   for(const items of groups){
+    const response=await fetch("/api/admin/products/bulk",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"import",products:items})});
+    const body=await response.json();
+    if(!response.ok)throw Error(saved+" ürün kaydedildi; kalanlar kaydedilemedi. "+(body.error||"İşlem başarısız."));
+    saved+=body.updated||items.length;
+   }
+   setMessage(saved+" ürün fotoğraflarıyla birlikte kaydedildi.");
    setQuickRows([newQuickRow(1),newQuickRow(2),newQuickRow(3)]);setQuickNext(4);
    await onChange();
   }catch(e){setError(e instanceof Error?e.message:"Ürünler kaydedilemedi.")}finally{setSaving(false)}
@@ -166,8 +189,9 @@ export default function AdminCommerceTools({products,mode,onChange}:Props){
   {mode==="bulk"?<>
    <div className="commerce-banner"><span>KOLAY TOPLU ÜRÜN EKLEME</span><h2>Ürünleri alt alta yazın, tek seferde kaydedin.</h2><p>Excel dosyası veya özel kod bilmeniz gerekmiyor. Ürün adı, kilogram fiyatı ve stok yeterli.</p></div>
    <section className="commerce-panel commerce-quick-add">
-     <div className="commerce-quick-heading"><div><h3>1. Kolay toplu ürün ekle</h3><p>Boş satırlar kaydedilmez. İsterseniz yeni satır ekleyin.</p></div><span>250 g · 500 g · 5 kg otomatik</span></div>
-     <div className="commerce-quick-scroll"><table className="commerce-quick-table"><thead><tr><th>Ürün adı *</th><th>1 kg fiyatı (TL) *</th><th>Stok</th><th>Kategori</th><th>5 kg indirim</th><th></th></tr></thead><tbody>{quickRows.map((row,index)=><tr key={row.key}>
+     <div className="commerce-quick-heading"><div><h3>1. Kolay toplu ürün ekle</h3><p>Fotoğrafı seç, ürün adını ve kilogram fiyatını gir. Boş satırlar kaydedilmez; istersen yeni satır ekle.</p></div><span>250 g · 500 g · 5 kg otomatik</span></div>
+     <div className="commerce-quick-scroll"><table className="commerce-quick-table"><thead><tr><th>Fotoğraf</th><th>Ürün adı *</th><th>1 kg fiyatı (TL) *</th><th>Stok</th><th>Kategori</th><th>5 kg indirim</th><th></th></tr></thead><tbody>{quickRows.map((row,index)=><tr key={row.key}>
+      <td><div className="commerce-quick-photo">{row.image?<><img src={row.image} alt={row.name||"Ürün fotoğrafı"}/><button type="button" className="commerce-photo-remove" aria-label="Fotoğrafı kaldır" title="Kaldır" onClick={()=>updateQuickRow(row.key,{image:""})}>×</button></>:<span className="commerce-photo-placeholder">📷</span>}<label className="commerce-quick-photo-button" title="Ürün fotoğrafı seç">{row.image?"Değiştir":"Ekle"}<input type="file" accept="image/png,image/jpeg,image/webp" aria-label={(index+1)+". ürünün fotoğrafını yükle" onChange={async e=>{const f=e.target.files?.[0];await addQuickPhoto(row.key,f);e.target.value=""}}/></label></div></td>
       <td><input type="text" aria-label={(index+1)+". ürünün adı"} maxLength={100} placeholder="Örn. Tuzlu Fıstık" value={row.name} onChange={e=>updateQuickRow(row.key,{name:e.target.value})}/></td>
       <td><input type="text" inputMode="decimal" aria-label={(index+1)+". ürünün kg fiyatı"} placeholder="Örn. 800" value={row.kg} onChange={e=>updateQuickRow(row.key,{kg:e.target.value})}/></td>
       <td><input type="number" min={0} aria-label={(index+1)+". ürünün stoğu"} value={row.stock} onChange={e=>updateQuickRow(row.key,{stock:e.target.value})}/></td>
