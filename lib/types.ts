@@ -5,9 +5,9 @@ export type Product = {
   stock: number; active: boolean; featured: boolean; badge?: string; cardNote?: string; origin?: string; roasting?: string; storageTip?: string; ingredients: string; allergens: string;
 };
 export type OrderStatus = "whatsapp_bekleniyor" | "yeni" | "onaylandi" | "hazirlaniyor" | "kargoda" | "tamamlandi" | "iptal";
-export type OrderItem = { productId: string; name: string; weight: string; qty: number; unitPrice: number | null; subtotal: number | null; };
+export type OrderItem = { productId: string; name: string; weight: string; qty: number; unitPrice: number | null; subtotal: number | null; originalUnitPrice?: number|null; discountType?: "package"|"campaign"|null; discountAmount?: number; };
 export type Order = {
  id: string; createdAt: string; name: string; phone: string; email: string;
  address: string; note: string; status: OrderStatus; items: OrderItem[];
- total: number | null; subtotal?: number|null; campaignDiscount?: number; basketDiscount?: number; discountReason?: string; shippingFee?: number|null; freeShipping?: boolean; couponCode?: string; carrier: string; trackingNo: string; payment: string; source: string;
+ total: number | null; subtotal?: number|null; originalSubtotal?: number|null; packageDiscount?: number; campaignDiscount?: number; basketDiscount?: number; discountReason?: string; shippingFee?: number|null; freeShipping?: boolean; couponCode?: string; carrier: string; trackingNo: string; payment: string; source: string;
 };
